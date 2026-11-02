@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browse Candidates</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7ff;
+            margin: 0;
+            padding: 0;
+            color: var(--dark-color);
+            line-height: 1.6;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 2px;
+        }
+
+        .filter-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-section a {
+            margin: 0 8px;
+            padding: 6px 12px;
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .filter-section a:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .candidates-list {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .candidates-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .candidates-list li {
+            padding: 18px 25px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .candidates-list li:last-child {
+            border-bottom: none;
+        }
+
+        .candidates-list li:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+            transform: translateX(5px);
+        }
+
+        .candidates-list li::before {
+            content: '•';
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--dark-color);
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px auto;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .candidates-list li {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Submitted Candidates{% if selected_category %} - {{ selected_category }}{% endif %}</h2>
+        </div>
+
+        <div class="filter-section">
+            <strong>Filter by Category:</strong>
+            <a href="{% url 'browse_candidates' %}">All</a>
+            {% for cat in categories %}
+                <a href="{% url 'browse_candidates' %}?category={{ cat }}">{{ cat }}</a>
+            {% endfor %}
+        </div>
+
+        <div class="candidates-list">
+            <ul>
+                {% for candidate in candidates %}
+                    <li><a href="{% url 'candidate_detail' candidate.id %}">{{ candidate.email }}</a></li>
+                {% empty %}
+                    <li class="empty-state">No candidates found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

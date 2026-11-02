@@ -1,0 +1,188 @@
+/* Generated from myapp/templates/job_list.html by scripts/extract-template-styles.mjs */
+
+.page-job-list {
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.page-job-list {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            line-height: 1.5;
+        }
+
+        .page-job-list header {
+            background-color: #34495e;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-job-list h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .page-job-list .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-job-list .job-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .page-job-list .job-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .page-job-list .job-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .page-job-list .job-id {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .page-job-list .job-detail {
+            margin-bottom: 12px;
+            display: flex;
+        }
+
+        .page-job-list .job-detail strong {
+            min-width: 150px;
+            color: #34495e;
+            display: inline-block;
+        }
+
+        .page-job-list .job-detail-value {
+            color: #555;
+            flex: 1;
+        }
+
+        .page-job-list .description-wrapper {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .page-job-list .description-content {
+            white-space: pre-line;
+        }
+
+        .page-job-list .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .page-job-list .apply-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        .page-job-list .apply-btn:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .page-job-list .apply-btn svg {
+            transition: transform 0.3s ease;
+        }
+
+        .page-job-list .apply-btn:hover svg {
+            transform: translateX(3px);
+        }
+
+        .page-job-list .delete-button {
+            background-color: #f8f9fa;
+            color: #dc3545;
+            padding: 12px 24px;
+            border: 1px solid #dc3545;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-job-list .delete-button:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .page-job-list .no-jobs {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #888;
+            padding: 40px 0;
+        }
+
+        .page-job-list .success-message {
+            color: #28a745;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+        }
+
+        /* New styles for scroll functionality */
+        .page-job-list .scroll-to-job-btn {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .page-job-list .scroll-to-job-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .page-job-list .highlight-new-job {
+            animation: page-job-list-highlight 2s ease-in-out;
+            border-left: 4px solid #4f46e5;
+        }
+
+        @keyframes page-job-list-highlight {
+            0% { background-color: rgba(79, 70, 229, 0.2); }
+            50% { background-color: rgba(79, 70, 229, 0.1); }
+            100% { background-color: transparent; }
+        }

@@ -1,0 +1,62 @@
+{% extends 'base_edu.html' %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Personal Information Section -->
+    <div class="form-section">
+        <h3>Personal Information</h3>
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="full_name" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" required>
+        </div>
+    </div>
+
+    <!-- Educational Background Section -->
+    <div class="form-section">
+        <h3>Educational Background</h3>
+
+        {{ education_formset.management_form }}
+
+        <div id="education-forms">
+            {% for form in education_formset %}
+                <div class="education-form mb-3 p-3 border rounded">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-secondary" id="add-education">+ Add Another Education</button>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary mt-3">Submit Application</button>
+</form>
+
+<script>
+    document.getElementById('add-education').addEventListener('click', function () {
+        var container = document.getElementById('education-forms');
+        var formCount = container.querySelectorAll('.education-form').length;
+
+        // Clone the last form
+        var newForm = container.querySelector('.education-form').cloneNode(true);
+
+        // Clear input fields
+        newForm.querySelectorAll('input, textarea, select').forEach(input => input.value = '');
+
+        // Update form index in attributes (name/id)
+        newForm.innerHTML = newForm.innerHTML.replace(/education_form-(\d+)-/g, 'education_form-' + formCount + '-');
+
+        // Update management form count
+        document.querySelector('[name="education_form-TOTAL_FORMS"]').value = formCount + 1;
+
+        container.appendChild(newForm);
+    });
+</script>
+
+{% endblock %}

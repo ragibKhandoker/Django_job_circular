@@ -1,0 +1,4 @@
+/* Each page wrapper (.page-*) stands in for the original <body>, so the real body carries no styling of its own. */
+body {
+    margin: 0;
+}

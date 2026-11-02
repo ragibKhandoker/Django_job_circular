@@ -1,0 +1,29 @@
+// URL paths mirror the original Django URLs in myapp/urls.py.
+export const ROUTES = {
+  home: '/',
+  signup: '/signup',
+  employerSignup: '/signup/employer',
+  candidateSignup: '/signup/candidate',
+  login: '/login_choice',
+  employerLogin: '/login_choice/employer_login',
+  candidateLogin: '/login_choice/candidate_login',
+  passwordReset: '/password-reset',
+  passwordResetDone: '/password-reset/done',
+  jobList: '/job-list',
+  jobCategory: '/jobs/category/:category',
+  totalJobs: '/jobs/total',
+  postJob: '/post-job',
+  applyForm: '/apply/:jobId',
+  applicationSubmitted: '/apply/:jobId/submitted',
+  applicationSuccess: '/application-success',
+  applySuccess: '/apply-success',
+  browseCandidates: '/browse-candidates',
+  candidateDetail: '/candidate/:applicantId',
+};
+
+export const routeTo = {
+  jobCategory: (category) => `/jobs/category/${encodeURIComponent(category)}`,
+  applyForm: (jobId) => `/apply/${jobId}`,
+  applicationSubmitted: (jobId) => `/apply/${jobId}/submitted`,
+  candidateDetail: (applicantId) => `/candidate/${applicantId}`,
+};

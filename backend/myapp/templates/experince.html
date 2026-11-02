@@ -1,0 +1,73 @@
+{% extends 'base_exp.html' %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Personal Information Section -->
+    <div class="form-section">
+        <h3>Personal Information</h3>
+        <!-- Example of personal information form fields -->
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="full_name" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" required>
+        </div>
+        <!-- Add more personal info fields here as needed -->
+    </div>
+
+    <!-- Work Experience Section -->
+    <div class="form-section">
+        <h3>Work Experience</h3>
+
+        <!-- Management form for Django Formset (essential for tracking formset data) -->
+        {{ work_formset.management_form }}
+
+        <!-- Work Experience Form Fields -->
+        <div id="work-experience-forms">
+            {% for form in work_formset %}
+                <div class="work-form">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Button to Add Another Work Experience Form -->
+        <button type="button" class="btn btn-secondary btn-add-more" id="add-work-experience">+ Add Another Position</button>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary">Submit Application</button>
+</form>
+
+<!-- JavaScript to Handle Adding New Work Experience Form Dynamically -->
+<script>
+    document.getElementById('add-work-experience').addEventListener('click', function () {
+        // Get the container where forms are added
+        var formsContainer = document.getElementById('work-experience-forms');
+
+        // Get the current number of work experience forms
+        var formCount = formsContainer.querySelectorAll('.work-form').length;
+
+        // Clone the last work experience form
+        var newForm = formsContainer.querySelector('.work-form').cloneNode(true);
+
+        // Clear the values of the new cloned form (so it's empty for new data)
+        var inputs = newForm.querySelectorAll('input, textarea');
+        inputs.forEach(function(input) {
+            input.value = '';
+        });
+
+        // Update the total forms field (work_form-TOTAL_FORMS) to reflect the new form
+        var managementForm = document.querySelector('[name="work_form-TOTAL_FORMS"]');
+        managementForm.value = parseInt(managementForm.value) + 1;
+
+        // Append the new form to the container
+        formsContainer.appendChild(newForm);
+    });
+</script>
+
+{% endblock %}

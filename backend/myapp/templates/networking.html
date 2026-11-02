@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Networking Job Board</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #4f46e5;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f1f5f9;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .job-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .job-company {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .job-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .job-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .job-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .job-list {
+            list-style: disc;
+            padding-left: 1.5rem;
+        }
+
+        .job-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .job-footer {
+            padding: 1rem 1.5rem;
+            background: #f1f5f9;
+            text-align: right;
+        }
+
+        .apply-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .apply-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .tag-remote {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .jobs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Networking Career Opportunities</h1>
+            <p class="subtitle">Explore top networking jobs from leading companies</p>
+        </header>
+
+        <div class="jobs-grid">
+            {% for job in jobs %}
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">{{ job.title }}</h2>
+                    <p class="job-company">{{ job.company }}</p>
+                    <div class="job-meta">
+                        <span class="meta-item">📍 {{ job.location }}</span>
+                        <span class="meta-item">🕒 {{ job.type }}</span>
+                        <span class="meta-item">💰 {{ job.salary }}</span>
+                    </div>
+                    <span class="tag tag-remote">{{ job.mode }}</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>{{ job.requirements }}</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>{{ job.responsibilities }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <a href="{% url 'apply' %}" class="apply-btn">Apply Now</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

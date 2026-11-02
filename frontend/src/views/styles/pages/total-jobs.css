@@ -1,0 +1,69 @@
+/* Generated from myapp/templates/total_jobs.html by scripts/extract-template-styles.mjs */
+
+.page-total-jobs {
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.page-total-jobs {
+            background: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .page-total-jobs h1 {
+            color: #0d6efd;
+            text-align: center;
+            margin: 40px 0 20px;
+        }
+
+        .page-total-jobs .job-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .page-total-jobs .job-card:hover {
+            transform: translateY(-3px);
+            background-color: #f1f1f1;
+        }
+
+        .page-total-jobs .job-card h5 {
+            color: #0d6efd;
+            margin-bottom: 10px;
+        }
+
+        .page-total-jobs .search-section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-total-jobs .search-section form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .page-total-jobs .btn-custom {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .page-total-jobs .btn-custom:hover {
+            background-color: #0b5ed7;
+        }
+
+        .page-total-jobs .apply-btn {
+            margin-top: 15px;
+        }
+
+        .page-total-jobs .no-jobs {
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.1rem;
+        }

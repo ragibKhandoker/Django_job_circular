@@ -1,0 +1,419 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Application Submitted</title>
+</head>
+<body>
+    <form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <h3>Applicant Info</h3>
+  {{ app_form.as_p }}
+
+  <h3>Work Experience</h3>
+  {{ work_formset.management_form }}
+  {% for form in work_formset %}
+    {{ form.as_p }}
+  {% endfor %}
+
+  <h3>Educational Background</h3>
+  {{ edu_formset.management_form }}
+  {% for form in edu_formset %}
+    {{ form.as_p }}
+  {% endfor %}
+
+  <button type="submit">Apply Now</button>
+</form>
+
+</body>
+</html> {% endcomment %}
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Job Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f9fc;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        form {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        fieldset {
+            margin-bottom: 25px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        legend {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .form-row, .form-group {
+            margin-bottom: 15px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="file"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 1em;
+        }
+
+        button[type="submit"],
+        button[type="button"] {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover,
+        button[type="button"]:hover {
+            background-color: #2980b9;
+        }
+
+        div[style*="border:1px solid #ccc"] {
+            background: #f2f2f2;
+            border-radius: 6px;
+        }
+    </style>
+
+</head>
+<body>
+    <h2>Apply for the Job</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Applicant Form -->
+        <fieldset>
+            <legend>Applicant Details</legend>
+            {{ application_form.as_p }}
+        </fieldset>
+
+        <!-- Work Experience FormSet -->
+        <fieldset>
+            <legend>Work Experience</legend>
+            {{ work_formset.management_form }}
+            {% for form in work_formset %}
+                <div style="border:1px solid #ccc; margin-bottom:10px; padding:10px;">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+            <button type="button" onclick="addForm('work')">Add More Work Experience</button>
+        </fieldset>
+
+        <!-- Educational Background FormSet -->
+        <fieldset>
+            <legend>Educational Background</legend>
+            {{ edu_formset.management_form }}
+            {% for form in edu_formset %}
+                <div style="border:1px solid #ccc; margin-bottom:10px; padding:10px;">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+            <button type="button" onclick="addForm('edu')">Add More Education</button>
+        </fieldset>
+
+        <button type="submit">Submit Application</button>
+    </form>
+
+    <!-- Optional JS for dynamic formset rows (simplified example) -->
+    <script>
+        function addForm(prefix) {
+            alert("To add dynamic rows, JavaScript or Django Formset libs (like formset.js or HTMX) are needed.");
+            // This is just a placeholder — advanced dynamic formsets require JS support
+        }
+    </script>
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-color: #2c3e50;
+            --light-gray: #f7f9fc;
+            --medium-gray: #eaeef2;
+            --dark-gray: #95a5a6;
+            --white: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--secondary-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+        }
+
+        fieldset {
+            margin-bottom: 30px;
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            transition: var(--transition);
+        }
+
+        fieldset:hover {
+            border-color: var(--primary-dark);
+        }
+
+        legend {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            padding: 0 10px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+        }
+
+        .form-row, .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="file"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background-color: var(--white);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .formset-item {
+            border: 1px solid var(--medium-gray);
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background-color: var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .formset-item:hover {
+            background-color: var(--medium-gray);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        button[type="submit"] {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        button[type="button"] {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        button[type="button"]:hover {
+            background-color: #1a252f;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            form {
+                padding: 20px;
+            }
+
+            fieldset {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Animation for form sections */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        fieldset {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        fieldset:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        fieldset:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <h2>Apply for the Job</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Applicant Form -->
+        <fieldset>
+            <legend>Applicant Details</legend>
+            {{ application_form.as_p }}
+        </fieldset>
+
+        <!-- Work Experience FormSet -->
+        <fieldset>
+            <legend>Work Experience</legend>
+            {{ work_formset.management_form }}
+            {% for form in work_formset %}
+                <div class="formset-item">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+            <div class="button-group">
+                <button type="button" onclick="addForm('work')">Add More Work Experience</button>
+            </div>
+        </fieldset>
+
+        <!-- Educational Background FormSet -->
+        <fieldset>
+            <legend>Educational Background</legend>
+            {{ edu_formset.management_form }}
+            {% for form in edu_formset %}
+                <div class="formset-item">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+            <div class="button-group">
+                <button type="button" onclick="addForm('edu')">Add More Education</button>
+            </div>
+        </fieldset>
+
+        <button type="submit">Submit Application</button>
+    </form>
+
+    <script>
+        function addForm(prefix) {
+            alert("To add dynamic rows, JavaScript or Django Formset libs (like formset.js or HTMX) are needed.");
+            // This is just a placeholder — advanced dynamic formsets require JS support
+        }
+    </script>
+</body>
+</html>

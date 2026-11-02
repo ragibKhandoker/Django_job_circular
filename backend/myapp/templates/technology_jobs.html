@@ -1,0 +1,107 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Technology Jobs</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .job-card { border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .job-card h2 { margin-top: 0; color: #2c3e50; }
+        .apply-link { display: inline-block; margin-top: 10px; background-color: #28a745; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; }
+        .apply-link:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <h1>Technology Jobs</h1>
+    {% if messages %}
+    <div id="message-box">
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    {% if jobs %}
+        {% for job in jobs %}
+            <div class="job-card">
+                <h2>{{ job.title }}</h2>
+                <p><strong>Location:</strong> {{ job.location }}</p>
+                <p><strong>Description:</strong> {{ job.requirements }}</p>
+                <p><strong>Salary:</strong> {{ job.salary }}</p>
+                <p><strong>Job Type:</strong> {{ job.status }}</p>
+                <a href="{% url 'apply' %}" class="apply-link">Apply Now</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No jobs available right now.</p>
+    {% endif %}
+    <style>
+        .alert {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        setTimeout(function() {
+            var messageBox = document.getElementById('message-box');
+            if (messageBox) {
+                messageBox.style.display = 'none';
+            }
+        }, 3000);
+    </script>
+
+
+
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Technology Jobs</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .job-card { border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .job-card h2 { margin-top: 0; color: #2c3e50; }
+        .apply-link { display: inline-block; margin-top: 10px; background-color: #28a745; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; }
+        .apply-link:hover { background-color: #218838; }
+
+        .alert {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Technology Jobs</h1>
+
+    {% if jobs %}
+        {% for job in jobs %}
+            <div class="job-card">
+                <h2>{{ job.title }}</h2>
+                <p><strong>Location:</strong> {{ job.location }}</p>
+                <p><strong>Description:</strong> {{ job.requirements }}</p>
+                <p><strong>Salary:</strong> {{ job.salary }}</p>
+                <p><strong>Job Type:</strong> {{ job.status }}</p>
+                <a href="{% url 'apply' job.id %}" class="apply-link">Apply Now</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No jobs available right now.</p>
+    {% endif %}
+
+
+</body>
+</html>

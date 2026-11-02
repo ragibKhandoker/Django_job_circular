@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post a Job</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        form p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        form p label {
+            flex: 0 0 200px;
+            margin-right: 10px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        form p input,
+        form p textarea,
+        form p select {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button.btn.btn-primary {
+            display: inline-flex;
+            align-items: center;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 20px;
+        }
+
+        button.btn.btn-primary:hover {
+            background-color: #3700b3;
+        }
+
+        i.fas.fa-paper-plane {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Post a Job</h1>
+    <p id="successMessage" style="display: none; color: green; font-weight: bold;">
+        Job has been posted successfully!
+    </p>
+    <form method="POST">
+        {% csrf_token %}
+        {% comment %} {{ form.as_p }} {% endcomment %}
+        <p>
+    {{ form.job_id.label_tag }} {{ form.job_id }}
+</p>
+<p>
+    {{ form.title.label_tag }} {{ form.title }}
+</p>
+<p>
+    {{form.company_name.label_tag}}{{form.company_name}}
+</p>
+<p>
+    {{ form.status.label_tag }} {{ form.status }}
+</p>
+<p>
+    {{ form.requirements.label_tag }} {{ form.requirements }}
+</p>
+<p>
+    {{ form.location.label_tag }} {{ form.location }}
+</p>
+<p>
+    {{ form.salary.label_tag }} {{ form.salary }}
+</p>
+<p>
+    {{ form.educational_level.label_tag }} {{ form.educational_level }}
+</p>
+<p>
+    {{ form.experience_level.label_tag }} {{ form.experience_level }}
+</p>
+<p>
+    {{ form.deadline.label_tag }} {{ form.deadline }}
+</p>
+{% comment %} <p>
+    {{ form.work_hours.label_tag }} {{ form.work_hours}}
+</p> {% endcomment %}
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> Post Job
+        </button>
+
+    </form>
+
+</body>
+</html>

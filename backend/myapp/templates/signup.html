@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Account</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .register-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      padding: 30px 20px;
+      text-align: center;
+      border: 1px solid #ddd;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .input-group {
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      border-color: #667eea;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .register-btn {
+      background: linear-gradient(to right, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 5px;
+    }
+
+    .register-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 15px 0;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .divider::before {
+      margin-right: 8px;
+    }
+
+    .divider::after {
+      margin-left: 8px;
+    }
+
+    .signin-link {
+      margin-top: 5px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .signin-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .signin-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h1>Create Account</h1>
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- User ID -->
+      <div class="input-group">
+          <label for="user_id">User ID</label>
+          <input name="user_id" type="text" id="user_id" placeholder="Enter your user ID" value="{{ form.user_id.value|default_if_none:'' }}" required>
+          {% if form.user_id.errors %}
+              <div class="error">{{ form.user_id.errors.0 }}</div>
+          {% endif %}
+      </div>
+
+      <!-- Full Name -->
+      <div class="input-group">
+          <label for="fullname">Full Name</label>
+          <input name="fullname" type="text" id="fullname" placeholder="Enter your full name" value="{{ form.fullname.value|default_if_none:'' }}" required>
+          {% if form.fullname.errors %}
+              <div class="error">{{ form.fullname.errors.0 }}</div>
+          {% endif %}
+      </div>
+
+      <!-- Email -->
+      <div class="input-group">
+          <label for="email">Email Address</label>
+          <input name="email" type="email" id="email" placeholder="Enter your email" value="{{ form.email.value|default_if_none:'' }}" required>
+          {% if form.email.errors %}
+              <div class="error">{{ form.email.errors.0 }}</div>
+          {% endif %}
+      </div>
+
+      <!-- Password -->
+      <div class="input-group">
+          <label for="password">Password</label>
+          <input name="password" type="password" id="password" placeholder="Create a password" required>
+          {% if form.password.errors %}
+              <div class="error">{{ form.password.errors.0 }}</div>
+          {% endif %}
+      </div>
+
+      <button type="submit" class="register-btn">Sign Up</button>
+
+      <div class="divider">or</div>
+
+      <div class="signin-link">
+          Already have an account? <a href="{% url 'signup' %}">Sign in</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

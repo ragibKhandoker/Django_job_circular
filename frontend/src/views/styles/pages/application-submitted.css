@@ -1,0 +1,59 @@
+/* Generated from myapp/templates/application_submitted.html by scripts/extract-template-styles.mjs */
+
+.page-application-submitted {
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.page-application-submitted {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page-application-submitted .confirmation-box {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+        }
+        .page-application-submitted h1 {
+            color: #28a745;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .page-application-submitted p.message {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .page-application-submitted .data-section {
+            margin-bottom: 25px;
+        }
+        .page-application-submitted .data-section h3 {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+        .page-application-submitted .data-item {
+            margin-bottom: 10px;
+        }
+        .page-application-submitted .label {
+            font-weight: bold;
+        }
+        .page-application-submitted a.home-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+        }
+        .page-application-submitted a.home-link:hover {
+            text-decoration: underline;
+        }

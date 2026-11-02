@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Listings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .job-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      transition: transform 0.2s ease;
+    }
+
+    .job-card:hover {
+      transform: scale(1.02);
+    }
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .job-number {
+      font-weight: bold;
+      color: #888;
+    }
+
+    .job-title {
+      font-size: 1.5em;
+      color: #2c3e50;
+      margin: 5px 0;
+    }
+
+    .company-name {
+      font-weight: bold;
+      color: #2980b9;
+      margin-bottom: 5px;
+    }
+
+    .industry-type {
+      color: #7f8c8d;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      margin-bottom: 10px;
+    }
+
+    .responsibilities {
+      padding-left: 20px;
+    }
+
+    .responsibilities li {
+      margin-bottom: 6px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="job-card">
+    <div class="job-header">
+      <div class="job-number">Job #101</div>
+      <div class="job-title">Software Engineer</div>
+    </div>
+    <div class="company-name">Tech Innovators Ltd.</div>
+    <div class="industry-type">Industry: Information Technology</div>
+    <div class="description">
+      We are looking for a passionate Software Engineer to join our growing team working on cutting-edge applications.
+    </div>
+    <div><strong>Responsibilities:</strong></div>
+    <ul class="responsibilities">
+      <li>Develop and maintain web applications</li>
+      <li>Collaborate with designers and backend developers</li>
+      <li>Write clean, scalable code</li>
+    </ul>
+  </div>
+
+</body>
+</html>

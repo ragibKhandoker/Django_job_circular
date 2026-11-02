@@ -1,0 +1,82 @@
+/* Generated from myapp/templates/apply_success.html by scripts/extract-template-styles.mjs */
+
+.page-apply-success {
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.page-apply-success {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .page-apply-success .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+        }
+
+        .page-apply-success h1 {
+            color: #00796b;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .page-apply-success p {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .page-apply-success a {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background-color: #00796b;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: background 0.3s;
+            text-align: center;
+        }
+
+        .page-apply-success a:hover {
+            background-color: #004d40;
+        }
+
+        .page-apply-success .data-block {
+            margin-top: 30px;
+        }
+
+        .page-apply-success .data-section {
+            background: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        .page-apply-success .data-section h3 {
+            margin-top: 0;
+            color: #004d40;
+        }
+
+        .page-apply-success .data-item {
+            margin: 5px 0;
+        }
+
+        .page-apply-success .section-title {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #00695c;
+            border-bottom: 2px solid #b2dfdb;
+            padding-bottom: 5px;
+        }

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Candidate Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 700px;
+            margin: 2rem;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: var(--transition);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-header h2 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M0,50 C150,100 350,0 500,50 C650,100 750,0 900,50 C1050,100 1200,0 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") no-repeat;
+            background-size: cover;
+        }
+
+        .profile-content {
+            padding: 2.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--secondary);
+            min-width: 120px;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .detail-label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: var(--dark);
+            padding-left: 1rem;
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .profile-card {
+                margin: 1rem;
+                border-radius: 12px;
+            }
+
+            .profile-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .profile-content {
+                padding: 1.5rem;
+            }
+
+            .detail-item {
+                flex-direction: column;
+            }
+
+            .detail-label {
+                padding-left: 1rem;
+                margin-bottom: 0.5rem;
+                min-width: auto;
+            }
+
+            .detail-value {
+                padding-left: 1rem;
+                border-left: none;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="profile-card">
+        <div class="profile-header">
+            <h2>Candidate Biodata</h2>
+        </div>
+        <div class="profile-content">
+            <div class="detail-item">
+                <span class="detail-label">Name:</span>
+                <span class="detail-value">{{ applicant.full_name }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">{{ applicant.email }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Phone:</span>
+                <span class="detail-value">{{ applicant.phone }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Address:</span>
+                <span class="detail-value">{{ applicant.address }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Cover Letter:</span>
+                <span class="detail-value">{{ applicant.cover_letter }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Resume:</span>
+                <span class="detail-value">{{ applicant.resume }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">LinkedIn:</span>
+                <span class="detail-value">{{ applicant.linkedin_profile }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Portfolio:</span>
+                <span class="detail-value">{{ applicant.portfolio_website }}</span>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

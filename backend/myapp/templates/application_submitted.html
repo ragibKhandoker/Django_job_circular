@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Application Submitted</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .confirmation-box {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #28a745;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        p.message {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .data-section {
+            margin-bottom: 25px;
+        }
+        .data-section h3 {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+        .data-item {
+            margin-bottom: 10px;
+        }
+        .label {
+            font-weight: bold;
+        }
+        a.home-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+        }
+        a.home-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-box">
+        <h1>Application Submitted!</h1>
+        <p class="message">Thank you for applying. We have received your information successfully.</p>
+
+        <div class="data-section">
+            <h3>Applicant Information</h3>
+            <div class="data-item"><span class="label">Name:</span> {{ applicant.full_name }}</div>
+            <div class="data-item"><span class="label">Email:</span> {{ applicant.email }}</div>
+            <div class="data-item"><span class="label">Phone:</span> {{ applicant.phone }}</div>
+            <div class="data-item"><span class="label">Address:</span> {{ applicant.address }}</div>
+            <div class="data-item"><span class="label">Cover Letter:</span> {{ applicant.cover_letter }}</div>
+            <div class="data-item"><span class="label">Resume:</span> {{ applicant.resume }}</div>
+            <div class="data-item"><span class="label">LinkedIn:</span> {{ applicant.linkedin_profile }}</div>
+            <div class="data-item"><span class="label">Portfolio Website:</span> {{ applicant.portfolio_website }}</div>
+
+
+        </div>
+
+        <div class="data-section">
+            <h3>Work Experience</h3>
+            {% if applicant.work_experiences.exists %}
+                {% for exp in applicant.work_experiences.all %}
+                    <div class="data-item">
+                        <div class="data-item"><span class="label">Company:</span> {{ exp.company_name }}</div>
+                        <div class="data-item"><span class="label">Position:</span> {{ exp.position }}</div>
+                        <div class="data-item"><span class="label">Start-date:</span> {{ exp.start_date }}</div>
+                        <div class="data-item"><span class="label">Ending-date:</span> {{ exp.end_date }}</div>
+                        <div class="data-item"><span class="label">Responsibilities:</span> {{ exp.responsibilities }}</div>
+                        <div class="data-item"><span class="label">description:</span> {{ exp.description }}</div>
+                        <div class="data-item"><span class="label">Currently Working:</span> {{ exp.currently_working }}</div>
+
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No work experience submitted.</p>
+            {% endif %}
+        </div>
+
+        <div class="data-section">
+            <h3>Educational Background</h3>
+            {% if applicant.educational_backgrounds.exists %}
+                {% for edu in applicant.educational_backgrounds.all %}
+                    <div class="data-item">
+                        <div class="data-item"><span class="label">Institution:</span> {{ edu.institution_name }}</div>
+                        <div class="data-item"><span class="label">Start Year:</span> {{ edu.start_year }}</div>
+                        <div class="data-item"><span class="label">End Year:</span> {{ edu.end_year }}</div>
+                        <div class="data-item"><span class="label">Grade:</span> {{ edu.grade }}</div>
+                        <div class="data-item"><span class="label">Firld of study:</span> {{ edu.field_of_study }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No educational background submitted.</p>
+            {% endif %}
+        </div>
+
+        <a href="/" class="home-link">Back to Home</a>
+    </div>
+</body>
+</html>

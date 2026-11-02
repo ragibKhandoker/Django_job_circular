@@ -1,0 +1,132 @@
+/* Generated from myapp/templates/login_employer.html by scripts/extract-template-styles.mjs */
+
+.page-login-employer {
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.page-login-employer, .page-login-employer * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .page-login-employer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-attachment: fixed;
+        }
+        .page-login-employer form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 380px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+        .page-login-employer form:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            transform: translateY(-5px);
+        }
+        .page-login-employer form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+        .page-login-employer input[type="text"],
+        .page-login-employer input[type="password"] {
+            width: 100%;
+            padding: 15px 20px;
+            margin: 12px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+        .page-login-employer input[type="text"]:focus,
+        .page-login-employer input[type="password"]:focus {
+            border-color: #667eea;
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        .page-login-employer .greeting {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        .page-login-employer button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        .page-login-employer button:hover {
+            background: linear-gradient(to right, #5a6fd1, #6a4298);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .page-login-employer .message {
+            margin-top: 20px;
+            text-align: center;
+            color: #e74c3c;
+            font-size: 14px;
+        }
+        .page-login-employer h3 {
+            margin: 5px 0;
+            font-weight: 500;
+        }
+        .page-login-employer .forgot-password {
+            text-align: right;
+            margin: 10px 0;
+        }
+        .page-login-employer .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .page-login-employer .forgot-password a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        .page-login-employer .employer_signup {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .page-login-employer .employer_signup a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .page-login-employer .employer_signup a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        @keyframes page-login-employer-fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .page-login-employer form {
+            animation: page-login-employer-fadeIn 0.6s ease-out forwards;
+        }

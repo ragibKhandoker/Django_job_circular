@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Career Opportunities</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #4f46e5;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f1f5f9;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .job-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .job-company {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .job-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .job-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .job-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .job-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .job-list {
+            list-style-position: outside;
+            padding-left: 1.25rem;
+        }
+
+        .job-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .job-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .job-footer {
+            padding: 1rem 1.5rem;
+            background: #f1f5f9;
+            text-align: right;
+        }
+
+        .apply-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .apply-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-remote {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .tag-onsite {
+            background: #e0e7ff;
+            color: var(--secondary);
+        }
+
+        .tag-hybrid {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .jobs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Engineering Career Opportunities</h1>
+            <p class="subtitle">Browse our current openings across engineering disciplines</p>
+        </header>
+
+        <div class="jobs-grid">
+            <!-- Job 1 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Mechanical Engineer</h2>
+                    <p class="job-company">Precision Dynamics</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Detroit, MI</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $85K-$115K</span>
+                    </div>
+                    <span class="tag tag-onsite">On-site</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Mechanical Engineering</li>
+                            <li>3+ years mechanical design experience</li>
+                            <li>Proficiency in CAD (SolidWorks/AutoCAD)</li>
+                            <li>Knowledge of manufacturing processes</li>
+                            <li>Finite element analysis experience</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design mechanical components and systems</li>
+                            <li>Create technical drawings and specifications</li>
+                            <li>Conduct stress and thermal analysis</li>
+                            <li>Collaborate with manufacturing teams</li>
+                            <li>Test and validate designs</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 2 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Electrical Engineer</h2>
+                    <p class="job-company">PowerGrid Solutions</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Boston, MA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $90K-$125K</span>
+                    </div>
+                    <span class="tag tag-hybrid">Hybrid</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Electrical Engineering</li>
+                            <li>PE license or EIT certification preferred</li>
+                            <li>Circuit design and analysis experience</li>
+                            <li>Proficiency with PCB design tools</li>
+                            <li>Knowledge of power distribution systems</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design electrical systems and components</li>
+                            <li>Develop schematics and wiring diagrams</li>
+                            <li>Conduct power system analysis</li>
+                            <li>Oversee equipment testing</li>
+                            <li>Ensure compliance with electrical codes</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 3 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Civil Engineer</h2>
+                    <p class="job-company">Urban Infrastructure Group</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Denver, CO</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $80K-$110K</span>
+                    </div>
+                    <span class="tag tag-onsite">On-site</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Civil Engineering</li>
+                            <li>EIT certification (PE preferred)</li>
+                            <li>3+ years civil design experience</li>
+                            <li>Proficiency in AutoCAD Civil 3D</li>
+                            <li>Knowledge of construction materials</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design infrastructure projects</li>
+                            <li>Prepare construction documents</li>
+                            <li>Conduct site inspections</li>
+                            <li>Coordinate with contractors</li>
+                            <li>Ensure regulatory compliance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 4 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Chemical Engineer</h2>
+                    <p class="job-company">ChemProcess Solutions</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Houston, TX</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $95K-$130K</span>
+                    </div>
+                    <span class="tag tag-onsite">On-site</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Chemical Engineering</li>
+                            <li>Process simulation software experience</li>
+                            <li>Knowledge of chemical reactions</li>
+                            <li>Understanding of safety protocols</li>
+                            <li>Plant operations experience</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design chemical processes</li>
+                            <li>Optimize production efficiency</li>
+                            <li>Develop safety procedures</li>
+                            <li>Troubleshoot equipment issues</li>
+                            <li>Analyze chemical data</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 5 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Aerospace Engineer</h2>
+                    <p class="job-company">Skyward Aerospace</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Los Angeles, CA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $110K-$150K</span>
+                    </div>
+                    <span class="tag tag-onsite">On-site</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Master's in Aerospace Engineering</li>
+                            <li>5+ years aerospace experience</li>
+                            <li>CFD and FEA analysis skills</li>
+                            <li>Aircraft/spacecraft design knowledge</li>
+                            <li>Security clearance eligibility</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design aircraft components</li>
+                            <li>Conduct aerodynamic analysis</li>
+                            <li>Test prototype systems</li>
+                            <li>Ensure regulatory compliance</li>
+                            <li>Collaborate with multidisciplinary teams</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 6 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Biomedical Engineer</h2>
+                    <p class="job-company">MedTech Innovations</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Minneapolis, MN</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $85K-$120K</span>
+                    </div>
+                    <span class="tag tag-hybrid">Hybrid</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Biomedical Engineering</li>
+                            <li>Medical device development experience</li>
+                            <li>Knowledge of FDA regulations</li>
+                            <li>Biomechanics understanding</li>
+                            <li>CAD and prototyping skills</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design medical equipment</li>
+                            <li>Conduct clinical testing</li>
+                            <li>Analyze biological data</li>
+                            <li>Prepare regulatory documentation</li>
+                            <li>Collaborate with healthcare professionals</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 7 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Environmental Engineer</h2>
+                    <p class="job-company">EcoSolutions Inc.</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Portland, OR</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $75K-$105K</span>
+                    </div>
+                    <span class="tag tag-remote">Remote Possible</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Environmental Engineering</li>
+                            <li>Knowledge of environmental regulations</li>
+                            <li>Water/wastewater treatment experience</li>
+                            <li>GIS software proficiency</li>
+                            <li>Field investigation skills</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design pollution control systems</li>
+                            <li>Conduct environmental impact studies</li>
+                            <li>Develop sustainability plans</li>
+                            <li>Monitor compliance with regulations</li>
+                            <li>Prepare technical reports</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 8 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Industrial Engineer</h2>
+                    <p class="job-company">Efficient Systems</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Chicago, IL</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $80K-$115K</span>
+                    </div>
+                    <span class="tag tag-hybrid">Hybrid</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Industrial Engineering</li>
+                            <li>Process optimization experience</li>
+                            <li>Lean/Six Sigma certification</li>
+                            <li>Data analysis skills</li>
+                            <li>ERP system knowledge</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Analyze production processes</li>
+                            <li>Design efficient workflows</li>
+                            <li>Reduce waste and costs</li>
+                            <li>Implement quality control systems</li>
+                            <li>Train staff on new procedures</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 9 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Materials Engineer</h2>
+                    <p class="job-company">Advanced Materials Corp</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Pittsburgh, PA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $90K-$130K</span>
+                    </div>
+                    <span class="tag tag-onsite">On-site</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Master's in Materials Science/Engineering</li>
+                            <li>Materials testing experience</li>
+                            <li>Knowledge of metallurgy/polymers</li>
+                            <li>Electron microscopy skills</li>
+                            <li>Failure analysis expertise</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Develop new materials</li>
+                            <li>Test material properties</li>
+                            <li>Analyze product failures</li>
+                            <li>Select materials for applications</li>
+                            <li>Improve manufacturing processes</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

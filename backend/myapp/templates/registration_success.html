@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Successful</title>
+    <script>
+        // Set a timer of 20 seconds (20000 milliseconds)
+        setTimeout(function() {
+            // Logout the user after 20 seconds
+            window.location.href = "{% url 'logout' %}"; // Redirect to logout URL
+        }, 40000); // 20 seconds
+    </script>
+</head>
+<body>
+    <h2>Registration Successful!</h2>
+    <p>You will be logged out after 20 seconds and need to log in again as a Candidate or Employer.</p>
+    <p>Please wait...</p>
+</body>
+</html>

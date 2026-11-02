@@ -1,0 +1,105 @@
+/* Generated from myapp/templates/apply_form.html by scripts/extract-template-styles.mjs */
+
+.page-apply-form {
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.page-apply-form .application-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-apply-form .form-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .page-apply-form .form-section h3 {
+        margin-bottom: 20px;
+        color: #0d6efd;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 10px;
+    }
+
+    .page-apply-form .form-label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .page-apply-form .btn-secondary {
+        background-color: #f0f0f0;
+        border-color: #ccc;
+        color: #333;
+    }
+
+    .page-apply-form .btn-secondary:hover {
+        background-color: #e0e0e0;
+        border-color: #bbb;
+        color: #000;
+    }
+
+    .page-apply-form .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .page-apply-form .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .page-apply-form .btn-add-more {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    .page-apply-form .edu-form, .page-apply-form .work-form {
+        background: #ffffff;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+    }
+
+    .page-apply-form input, .page-apply-form select, .page-apply-form textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-top: 5px;
+    }
+
+    .page-apply-form input:focus, .page-apply-form select:focus, .page-apply-form textarea:focus {
+        border-color: #0d6efd;
+        outline: none;
+    }
+
+    .page-apply-form .d-grid .btn-lg {
+        padding: 15px;
+        font-size: 1.2rem;
+    }
+
+    .page-apply-form .alert {
+        margin-bottom: 20px; /* Adds space below the alert box */
+    }
+
+    .page-apply-form .error {
+        border: 2px solid red; /* Highlights the field with a red border */
+    }
+
+    @media (max-width: 767px) {
+        .page-apply-form .row > .col-md-6 {
+            margin-bottom: 30px;
+        }
+    }

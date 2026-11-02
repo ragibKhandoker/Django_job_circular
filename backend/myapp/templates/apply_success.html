@@ -1,0 +1,273 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Application Submitted</title>
+</head>
+<body>
+    <h1>Application Submitted Successfully!</h1>
+    <p>Thank you for your application. We'll review it and get back to you soon.</p>
+    <a href="/">Return to Home</a>
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Submitted</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+        }
+
+        h1 {
+            color: #00796b;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        a {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background-color: #00796b;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: background 0.3s;
+            text-align: center;
+        }
+
+        a:hover {
+            background-color: #004d40;
+        }
+
+        .data-block {
+            margin-top: 30px;
+        }
+
+        .data-section {
+            background: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        .data-section h3 {
+            margin-top: 0;
+            color: #004d40;
+        }
+
+        .data-item {
+            margin: 5px 0;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #00695c;
+            border-bottom: 2px solid #b2dfdb;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Application Submitted Successfully!</h1>
+        <p>Thank you for your application. We'll review it and get back to you soon.</p>
+        <a href="/">Return to Home</a>
+
+        <!-- ✅ Dynamic Data Display Section -->
+        <div class="data-block">
+            <div class="section-title">Applicant Information</div>
+            <div class="data-section">
+                <div class="data-item"><strong>Name:</strong> {{ applicant.name }}</div>
+                <div class="data-item"><strong>Email:</strong> {{ applicant.email }}</div>
+                <div class="data-item"><strong>Phone:</strong> {{ applicant.phone }}</div>
+                <div class="data-item"><strong>Address:</strong> {{ applicant.address }}</div>
+            </div>
+
+            <div class="section-title">Work Experience</div>
+            {% for exp in applicant.work_experiences.all %}
+            <div class="data-section">
+                <div class="data-item"><strong>Company:</strong> {{ exp.company_name }}</div>
+                <div class="data-item"><strong>Position:</strong> {{ exp.position }}</div>
+                <div class="data-item"><strong>Duration:</strong> {{ exp.duration }}</div>
+            </div>
+            {% empty %}
+            <p>No work experience submitted.</p>
+            {% endfor %}
+
+            <div class="section-title">Educational Background</div>
+            {% for edu in applicant.educational_backgrounds.all %}
+            <div class="data-section">
+                <div class="data-item"><strong>Institution:</strong> {{ edu.institution }}</div>
+                <div class="data-item"><strong>Degree:</strong> {{ edu.degree }}</div>
+                <div class="data-item"><strong>Year:</strong> {{ edu.year }}</div>
+            </div>
+            {% empty %}
+            <p>No educational background submitted.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Submitted Successfully</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary-color: #2b2d42;
+            --accent-color: #f72585;
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--secondary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .success-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            margin: 2rem auto;
+        }
+
+        .success-icon {
+            color: #4bb543;
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .application-info {
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .info-item {
+            margin-bottom: 1rem;
+        }
+
+        .info-item strong {
+            display: inline-block;
+            width: 120px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .success-icon {
+                font-size: 4rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1>Application Submitted Successfully!</h1>
+        <p>Thank you for applying to <strong>{{ application.job.title }}</strong> at <strong>{{ application.job.company_name }}</strong>.</p>
+
+        <div class="application-info">
+            <div class="info-item">
+                <strong>Application ID:</strong> {{ application.id }}
+            </div>
+            <div class="info-item">
+                <strong>Applicant Name:</strong> {{ application.applicant.first_name }} {{ application.applicant.last_name }}
+            </div>
+            <div class="info-item">
+                <strong>Applied Date:</strong> {{ application.application_date|date:"F j, Y" }}
+            </div>
+            <div class="info-item">
+                <strong>Status:</strong> <span style="color: #4bb543;">{{ application.get_status_display }}</span>
+            </div>
+        </div>
+
+        <p>We've sent a confirmation email to <strong>{{ application.applicant.email }}</strong>. Our team will review your application and get back to you soon.</p>
+
+        <a href="/" class="btn">
+            <i class="fas fa-home"></i> Return to Home
+        </a>
+    </div>
+</body>
+</html> {% endcomment %}

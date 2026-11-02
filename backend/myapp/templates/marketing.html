@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Career Opportunities</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #8b5cf6;
+            --secondary: #6d28d9;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f1f5f9;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .job-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .job-company {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .job-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .job-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .job-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .job-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .job-list {
+            list-style-position: outside;
+            padding-left: 1.25rem;
+        }
+
+        .job-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .job-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .job-footer {
+            padding: 1rem 1.5rem;
+            background: #f1f5f9;
+            text-align: right;
+        }
+
+        .apply-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .apply-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-remote {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .tag-onsite {
+            background: #e0e7ff;
+            color: var(--secondary);
+        }
+
+        .tag-hybrid {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .jobs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Marketing Career Opportunities</h1>
+            <p class="subtitle">Explore exciting marketing roles across various industries and specialties</p>
+        </header>
+
+        <div class="jobs-grid">
+            <!-- Job 1 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Digital Marketing Manager</h2>
+                    <p class="job-company">Growth Hacker Digital</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> New York, NY</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $75K-$110K</span>
+                    </div>
+                    <span class="tag tag-hybrid">Hybrid</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Marketing or related field</li>
+                            <li>5+ years digital marketing experience</li>
+                            <li>Expertise in SEO/SEM and social media</li>
+                            <li>Google Ads and Analytics certification</li>
+                            <li>Experience with marketing automation</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Develop digital marketing strategies</li>
+                            <li>Manage PPC and social media campaigns</li>
+                            <li>Optimize website for conversions</li>
+                            <li>Analyze campaign performance metrics</li>
+                            <li>Lead digital marketing team</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 2 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Content Marketing Specialist</h2>
+                    <p class="job-company">StoryBrand Media</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Austin, TX</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $60K-$85K</span>
+                    </div>
+                    <span class="tag tag-remote">Remote Possible</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Communications, Journalism or Marketing</li>
+                            <li>3+ years content creation experience</li>
+                            <li>Excellent writing and editing skills</li>
+                            <li>SEO content strategy knowledge</li>
+                            <li>Familiarity with CMS platforms</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Create engaging blog content</li>
+                            <li>Develop email marketing campaigns</li>
+                            <li>Produce whitepapers and case studies</li>
+                            <li>Optimize content for search engines</li>
+                            <li>Collaborate with design team</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 3 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Social Media Manager</h2>
+                    <p class="job-company">Influence Digital</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Los Angeles, CA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $65K-$90K</span>
+                    </div>
+                    <span class="tag tag-remote">Remote Possible</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Marketing or related field</li>
+                            <li>4+ years social media management</li>
+                            <li>Experience with major platforms</li>
+                            <li>Analytics and reporting skills</li>
+                            <li>Community management expertise</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Develop social media strategy</li>
+                            <li>Create and schedule content</li>
+                            <li>Engage with online community</li>
+                            <li>Run paid social campaigns</li>
+                            <li>Monitor trends and competitors</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 4 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Marketing Analytics Manager</h2>
+                    <p class="job-company">DataDriven Marketing Co.</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Chicago, IL</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $90K-$130K</span>
+                    </div>
+                    <span class="tag tag-hybrid">Hybrid</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Master's in Marketing Analytics or related</li>
+                            <li>5+ years marketing analytics experience</li>
+                            <li>Advanced Excel and SQL skills</li>
+                            <li>Experience with BI tools (Tableau, PowerBI)</li>
+                            <li>Statistical analysis knowledge</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Analyze marketing campaign performance</li>
+                            <li>Develop attribution models</li>
+                            <li>Create dashboards and reports</li>
+                            <li>Identify trends and insights</li>
+                            <li>Optimize marketing spend</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 5 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Brand Manager</h2>
+                    <p class="job-company">Global Brand Partners</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> San Francisco, CA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $100K-$150K</span>
+                    </div>
+                    <span class="tag tag-onsite">On-site</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>MBA in Marketing or related field</li>
+                            <li>7+ years brand management</li>
+                            <li>Product launch experience</li>
+                            <li>Market research expertise</li>
+                            <li>Cross-functional team leadership</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Develop brand strategy</li>
+                            <li>Manage brand positioning</li>
+                            <li>Oversee marketing campaigns</li>
+                            <li>Conduct competitive analysis</li>
+                            <li>Manage brand budget</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 6 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Email Marketing Specialist</h2>
+                    <p class="job-company">Conversion Labs</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Boston, MA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $55K-$80K</span>
+                    </div>
+                    <span class="tag tag-remote">Remote Possible</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Marketing or related</li>
+                            <li>2+ years email marketing experience</li>
+                            <li>Email automation platform experience</li>
+                            <li>HTML/CSS basics for email</li>
+                            <li>A/B testing knowledge</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Design email campaigns</li>
+                            <li>Build email lists and segments</li>
+                            <li>Write compelling copy</li>
+                            <li>Analyze performance metrics</li>
+                            <li>Optimize deliverability</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 7 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">SEO Manager</h2>
+                    <p class="job-company">Search Engine Pros</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Seattle, WA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $70K-$100K</span>
+                    </div>
+                    <span class="tag tag-remote">Remote Possible</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Marketing or related</li>
+                            <li>4+ years SEO experience</li>
+                            <li>Technical SEO expertise</li>
+                            <li>Keyword research skills</li>
+                            <li>Link building strategies</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Develop SEO strategy</li>
+                            <li>Optimize website content</li>
+                            <li>Conduct technical audits</li>
+                            <li>Monitor rankings and traffic</li>
+                            <li>Stay updated with algorithm changes</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 8 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Product Marketing Manager</h2>
+                    <p class="job-company">TechSolutions Inc.</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> San Diego, CA</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $95K-$140K</span>
+                    </div>
+                    <span class="tag tag-hybrid">Hybrid</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Marketing or Business</li>
+                            <li>5+ years product marketing</li>
+                            <li>B2B marketing experience</li>
+                            <li>Strong presentation skills</li>
+                            <li>Technical product understanding</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Develop go-to-market strategies</li>
+                            <li>Create product messaging</li>
+                            <li>Train sales teams</li>
+                            <li>Analyze market trends</li>
+                            <li>Coordinate product launches</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+
+            <!-- Job 9 -->
+            <div class="job-card">
+                <div class="job-header">
+                    <h2 class="job-title">Influencer Marketing Coordinator</h2>
+                    <p class="job-company">BuzzCreator Agency</p>
+                    <div class="job-meta">
+                        <span class="meta-item"><span class="material-icons">place</span> Miami, FL</span>
+                        <span class="meta-item"><span class="material-icons">schedule</span> Full-time</span>
+                        <span class="meta-item"><span class="material-icons">attach_money</span> $50K-$75K</span>
+                    </div>
+                    <span class="tag tag-remote">Remote Possible</span>
+                </div>
+                <div class="job-body">
+                    <div class="job-section">
+                        <h3 class="section-title">Requirements</h3>
+                        <ul class="job-list">
+                            <li>Bachelor's in Marketing or PR</li>
+                            <li>2+ years influencer marketing</li>
+                            <li>Social media savvy</li>
+                            <li>Strong negotiation skills</li>
+                            <li>Creative campaign ideas</li>
+                        </ul>
+                    </div>
+                    <div class="job-section">
+                        <h3 class="section-title">Responsibilities</h3>
+                        <ul class="job-list">
+                            <li>Identify and recruit influencers</li>
+                            <li>Negotiate partnerships</li>
+                            <li>Develop campaign briefs</li>
+                            <li>Track campaign performance</li>
+                            <li>Manage influencer relationships</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job-footer">
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

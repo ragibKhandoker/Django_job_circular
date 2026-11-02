@@ -1,0 +1,73 @@
+/* Generated from myapp/templates/post_job.html by scripts/extract-template-styles.mjs */
+
+.page-post-job {
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.page-post-job {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+        }
+
+        .page-post-job h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .page-post-job form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .page-post-job form p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .page-post-job form p label {
+            flex: 0 0 200px;
+            margin-right: 10px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .page-post-job form p input,
+        .page-post-job form p textarea,
+        .page-post-job form p select {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .page-post-job button.btn.btn-primary {
+            display: inline-flex;
+            align-items: center;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .page-post-job button.btn.btn-primary:hover {
+            background-color: #3700b3;
+        }
+
+        .page-post-job i.fas.fa-paper-plane {
+            margin-right: 8px;
+        }

@@ -1,0 +1,48 @@
+/* /login_choice: one login page for job seekers and employers. Layout and form styles: components/auth-split.css. */
+
+.page-login .role-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    margin-top: 24px;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.page-login .role-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.page-login .role-tab:hover {
+    color: var(--ink);
+}
+
+.page-login .role-tab.is-active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(11, 94, 215, 0.25);
+}
+
+.page-login .role-tab:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.page-login .auth-form {
+    margin-top: 24px;
+}

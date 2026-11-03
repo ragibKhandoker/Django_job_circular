@@ -10,13 +10,11 @@ import ApplyFormPage from './views/pages/ApplyFormPage.jsx';
 import ApplySuccessPage from './views/pages/ApplySuccessPage.jsx';
 import BrowseCandidatesPage from './views/pages/BrowseCandidatesPage.jsx';
 import CandidateDetailPage from './views/pages/CandidateDetailPage.jsx';
-import CandidateLoginPage from './views/pages/CandidateLoginPage.jsx';
 import CandidateSignupPage from './views/pages/CandidateSignupPage.jsx';
-import EmployerLoginPage from './views/pages/EmployerLoginPage.jsx';
 import EmployerSignupPage from './views/pages/EmployerSignupPage.jsx';
 import HomePage from './views/pages/HomePage.jsx';
 import JobListPage from './views/pages/JobListPage.jsx';
-import LoginChoicePage from './views/pages/LoginChoicePage.jsx';
+import LoginPage from './views/pages/LoginPage.jsx';
 import NotFoundPage from './views/pages/NotFoundPage.jsx';
 import PasswordResetDonePage from './views/pages/PasswordResetDonePage.jsx';
 import PasswordResetPage from './views/pages/PasswordResetPage.jsx';
@@ -26,7 +24,15 @@ import ThemeToggle from './views/components/ThemeToggle.jsx';
 import TotalJobsPage from './views/pages/TotalJobsPage.jsx';
 
 // These pages put the theme toggle in their own header; every other page gets a floating one.
-const PAGES_WITH_OWN_TOGGLE = new Set([ROUTES.home, ROUTES.signup, ROUTES.candidateSignup, ROUTES.employerSignup]);
+const PAGES_WITH_OWN_TOGGLE = new Set([
+  ROUTES.home,
+  ROUTES.signup,
+  ROUTES.candidateSignup,
+  ROUTES.employerSignup,
+  ROUTES.login,
+  ROUTES.employerLogin,
+  ROUTES.candidateLogin,
+]);
 
 function FloatingThemeToggle() {
   const { pathname } = useLocation();
@@ -46,9 +52,10 @@ export default function App() {
               <Route path={ROUTES.signup} element={<RegistrationChoosePage />} />
               <Route path={ROUTES.employerSignup} element={<EmployerSignupPage />} />
               <Route path={ROUTES.candidateSignup} element={<CandidateSignupPage />} />
-              <Route path={ROUTES.login} element={<LoginChoicePage />} />
-              <Route path={ROUTES.employerLogin} element={<EmployerLoginPage />} />
-              <Route path={ROUTES.candidateLogin} element={<CandidateLoginPage />} />
+              {/* One login page; the URL picks the role tab. The shared key keeps typed values when switching tabs. */}
+              <Route path={ROUTES.login} element={<LoginPage key="login" />} />
+              <Route path={ROUTES.employerLogin} element={<LoginPage key="login" role="employer" />} />
+              <Route path={ROUTES.candidateLogin} element={<LoginPage key="login" role="candidate" />} />
               <Route path={ROUTES.passwordReset} element={<PasswordResetPage />} />
               <Route path={ROUTES.passwordResetDone} element={<PasswordResetDonePage />} />
               <Route path={ROUTES.jobList} element={<JobListPage />} />

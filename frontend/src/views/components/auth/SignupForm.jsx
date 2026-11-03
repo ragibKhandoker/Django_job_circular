@@ -1,36 +1,8 @@
-import { ArrowRight, AtSign, CircleAlert, Eye, EyeOff, LoaderCircle, Lock, Mail, UserRound } from 'lucide-react';
+import { ArrowRight, AtSign, CircleAlert, LoaderCircle, Lock, Mail, UserRound } from 'lucide-react';
 import { useState } from 'react';
+import { AuthField as Field, PasswordInput } from './fields.jsx';
 
 const MIN_PASSWORD_LENGTH = 8;
-
-function Field({ label, Icon, hint, error, children }) {
-  return (
-    <label className={`auth-field ${error ? 'has-error' : ''}`}>
-      <span className="auth-label">{label}</span>
-      <span className="auth-input">
-        <Icon className="auth-input-icon" aria-hidden="true" />
-        {children}
-      </span>
-      {(error || hint) && <span className={error ? 'auth-error-text' : 'auth-hint-text'}>{error || hint}</span>}
-    </label>
-  );
-}
-
-function PasswordInput({ visible, onToggle, ...props }) {
-  return (
-    <>
-      <input type={visible ? 'text' : 'password'} {...props} />
-      <button
-        type="button"
-        className="auth-eye"
-        onClick={onToggle}
-        aria-label={visible ? 'Hide password' : 'Show password'}
-      >
-        {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-      </button>
-    </>
-  );
-}
 
 /** The sign-up form shared by the candidate and employer pages (fields match /api/auth/signup/). */
 export default function SignupForm({ values, messages, submitting, onChange, onSubmit, submitLabel }) {

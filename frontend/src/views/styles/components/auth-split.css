@@ -11,6 +11,9 @@
     --danger: #c42b3c;
     --surface: #fff;
     --page-bg: #f5f8fe;
+    --glow-1: rgba(11, 94, 215, 0.12);
+    --glow-2: rgba(106, 75, 214, 0.08);
+    --dot: rgba(15, 27, 61, 0.09);
 
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
@@ -162,11 +165,35 @@
 /* ---------- right: content ---------- */
 .auth-split .auth-main {
     position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 88px 24px 48px;
+}
+
+/* Soft brand glows behind the form. */
+.auth-split .auth-main::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        radial-gradient(520px circle at 100% 0%, var(--glow-1), transparent 60%),
+        radial-gradient(420px circle at 0% 100%, var(--glow-2), transparent 60%);
+}
+
+/* Fine dot grid that fades out towards the edges. */
+.auth-split .auth-main::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 75%);
 }
 
 .auth-split .auth-back {
@@ -304,6 +331,23 @@
     min-width: 0;
 }
 
+.auth-split .auth-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.auth-split .auth-forgot {
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.auth-split .auth-forgot:hover {
+    text-decoration: underline;
+}
+
 .auth-split .auth-label {
     color: var(--ink);
     font-size: 14px;
@@ -429,6 +473,41 @@
     to { transform: rotate(360deg); }
 }
 
+.auth-split .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 28px 0 16px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.auth-split .auth-divider::before,
+.auth-split .auth-divider::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--line);
+}
+
+.auth-split .auth-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 13px 20px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 700;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.auth-split .auth-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
     .auth-split {
@@ -488,6 +567,9 @@
     --danger: #ff6b7d;
     --surface: #131c2f;
     --page-bg: #0b1120;
+    --glow-1: rgba(76, 141, 255, 0.16);
+    --glow-2: rgba(124, 92, 255, 0.1);
+    --dot: rgba(255, 255, 255, 0.06);
 }
 
 :root[data-theme='dark'] .auth-split .auth-input input:hover {

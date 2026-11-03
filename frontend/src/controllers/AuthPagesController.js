@@ -1,31 +1,57 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../config/routes.js';
 import { AuthModel, EMPTY_SIGNUP } from '../models/AuthModel.js';
 import { useAuth } from './AuthController.jsx';
 import { useFlash, useFlashMessages } from './FlashController.jsx';
 import { useForm } from './useForm.js';
 
-/** Employer and candidate login share the same flow (views.employer_login_view / candidate_login_view). */
-export function useLoginController() {
+const LOGIN_ROUTES = {
+  candidate: ROUTES.candidateLogin,
+  employer: ROUTES.employerLogin,
+};
+
+/**
+ * One login page for job seekers and employers (both log in with the same
+ * Django account; the role only changes the copy and the sign-up link).
+ * The role comes from the URL, so links like "Employer Login" always open the
+ * right tab. After logging in, return to the page RequireAuth sent the user from.
+ */
+export function useLoginController(role) {
   const { login } = useAuth();
   const flash = useFlash();
   const navigate = useNavigate();
+  const location = useLocation();
   const { messages, replace } = useFlashMessages();
   const { values, handleChange } = useForm({ username: '', password: '' });
+  const [submitting, setSubmitting] = useState(false);
+
+  // Keep RequireAuth's "from" state when switching tabs.
+  const setRole = (next) => navigate(LOGIN_ROUTES[next], { replace: true, state: location.state });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setSubmitting(true);
     try {
       const result = await login(values.username, values.password);
       flash(result.detail);
-      navigate(ROUTES.home);
+      navigate(location.state?.from ?? ROUTES.home, { replace: true });
     } catch (error) {
       replace(error.message);
+      setSubmitting(false);
     }
   };
 
-  return { values, messages, handleChange, handleSubmit };
+  return {
+    role,
+    setRole,
+    values,
+    messages,
+    submitting,
+    signupRoute: SIGNUP_ROUTES[role],
+    handleChange,
+    handleSubmit,
+  };
 }
 
 const SIGNUP_ROUTES = {

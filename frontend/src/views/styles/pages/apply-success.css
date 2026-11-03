@@ -80,3 +80,24 @@
             border-bottom: 2px solid #b2dfdb;
             padding-bottom: 5px;
         }
+
+/* Responsive */
+.page-apply-success {
+    padding: 24px 16px;
+    box-sizing: border-box;
+}
+
+.page-apply-success .container {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    .page-apply-success .container {
+        padding: 24px 18px;
+    }
+
+    .page-apply-success h1 {
+        font-size: 1.6rem;
+    }
+}

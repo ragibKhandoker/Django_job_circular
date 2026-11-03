@@ -1,7 +1,8 @@
-import { BriefcaseBusiness, ChevronDown, Flame, MapPin, Search, TrendingUp } from 'lucide-react';
+import { BriefcaseBusiness, Flame, Search, TrendingUp } from 'lucide-react';
 // Photo: Vitaly Gariev on Unsplash (Unsplash License)
 // https://unsplash.com/photos/two-professionals-shaking-hands-across-a-table-jEpZNyFSQwQ
 import heroPhoto from '../../images/hero-interview.jpg';
+import LocationSelect from './LocationSelect.jsx';
 
 const POPULAR_SEARCHES = [
   { label: 'IT Job', q: 'Technology' },
@@ -49,16 +50,7 @@ export default function HeroSection({
                 aria-label="Job keyword"
               />
             </label>
-            <label className="search-location">
-              <MapPin aria-hidden="true" />
-              <select value={location} onChange={onLocationChange} aria-label="Location">
-                <option value="">All Locations</option>
-                {locations.map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-              <ChevronDown className="select-caret" aria-hidden="true" />
-            </label>
+            <LocationSelect value={location} options={locations} onChange={onLocationChange} />
             <button type="submit" className="btn btn-primary search-submit">
               <Search aria-hidden="true" /> Search Jobs
             </button>

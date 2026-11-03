@@ -103,3 +103,37 @@
             margin-bottom: 30px;
         }
     }
+
+/* Responsive */
+@media (max-width: 767px) {
+    .page-apply-form .application-container {
+        padding: 20px 16px;
+        margin-top: 16px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .page-apply-form .form-section {
+        padding: 16px;
+    }
+
+    .page-apply-form .form-section h3 {
+        font-size: 1.25rem;
+    }
+
+    /* Bootstrap's row gutters shift the stacked columns sideways; drop them when stacked. */
+    .page-apply-form .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .page-apply-form .row > [class*='col']:not(.form-section) {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .page-apply-form input,
+    .page-apply-form select,
+    .page-apply-form textarea {
+        font-size: 16px; /* stops iOS zooming into the field */
+    }
+}

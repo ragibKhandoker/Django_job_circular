@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../config/routes.js';
 import { AuthModel, EMPTY_SIGNUP } from '../models/AuthModel.js';
@@ -27,24 +28,45 @@ export function useLoginController() {
   return { values, messages, handleChange, handleSubmit };
 }
 
+const SIGNUP_ROUTES = {
+  candidate: ROUTES.candidateSignup,
+  employer: ROUTES.employerSignup,
+};
+
+/** /signup: pick candidate or employer, then continue to that sign-up form. */
+export function useRegistrationChooseController() {
+  const navigate = useNavigate();
+  const [role, setRole] = useState('candidate');
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    navigate(SIGNUP_ROUTES[role]);
+  };
+
+  return { role, setRole, handleSubmit };
+}
+
 export function useSignupController() {
   const flash = useFlash();
   const navigate = useNavigate();
   const { messages, replace } = useFlashMessages();
   const { values, handleChange } = useForm(EMPTY_SIGNUP);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setSubmitting(true);
     try {
       const result = await AuthModel.signup(values);
       flash(result.detail);
       navigate(ROUTES.login);
     } catch (error) {
       replace(error.message);
+      setSubmitting(false);
     }
   };
 
-  return { values, messages, handleChange, handleSubmit };
+  return { values, messages, submitting, handleChange, handleSubmit };
 }
 
 export function usePasswordResetController() {

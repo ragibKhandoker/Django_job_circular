@@ -2,3 +2,70 @@
 body {
     margin: 0;
 }
+
+/* Mobile safety net for every page: nothing may be wider than the screen. */
+body {
+    overflow-wrap: break-word;
+}
+
+img,
+video,
+input,
+select,
+textarea {
+    max-width: 100%;
+}
+
+/* ---------- day / night mode ---------- */
+:root[data-theme='dark'] body {
+    background: #0b1120;
+}
+
+/* Floating sun/moon button for pages without their own header toggle. */
+.theme-toggle-floating {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #e4e9f2;
+    border-radius: 50%;
+    background: #fff;
+    color: #0f1b3d;
+    box-shadow: 0 8px 24px rgba(15, 27, 61, 0.15);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.theme-toggle-floating:hover {
+    transform: translateY(-2px);
+}
+
+.theme-toggle-floating .lucide {
+    width: 22px;
+    height: 22px;
+}
+
+:root[data-theme='dark'] .theme-toggle-floating {
+    border-color: #26324d;
+    background: #151e33;
+    color: #f5c451;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/*
+ * Older pages use hard-coded light colours, so in night mode they are inverted
+ * (white <-> black) with the hue rotated back so brand colours stay recognisable.
+ * Photos and videos are inverted again so they keep their real colours.
+ * Pages with a designed dark palette (home and sign-up) are excluded.
+ */
+:root[data-theme='dark'] #root > [class^='page-']:not(.page-home):not(.page-registration-choose):not(.page-candidate-signup):not(.page-employer-signup) {
+    filter: invert(0.92) hue-rotate(180deg);
+}
+
+:root[data-theme='dark'] #root > [class^='page-']:not(.page-home):not(.page-registration-choose):not(.page-candidate-signup):not(.page-employer-signup) :is(img, video, picture) {
+    filter: invert(1) hue-rotate(180deg);
+}

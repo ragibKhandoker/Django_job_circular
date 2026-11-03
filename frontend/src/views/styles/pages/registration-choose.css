@@ -1,62 +1,134 @@
-/* Generated from myapp/templates/registration_choose.html by scripts/extract-template-styles.mjs */
+/* /signup: account type cards. Layout and shared form styles live in styles/components/auth-split.css. */
 
-.page-registration-choose {
-    min-height: 100vh;
-    box-sizing: border-box;
+.page-registration-choose .role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 32px;
+    border: 0;
 }
 
-.page-registration-choose, .page-registration-choose * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.page-registration-choose .role-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.page-registration-choose .role-option:hover {
+    border-color: #b8cdf0;
+}
+
+.page-registration-choose .role-option.is-selected {
+    border-color: var(--primary);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px rgba(11, 94, 215, 0.1);
+}
+
+.page-registration-choose .role-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.page-registration-choose .role-option:has(input:focus-visible) {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.page-registration-choose .role-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 22px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.page-registration-choose .role-icon .lucide {
+    stroke-width: 1.75;
+}
+
+.page-registration-choose .is-selected .role-icon {
+    background: var(--primary);
+    color: #fff;
+}
+
+.page-registration-choose .role-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.page-registration-choose .role-text strong {
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.page-registration-choose .role-text small {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page-registration-choose .role-radio {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #c5d0e3;
+    border-radius: 50%;
+    color: transparent;
+    font-size: 13px;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.page-registration-choose .is-selected .role-radio {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+}
+
+.page-registration-choose .role-radio .lucide {
+    stroke-width: 3;
+}
+
+/* Small phones: tighter cards so the text has room. */
+@media (max-width: 400px) {
+    .page-registration-choose .role-option {
+        gap: 12px;
+        padding: 14px;
     }
 
-    .page-registration-choose {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .page-registration-choose .role-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
     }
 
-    .page-registration-choose .choice-container {
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-      width: 400px;
-      padding: 40px 30px;
-      text-align: center;
-      animation: page-registration-choose-fadeIn 0.5s ease-in-out;
+    .page-registration-choose .role-text strong {
+        font-size: 16px;
     }
+}
 
-    @keyframes page-registration-choose-fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+/* Night mode */
+:root[data-theme='dark'] .page-registration-choose .role-option:hover {
+    border-color: #34466e;
+}
 
-    .page-registration-choose h2 {
-      color: #333;
-      margin-bottom: 30px;
-      font-size: 22px;
-      font-weight: 600;
-    }
-
-    .page-registration-choose .role-btn {
-      display: block;
-      width: 100%;
-      padding: 12px 0;
-      margin-bottom: 15px;
-      background: linear-gradient(to right, #667eea, #764ba2);
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .page-registration-choose .role-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
+:root[data-theme='dark'] .page-registration-choose .role-radio {
+    border-color: #3a4866;
+}

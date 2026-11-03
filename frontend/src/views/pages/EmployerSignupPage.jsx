@@ -1,26 +1,50 @@
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../config/routes.js';
 import { useSignupController } from '../../controllers/AuthPagesController.js';
+import { PLUS_JAKARTA } from '../assets.js';
+import AuthSplitLayout from '../components/auth/AuthSplitLayout.jsx';
+import SignupForm from '../components/auth/SignupForm.jsx';
 import Page from '../components/Page.jsx';
-import SignupFields from '../components/SignupFields.jsx';
-import '../styles/pages/employer-signup.css';
+// Photo: Vitaly Gariev on Unsplash (Unsplash License)
+// https://unsplash.com/photos/diverse-team-collaborating-around-a-laptop-in-office-yd_RKGH_RH4
+import sidePhoto from '../images/employer-team.jpg';
+
+const BENEFITS = [
+  'Post job circulars in minutes',
+  'Reach candidates from across Bangladesh',
+  'Review applicants and CVs in one place',
+];
 
 export default function EmployerSignupPage() {
-  const { values, messages, handleChange, handleSubmit } = useSignupController();
+  const { values, messages, submitting, handleChange, handleSubmit } = useSignupController();
 
   return (
-    <Page name="page-employer-signup" title="Employee Signup Page">
-      <div className="container">
-        <form onSubmit={handleSubmit}>
-          <h1>Employer Sign Up</h1>
-          <SignupFields values={values} onChange={handleChange} />
-          <button type="submit">Create Account</button>
-        </form>
+    <Page name="page-employer-signup" title="Employer Sign Up - JobFinder" stylesheets={[PLUS_JAKARTA]}>
+      <AuthSplitLayout
+        photo={sidePhoto}
+        photoPosition="40% center"
+        heading="Hire the right people, faster."
+        benefits={BENEFITS}
+        backTo={ROUTES.signup}
+        backLabel="Change account type"
+      >
+        <span className="auth-step">Step 2 of 2 · Employer</span>
+        <h1 className="auth-title">Create your employer account</h1>
+        <p className="auth-lead">Start posting jobs and reviewing applicants today.</p>
 
-        <div className="messages">
-          {messages.map((message, index) => (
-            <h3 key={index}>{message}</h3>
-          ))}
-        </div>
-      </div>
+        <SignupForm
+          values={values}
+          messages={messages}
+          submitting={submitting}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          submitLabel="Create employer account"
+        />
+
+        <p className="auth-hint">
+          Already have an account? <Link to={ROUTES.employerLogin}>Log in</Link>
+        </p>
+      </AuthSplitLayout>
     </Page>
   );
 }

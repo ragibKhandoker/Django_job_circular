@@ -186,3 +186,43 @@
             50% { background-color: rgba(79, 70, 229, 0.1); }
             100% { background-color: transparent; }
         }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .page-job-list h1 {
+        font-size: 1.8rem;
+        padding: 0 16px;
+    }
+
+    .page-job-list .container {
+        margin: 20px auto;
+        padding: 0 14px;
+    }
+
+    .page-job-list .job-card {
+        padding: 20px 18px;
+    }
+
+    .page-job-list .job-title {
+        font-size: 1.4rem;
+    }
+
+    /* label above value instead of a 150px label column */
+    .page-job-list .job-detail {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .page-job-list .job-detail strong {
+        min-width: 0;
+    }
+
+    .page-job-list .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .page-job-list .apply-btn,
+    .page-job-list .delete-button {
+        flex: 1 1 140px;
+    }
+}

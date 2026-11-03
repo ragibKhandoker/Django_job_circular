@@ -90,3 +90,15 @@
                 padding: 12px;
             }
         }
+
+/* Responsive: padding counts inside the width so the card never overflows. */
+.page-login-choice {
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.page-login-choice .login-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 380px;
+}

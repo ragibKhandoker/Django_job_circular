@@ -84,7 +84,7 @@
 
 .page-home .btn-primary {
     background: var(--primary);
-    color: var(--white);
+    color: #fff;
     box-shadow: 0 6px 16px rgba(11, 94, 215, 0.25);
 }
 
@@ -113,7 +113,7 @@
 
 .page-home .btn-ghost:hover {
     background: var(--primary);
-    color: var(--white);
+    color: #fff;
 }
 
 .page-home .btn-sm {
@@ -152,7 +152,7 @@
     height: 44px;
     border-radius: 10px;
     background: linear-gradient(135deg, #1f6fe5, #0846a8);
-    color: var(--white);
+    color: #fff;
     font-size: 22px;
 }
 
@@ -316,7 +316,8 @@
 }
 
 .page-home .menu-toggle,
-.page-home .nav-actions-mobile {
+.page-home .nav-actions-mobile,
+.page-home .theme-toggle-compact {
     display: none;
 }
 
@@ -336,7 +337,7 @@
     padding: 12px 18px;
     border-radius: 12px;
     background: #12965a;
-    color: var(--white);
+    color: #fff;
     font-weight: 600;
     box-shadow: var(--shadow);
     animation: home-slide-in 0.3s ease;
@@ -345,7 +346,8 @@
 /* ---------- hero ---------- */
 .page-home .hero {
     position: relative;
-    overflow: hidden;
+    /* clip sideways only, so the location dropdown can extend below the hero */
+    overflow-x: clip;
     padding: 48px 0 40px;
     background:
         radial-gradient(circle at 85% 20%, rgba(199, 219, 255, 0.55), transparent 45%),
@@ -419,19 +421,15 @@
     box-shadow: var(--shadow-lg);
 }
 
-.page-home .search-field,
-.page-home .search-location {
+.page-home .search-field {
     position: relative;
     display: flex;
+    flex: 1;
     align-items: center;
     gap: 10px;
+    min-width: 0;
     padding: 0 14px;
     color: var(--ink);
-}
-
-.page-home .search-field {
-    flex: 1;
-    min-width: 0;
 }
 
 .page-home .search-field > svg {
@@ -439,17 +437,7 @@
     color: #2f3a5c;
 }
 
-.page-home .search-location {
-    flex: 0 0 190px;
-    border-left: 1px solid var(--line);
-}
-
-.page-home .search-location > svg:first-child {
-    color: var(--ink);
-}
-
-.page-home .search-field input,
-.page-home .search-location select {
+.page-home .search-field input {
     width: 100%;
     height: 48px;
     border: 0;
@@ -462,18 +450,180 @@
     color: #8a93ab;
 }
 
-.page-home .search-location select {
-    appearance: none;
-    padding-right: 22px;
+/* ---------- location picker (LocationSelect) ---------- */
+.page-home .search-location {
+    position: relative;
+    flex: 0 0 200px;
+    border-left: 1px solid var(--line);
+}
+
+.page-home .location-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.page-home .location-trigger:hover,
+.page-home .search-location.is-open .location-trigger {
+    background: var(--primary-soft);
+}
+
+.page-home .location-trigger:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.page-home .location-trigger-icon {
+    color: var(--primary);
+}
+
+.page-home .location-value {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-home .location-caret {
+    font-size: 13px;
+    color: var(--muted);
+    transition: transform 0.2s;
+}
+
+.page-home .search-location.is-open .location-caret {
+    transform: rotate(180deg);
+}
+
+.page-home .location-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    z-index: 40;
+    width: 270px;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--white);
+    box-shadow: 0 18px 40px rgba(15, 27, 61, 0.16);
+    animation: home-dropdown-in 0.16s ease-out;
+}
+
+.page-home .location-panel-title {
+    padding: 8px 12px 6px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.page-home .location-panel ul {
+    max-height: 320px;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+    outline: none;
+    overscroll-behavior: contain;
+}
+
+.page-home .location-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    color: var(--ink);
+    font-size: 15px;
     font-weight: 500;
     cursor: pointer;
 }
 
-.page-home .select-caret {
+.page-home .location-option.is-active {
+    background: var(--primary-soft);
+}
+
+.page-home .location-option.is-selected {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.page-home .location-option-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 14px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.page-home .location-option.is-active .location-option-icon,
+.page-home .location-option.is-selected .location-option-icon {
+    background: var(--primary);
+    color: #fff;
+}
+
+.page-home .location-option-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.page-home .location-option-text small {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.page-home .location-check {
+    color: var(--primary);
+    stroke-width: 2.5;
+}
+
+/* First option ("All Locations") is separated from the divisions. */
+.page-home .location-option:first-child {
+    margin-bottom: 6px;
+}
+
+.page-home .location-panel li:nth-child(2) {
+    position: relative;
+    margin-top: 6px;
+}
+
+.page-home .location-panel li:nth-child(2)::before {
+    content: '';
     position: absolute;
-    right: 14px;
-    font-size: 11px;
-    pointer-events: none;
+    top: -7px;
+    left: 12px;
+    right: 12px;
+    border-top: 1px solid var(--line);
+}
+
+@keyframes home-dropdown-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+:root[data-theme='dark'] .page-home .location-panel {
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
 .page-home .search-submit {
@@ -515,7 +665,7 @@
 
 .page-home .chip:hover {
     background: var(--primary);
-    color: var(--white);
+    color: #fff;
 }
 
 /* hero photo */
@@ -567,7 +717,7 @@
     height: 46px;
     border-radius: 12px;
     background: var(--primary);
-    color: var(--white);
+    color: #fff;
     font-size: 19px;
 }
 
@@ -589,7 +739,7 @@
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     margin-top: -12px;
     padding: 24px 16px;
     border: 1px solid var(--line);
@@ -701,7 +851,7 @@
 /* ---------- categories ---------- */
 .page-home .category-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
 }
 
@@ -740,7 +890,7 @@
 
 .page-home .category-card:hover .category-icon {
     background: var(--primary);
-    color: var(--white);
+    color: #fff;
 }
 
 .page-home .category-text {
@@ -773,7 +923,7 @@
 /* ---------- jobs ---------- */
 .page-home .jobs-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
 }
 
@@ -885,7 +1035,7 @@
 /* ---------- companies ---------- */
 .page-home .company-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
 }
 
@@ -913,7 +1063,7 @@
     height: 52px;
     border-radius: 14px;
     background: linear-gradient(135deg, #1f6fe5, #6a4bd6);
-    color: var(--white);
+    color: #fff;
     font-size: 22px;
     font-weight: 800;
 }
@@ -943,7 +1093,7 @@
 /* ---------- career tips ---------- */
 .page-home .tips-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
 }
 
@@ -982,7 +1132,7 @@
 }
 
 .page-home .brand-light .brand-text strong {
-    color: var(--white);
+    color: #fff;
 }
 
 .page-home .brand-light .brand-text strong span {
@@ -1001,7 +1151,7 @@
 
 .page-home .site-footer h4 {
     margin: 0 0 16px;
-    color: var(--white);
+    color: #fff;
     font-size: 16px;
 }
 
@@ -1016,7 +1166,7 @@
 }
 
 .page-home .site-footer ul a:hover {
-    color: var(--white);
+    color: #fff;
 }
 
 .page-home .footer-bottom {
@@ -1053,13 +1203,20 @@
     }
 
     .page-home .category-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 1024px) {
     .page-home .header-inner {
         justify-content: space-between;
+    }
+
+    .page-home .theme-toggle-compact {
+        display: grid;
+        order: 2;
+        margin-left: auto;
+        border: 1px solid var(--line);
     }
 
     .page-home .menu-toggle {
@@ -1133,7 +1290,7 @@
     }
 
     .page-home .hero-inner {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .page-home .hero-photo {
@@ -1146,9 +1303,17 @@
         height: 380px;
     }
 
+    /* Badge goes under the photo instead of covering it. */
+    .page-home .photo-badge {
+        position: relative;
+        margin-top: 12px;
+        box-shadow: var(--shadow-sm);
+    }
+
     .page-home .feature-strip {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         row-gap: 20px;
+        margin-top: 24px;
     }
 
     .page-home .feature:nth-child(3) {
@@ -1158,11 +1323,11 @@
     .page-home .jobs-grid,
     .page-home .company-grid,
     .page-home .tips-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .page-home .footer-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -1203,8 +1368,13 @@
     }
 
     .page-home .search-location {
+        flex: none; /* the desktop 190px basis would become a height here */
         border-left: 0;
         border-top: 1px solid var(--line);
+    }
+
+    .page-home .location-panel {
+        width: 100%;
     }
 
     .page-home .hero-photo {
@@ -1223,7 +1393,7 @@
     }
 
     .page-home .feature-strip {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .page-home .feature + .feature {
@@ -1241,11 +1411,107 @@
         align-items: flex-start;
     }
 
+    /* minmax(0, 1fr): let columns shrink below their content's width. */
     .page-home .category-grid,
     .page-home .jobs-grid,
     .page-home .company-grid,
     .page-home .tips-grid,
     .page-home .footer-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
+
+    .page-home .job-card-top,
+    .page-home .company-card {
+        flex-wrap: wrap;
+    }
+
+    .page-home .job-card {
+        padding: 18px;
+    }
+}
+
+/* ---------- night mode ---------- */
+:root[data-theme='dark'] .page-home {
+    --primary: #4c8dff;
+    --primary-dark: #2f74f0;
+    --primary-soft: rgba(76, 141, 255, 0.14);
+    --ink: #eef2fa;
+    --text: #c2cadb;
+    --muted: #8b95ad;
+    --line: #243049;
+    --bg: #0f1727;
+    --white: #131c2f;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+    background: #0b1120;
+}
+
+.page-home,
+.page-home .site-header,
+.page-home .hero,
+.page-home .section-tinted {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+:root[data-theme='dark'] .page-home .site-header {
+    background: rgba(11, 17, 32, 0.9);
+}
+
+:root[data-theme='dark'] .page-home .nav-link svg,
+:root[data-theme='dark'] .page-home .search-field > svg {
+    color: var(--text);
+}
+
+:root[data-theme='dark'] .page-home .btn-outline {
+    border-color: #2f4472;
+}
+
+:root[data-theme='dark'] .page-home .hero {
+    background:
+        radial-gradient(circle at 85% 20%, rgba(76, 141, 255, 0.16), transparent 45%),
+        linear-gradient(180deg, #0d1424 0%, #0b1120 100%);
+}
+
+:root[data-theme='dark'] .page-home .hero-badge {
+    background: rgba(240, 87, 27, 0.14);
+    color: #ff9a8a;
+}
+
+:root[data-theme='dark'] .page-home .chip {
+    background: #1b2640;
+    color: #c9d4ec;
+}
+
+:root[data-theme='dark'] .page-home .chip:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+:root[data-theme='dark'] .page-home .hero-photo::before {
+    background: #16213a;
+}
+
+:root[data-theme='dark'] .page-home .empty-state {
+    border-color: #2c3956;
+}
+
+:root[data-theme='dark'] .page-home .job-logo {
+    background: #1a2439;
+}
+
+:root[data-theme='dark'] .page-home .company-openings,
+:root[data-theme='dark'] .page-home .flash-message {
+    background: rgba(18, 150, 90, 0.18);
+    color: #4ade80;
+}
+
+:root[data-theme='dark'] .page-home .site-footer {
+    background: #070b16;
+    border-top: 1px solid var(--line);
+}
+
+:root[data-theme='dark'] .page-home .theme-toggle {
+    color: #f5c451;
 }

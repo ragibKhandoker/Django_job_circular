@@ -19,6 +19,7 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../config/routes.js';
+import ThemeToggle from '../ThemeToggle.jsx';
 import { categoryInfo } from './categoryInfo.js';
 
 const SECTION_LINKS = [
@@ -47,6 +48,9 @@ export default function SiteHeader({ isAuthenticated, username, categories, cate
             <small>Find Your Dream Job</small>
           </span>
         </Link>
+
+        {/* Shown next to the menu button on tablets/phones; desktop uses the one in header-actions. */}
+        <ThemeToggle className="icon-btn theme-toggle-compact" />
 
         <button
           type="button"
@@ -98,6 +102,7 @@ export default function SiteHeader({ isAuthenticated, username, categories, cate
         </nav>
 
         <div className="header-actions">
+          <ThemeToggle className="icon-btn" />
           <button type="button" className="icon-btn" aria-label="Search jobs" onClick={focusSearch}>
             <Search aria-hidden="true" />
           </button>

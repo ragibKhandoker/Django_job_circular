@@ -71,3 +71,52 @@
         .page-post-job i.fas.fa-paper-plane {
             margin-right: 8px;
         }
+
+/* Responsive: stack label above field on narrow screens. */
+.page-post-job {
+    box-sizing: border-box;
+}
+
+.page-post-job form,
+.page-post-job form * {
+    box-sizing: border-box;
+}
+
+.page-post-job form p input,
+.page-post-job form p textarea,
+.page-post-job form p select {
+    min-width: 0;
+}
+
+@media (max-width: 700px) {
+    .page-post-job {
+        padding: 24px 16px;
+    }
+
+    .page-post-job form {
+        padding: 20px;
+    }
+
+    .page-post-job form p {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .page-post-job form p label {
+        flex: none;
+        margin-right: 0;
+    }
+
+    .page-post-job form p input,
+    .page-post-job form p textarea,
+    .page-post-job form p select {
+        width: 100%;
+        font-size: 16px; /* stops iOS zooming into the field */
+    }
+
+    .page-post-job button.btn.btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}

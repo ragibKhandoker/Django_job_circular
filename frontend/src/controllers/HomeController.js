@@ -73,7 +73,7 @@ export function useHomeController() {
     keyword,
     location,
     handleKeywordChange: (event) => setKeyword(event.target.value),
-    handleLocationChange: (event) => setLocation(event.target.value),
+    handleLocationChange: setLocation,
     handleSearch,
     searchKeyword: (q) => search({ q }),
     categories: JOB_CATEGORIES,

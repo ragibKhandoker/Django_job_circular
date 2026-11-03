@@ -1,0 +1,508 @@
+/* Shared layout for the sign-up / login pages (AuthSplitLayout). Scoped to .auth-split. */
+
+.auth-split {
+    --primary: #0b5ed7;
+    --primary-dark: #0846a8;
+    --primary-soft: #e7f0ff;
+    --ink: #0f1b3d;
+    --text: #3d4766;
+    --muted: #6b7591;
+    --line: #e4e9f2;
+    --danger: #c42b3c;
+    --surface: #fff;
+    --page-bg: #f5f8fe;
+
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    min-height: 100vh;
+    background: var(--page-bg);
+    color: var(--text);
+    transition: background-color 0.3s, color 0.3s;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+.auth-split *,
+.auth-split *::before,
+.auth-split *::after {
+    box-sizing: border-box;
+}
+
+.auth-split h1,
+.auth-split h2,
+.auth-split p,
+.auth-split ul,
+.auth-split fieldset {
+    margin: 0;
+    padding: 0;
+}
+
+.auth-split a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.auth-split .lucide {
+    width: 1.15em;
+    height: 1.15em;
+    flex-shrink: 0;
+}
+
+.auth-split .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ---------- left: photo panel ---------- */
+/* Sticky so the photo and pitch stay in view while a long form scrolls. */
+.auth-split .auth-aside {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.auth-split .auth-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.auth-split .auth-overlay {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 40px 48px;
+    background: linear-gradient(180deg, rgba(8, 30, 74, 0.55) 0%, rgba(8, 30, 74, 0.2) 35%, rgba(8, 30, 74, 0.88) 100%);
+    color: #fff;
+}
+
+.auth-split .auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    align-self: flex-start;
+}
+
+.auth-split .auth-brand-icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 20px;
+}
+
+.auth-split .auth-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.auth-split .auth-brand-text strong {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.auth-split .auth-brand-text strong span {
+    color: #8db8ff;
+}
+
+.auth-split .auth-brand-text small {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.auth-split .auth-pitch h2 {
+    max-width: 440px;
+    font-size: clamp(28px, 2.6vw, 38px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+}
+
+.auth-split .auth-pitch ul {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+    list-style: none;
+}
+
+.auth-split .auth-pitch li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-split .auth-check {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 13px;
+}
+
+/* ---------- right: content ---------- */
+.auth-split .auth-main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 88px 24px 48px;
+}
+
+.auth-split .auth-back {
+    position: absolute;
+    top: 32px;
+    left: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.auth-split .auth-back:hover {
+    color: var(--primary);
+}
+
+.auth-split .auth-content {
+    width: 100%;
+    max-width: 480px;
+}
+
+.auth-split .auth-theme-toggle {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 19px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.auth-split .auth-theme-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* ---------- shared form pieces ---------- */
+.auth-split .auth-step {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.auth-split .auth-title {
+    margin-top: 16px;
+    color: var(--ink);
+    font-size: clamp(28px, 3vw, 36px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+}
+
+.auth-split .auth-lead {
+    margin-top: 8px;
+    color: var(--muted);
+}
+
+.auth-split .auth-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 28px;
+    padding: 15px 20px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #fff;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(11, 94, 215, 0.25);
+    transition: background 0.2s, transform 0.2s, opacity 0.2s;
+}
+
+.auth-split .auth-submit:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.auth-split .auth-submit:disabled {
+    opacity: 0.7;
+    cursor: progress;
+}
+
+.auth-split .auth-hint {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 15px;
+    text-align: center;
+}
+
+.auth-split .auth-hint a {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.auth-split .auth-hint a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- form fields ---------- */
+.auth-split .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 28px;
+}
+
+.auth-split .auth-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.auth-split .auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.auth-split .auth-label {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.auth-split .auth-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auth-split .auth-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #8a93ab;
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.auth-split .auth-input input {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px 0 42px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    outline: none;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-split .auth-input input::placeholder {
+    color: #a3adc4;
+}
+
+.auth-split .auth-input input:hover {
+    border-color: #c5d3ec;
+}
+
+.auth-split .auth-input input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(11, 94, 215, 0.12);
+}
+
+.auth-split .auth-input:focus-within .auth-input-icon {
+    color: var(--primary);
+}
+
+.auth-split .auth-input:has(.auth-eye) input {
+    padding-right: 46px;
+}
+
+.auth-split .auth-eye {
+    position: absolute;
+    right: 6px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: #8a93ab;
+    cursor: pointer;
+}
+
+.auth-split .auth-eye:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.auth-split .auth-hint-text,
+.auth-split .auth-error-text {
+    font-size: 13px;
+}
+
+.auth-split .auth-hint-text {
+    color: var(--muted);
+}
+
+.auth-split .auth-error-text {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.auth-split .has-error .auth-input input {
+    border-color: var(--danger);
+}
+
+.auth-split .has-error .auth-input input:focus {
+    box-shadow: 0 0 0 4px rgba(196, 43, 60, 0.12);
+}
+
+.auth-split .auth-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid #f3c2c8;
+    border-radius: 12px;
+    background: #fff4f5;
+    color: var(--danger);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.auth-split .auth-alert .lucide {
+    margin-top: 2px;
+}
+
+.auth-split .auth-form .auth-submit {
+    margin-top: 8px;
+}
+
+.auth-split .auth-spin {
+    animation: auth-spin 0.8s linear infinite;
+}
+
+@keyframes auth-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+    .auth-split {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .auth-split .auth-aside {
+        position: relative;
+        height: auto;
+        min-height: 240px;
+    }
+
+    .auth-split .auth-overlay {
+        gap: 32px;
+        padding: 24px;
+    }
+
+    .auth-split .auth-pitch ul {
+        display: none;
+    }
+
+    .auth-split .auth-main {
+        padding: 24px 20px 48px;
+    }
+
+    .auth-split .auth-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .auth-split .auth-theme-toggle {
+        top: 18px;
+        right: 20px;
+    }
+
+    .auth-split .auth-back {
+        position: static;
+        align-self: flex-start;
+        margin-bottom: 24px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-split * {
+        transition: none !important;
+    }
+}
+
+/* ---------- night mode ---------- */
+:root[data-theme='dark'] .auth-split {
+    --primary: #4c8dff;
+    --primary-dark: #2f74f0;
+    --primary-soft: rgba(76, 141, 255, 0.14);
+    --ink: #eef2fa;
+    --text: #c2cadb;
+    --muted: #8b95ad;
+    --line: #26324d;
+    --danger: #ff6b7d;
+    --surface: #131c2f;
+    --page-bg: #0b1120;
+}
+
+:root[data-theme='dark'] .auth-split .auth-input input:hover {
+    border-color: #34466e;
+}
+
+:root[data-theme='dark'] .auth-split .auth-alert {
+    border-color: rgba(255, 107, 125, 0.35);
+    background: rgba(255, 107, 125, 0.1);
+}
+
+:root[data-theme='dark'] .auth-split .auth-theme-toggle {
+    color: #f5c451;
+}
+
+:root[data-theme='dark'] .auth-split .auth-overlay {
+    background: linear-gradient(180deg, rgba(5, 12, 30, 0.65) 0%, rgba(5, 12, 30, 0.3) 35%, rgba(5, 12, 30, 0.92) 100%);
+}

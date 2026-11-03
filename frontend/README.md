@@ -1,6 +1,6 @@
 # JobFinder Pro: React frontend
 
-This is a React (Vite) version of the Django templates in `myapp/templates/`. The UI is the same: each page's CSS is copied from its original template. Django still owns the data. The app talks to the JSON API in `myapp/api.py`, which is mounted at `/api/`.
+This is the website UI, built with React (Vite). Django only serves data: the app talks to the JSON API in `backend/myapp/api.py`, which is mounted at `/api/`.
 
 ## Run
 
@@ -41,10 +41,10 @@ src/
 │   │   ApplicationController.js, CandidatesController.js
 │   └── useForm.js, useAsync.js
 ├── views/             V: presentation only (JSX + CSS)
-│   ├── pages/             one component per original template
+│   ├── pages/             one component per page
 │   ├── components/        shared pieces (header, footer, job cards, form fields)
 │   ├── hooks/             view-only effects (title/stylesheets, scrolling)
-│   └── styles/pages/      generated, scoped CSS (one file per template)
+│   └── styles/pages/      scoped CSS (one file per page)
 ├── config/routes.js   URL paths (same as myapp/urls.py)
 └── App.jsx            router
 ```
@@ -53,9 +53,6 @@ Rules: views only import controllers, never models. Controllers import models. M
 
 ## Styles
 
-`npm run extract-styles` regenerates `src/views/styles/pages/*.css` from the `<style>` blocks in `myapp/templates/`. It scopes every selector to the page's wrapper class (`body` becomes `.page-home`, `h1` becomes `.page-home h1`). This stops the pages' global selectors from clashing in one app. Do one of these, not both:
+Each page's CSS lives in `src/views/styles/pages/` and every selector is scoped to the page's wrapper class (for example `.page-home h1`), so pages' styles never clash.
 
-- edit the template's `<style>` and re-run the script, or
-- edit the generated CSS directly and stop using the script.
-
-Bootstrap and Google Fonts load only while the page that used them is mounted (`views/hooks/usePageAssets.js`), as they did in the original templates.
+Bootstrap and Google Fonts load only while the page that used them is mounted (`views/hooks/usePageAssets.js`), so they never affect other pages.

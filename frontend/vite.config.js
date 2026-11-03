@@ -17,6 +17,7 @@ export default defineConfig({
       '/admin': toDjango,
       '/static': toDjango,
       '/media': toDjango,
+      '/reset': toDjango, // password reset link from the email
     },
   },
 });

@@ -12,7 +12,7 @@ This project demonstrates a clean, category-based job management system that bal
 - 📱 **Responsive Design** – Clean and mobile-friendly UI using HTML and CSS.
 - 🗂️ **Category-based Job Organization** – Jobs are organized into categories for better filtering.
 # 🛠️ Technologies Used
-- **Frontend:** React (Vite) in `frontend/`, plus the original Django templates
+- **Frontend:** React (Vite) in `frontend/`
 - **Backend:** Django 5.2 (Python)
 - **Database:** MongoDB Atlas (via `django-mongodb-backend`)
 

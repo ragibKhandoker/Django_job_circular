@@ -1,8 +1,4 @@
-"""JSON API consumed by the React frontend (frontend/).
-
-The original template views in views.py are left untouched; these endpoints
-expose the same behaviour as JSON so the React app can render the UI.
-"""
+"""JSON API consumed by the React frontend (frontend/)."""
 import json
 from functools import wraps
 

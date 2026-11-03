@@ -1,4 +1,4 @@
-// External stylesheets the original templates linked in their <head>.
+// External stylesheets that pages load while mounted (see usePageAssets).
 export const FONT_AWESOME = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
 export const BOOTSTRAP = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css';
 export const POPPINS = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap';

@@ -5,8 +5,12 @@ This is a React (Vite) version of the Django templates in `myapp/templates/`. Th
 ## Run
 
 ```powershell
-# terminal 1: Django (from the project root)
-python manage.py runserver
+# terminal 1: Django (WSL / Linux)
+cd backend
+python3 -m venv .venv && .venv/bin/pip install -r ../requirements.txt   # first time only
+cp .env.example .env      # then put your MongoDB Atlas URI in .env
+.venv/bin/python manage.py migrate
+.venv/bin/python manage.py runserver
 
 # terminal 2: React
 cd frontend
@@ -14,7 +18,9 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-Vite proxies `/api` to Django (`http://127.0.0.1:8000`, or set `DJANGO_URL`). This keeps the session and CSRF cookies same-origin. Open the site at **http://localhost:5173**.
+Vite proxies `/api` to Django (`http://127.0.0.1:8000`, or set `DJANGO_URL`). `/media` (uploaded resumes) is proxied too. This keeps the session and CSRF cookies same-origin.
+
+The database is MongoDB Atlas (`django-mongodb-backend`). Set `MONGODB_URI` and `MONGODB_DB` in `backend/.env`. On startup, `runserver` prints whether Atlas connected, and `/api/health/` reports the database status.
 
 ## MVC structure
 

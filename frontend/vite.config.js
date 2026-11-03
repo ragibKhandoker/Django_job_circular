@@ -16,6 +16,7 @@ export default defineConfig({
       '/api': toDjango,
       '/admin': toDjango,
       '/static': toDjango,
+      '/media': toDjango,
     },
   },
 });

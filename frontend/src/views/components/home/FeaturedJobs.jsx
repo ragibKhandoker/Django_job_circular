@@ -1,42 +1,72 @@
+import { ArrowRight, BriefcaseBusiness, Calendar, Clock, MapPin, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { routeTo } from '../../../config/routes.js';
+import { ROUTES } from '../../../config/routes.js';
+import { categoryInfo } from './categoryInfo.js';
 
-function FeaturedJobCard({ job }) {
+function JobCard({ job, statusLabel, salaryLabel, applyLink }) {
+  const info = categoryInfo(job.title);
   return (
-    <div className="job-card">
-      <div className="job-card-header">
-        <div className="company-logo">{job.initials}</div>
-        <div className="job-info">
-          <h3>{job.title}</h3>
-          <p>{job.location}</p>
+    <article className="job-card">
+      <div className="job-card-top">
+        <span className="job-logo">{job.company_name.slice(0, 2).toUpperCase()}</span>
+        <div className="job-card-title">
+          <h3>{info.label}</h3>
+          <p>{job.company_name}</p>
         </div>
+        <span className="job-type">{statusLabel(job.status)}</span>
       </div>
-      <div className="job-meta">
-        <span>{job.location}</span>
-        <span>{job.status}</span>
-        <span>{job.postedAgo} ago</span>
-      </div>
-      <p className="job-salary">{job.salary}</p>
-      <p>{job.requirementsPreview}</p>
+      <ul className="job-meta">
+        <li><MapPin aria-hidden="true" /> {job.location}</li>
+        <li><span className="taka">৳</span> {salaryLabel(job.salary)}</li>
+        {job.deadline && <li><Calendar aria-hidden="true" /> Deadline: {job.deadlineDisplay}</li>}
+      </ul>
+      <p className="job-desc">{job.requirementsPreview}</p>
       <div className="job-card-footer">
-        <span className="job-date">Posted {job.postedAgo} ago</span>
-        <Link to={routeTo.applyForm(job.id)} className="btn btn-primary">Apply Now</Link>
+        <span className="job-posted"><Clock aria-hidden="true" /> {job.postedAgo} ago</span>
+        <Link to={applyLink(job.id)} className="btn btn-primary btn-sm">Apply Now</Link>
       </div>
-    </div>
+    </article>
   );
 }
 
-export default function FeaturedJobs({ jobs }) {
+export default function FeaturedJobs({ jobs, loading, statusLabel, salaryLabel, applyLink, isAuthenticated }) {
   return (
-    <section className="featured-jobs">
-      <div className="section-title">
-        <h2>Featured Jobs</h2>
-      </div>
-      <div className="jobs-grid">
-        {jobs.length > 0 ? (
-          jobs.map((job) => <FeaturedJobCard key={job.id} job={job} />)
-        ) : (
-          <p>No featured jobs right now.</p>
+    <section className="section section-tinted" id="latest-jobs">
+      <div className="container">
+        <div className="section-head">
+          <div>
+            <h2 className="section-title">Latest Job Circulars</h2>
+            <p className="section-subtitle">Fresh opportunities posted by employers</p>
+          </div>
+          <Link to={ROUTES.jobList} className="btn btn-ghost">
+            View All Jobs <ArrowRight aria-hidden="true" />
+          </Link>
+        </div>
+
+        {loading && <p className="empty-state">Loading jobs...</p>}
+
+        {!loading && jobs.length === 0 && (
+          <div className="empty-state">
+            <BriefcaseBusiness aria-hidden="true" />
+            <p>No job circulars yet. Be the first to post one!</p>
+            <Link to={isAuthenticated ? ROUTES.postJob : ROUTES.employerLogin} className="btn btn-primary">
+              <Plus aria-hidden="true" /> Post a Job
+            </Link>
+          </div>
+        )}
+
+        {jobs.length > 0 && (
+          <div className="jobs-grid">
+            {jobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                statusLabel={statusLabel}
+                salaryLabel={salaryLabel}
+                applyLink={applyLink}
+              />
+            ))}
+          </div>
         )}
       </div>
     </section>

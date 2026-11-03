@@ -13,6 +13,18 @@ export const JOB_CATEGORIES = [
   'Education',
 ];
 
+// Divisions of Bangladesh, used as location filters (matched with icontains).
+export const BD_DIVISIONS = [
+  'Dhaka',
+  'Chattogram',
+  'Rajshahi',
+  'Khulna',
+  'Barishal',
+  'Sylhet',
+  'Rangpur',
+  'Mymensingh',
+];
+
 export const JOB_TITLE_CHOICES = JOB_CATEGORIES.map((c) => [c, c]);
 
 export const SALARY_CHOICES = [

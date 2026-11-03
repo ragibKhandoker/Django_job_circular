@@ -10,6 +10,7 @@
     "extract-styles": "node scripts/extract-template-styles.mjs"
   },
   "dependencies": {
+    "lucide-react": "^1.66.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.0"

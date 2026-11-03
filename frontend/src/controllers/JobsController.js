@@ -41,17 +41,20 @@ export function useTotalJobsController() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = searchParams.get('location') ?? '';
   const latest = searchParams.get('latest') ?? '';
+  // Keyword from the home page search bar; kept across location searches.
+  const q = searchParams.get('q') ?? '';
   const [locationInput, setLocationInput] = useState(location);
 
   const { data: jobs, loading } = useAsync(
-    () => JobModel.list(latest === '1' ? { location, latest, limit: 10 } : { location }),
-    [location, latest],
+    () => JobModel.list(latest === '1' ? { q, location, latest, limit: 10 } : { q, location }),
+    [q, location, latest],
     [],
   );
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const params = { location: locationInput };
+    if (q) params.q = q;
     if (event.nativeEvent.submitter?.name === 'latest') params.latest = '1';
     setSearchParams(params);
   };

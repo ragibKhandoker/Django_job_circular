@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django_mongodb_backend.fields import ObjectIdAutoField
 
 
 class Employee(models.Model):
-    employer_id = models.AutoField(primary_key=True)
+    employer_id = ObjectIdAutoField(primary_key=True)
     company_name = models.CharField(max_length=100)
     full_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100,unique=True)
@@ -29,7 +30,7 @@ class Employee(models.Model):
 
 class Candidate(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, null=True, blank=True)
-    candidate_id = models.AutoField(primary_key=True)
+    candidate_id = ObjectIdAutoField(primary_key=True)
     full_name = models.CharField(max_length=100)
     email = models.EmailField(max_length=100,unique=True)
     password = models.CharField(max_length=100)

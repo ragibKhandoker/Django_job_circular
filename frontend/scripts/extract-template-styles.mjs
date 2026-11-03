@@ -22,7 +22,6 @@ const outDir = path.resolve(here, '../src/views/styles/pages');
 // template file -> page class. `bodyMargin` keeps the browser's default 8px
 // body margin for templates that never reset it.
 const PAGES = [
-  { template: 'home.html', page: 'page-home' },
   { template: 'registration_choose.html', page: 'page-registration-choose' },
   { template: 'employer_signup.html', page: 'page-employer-signup' },
   { template: 'candidate_signup.html', page: 'page-candidate-signup' },

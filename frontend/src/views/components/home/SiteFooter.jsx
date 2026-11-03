@@ -1,50 +1,56 @@
+import { BriefcaseBusiness } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../config/routes.js';
 
 export default function SiteFooter() {
   return (
-    <footer>
-      <div className="footer-content">
-        <div className="footer-column">
-          <h3>JobFinder Pro</h3>
-          <p>Connecting talent with opportunity since 2023. Our platform helps millions find their dream jobs.</p>
-          <div className="social-links">
-            <a href="#"><i className="fab fa-facebook-f"></i></a>
-            <a href="#"><i className="fab fa-twitter"></i></a>
-            <a href="#"><i className="fab fa-linkedin-in"></i></a>
-            <a href="#"><i className="fab fa-instagram"></i></a>
+    <footer className="site-footer" id="about">
+      <div className="container footer-grid">
+        <div className="footer-about">
+          <div className="brand brand-light">
+            <span className="brand-icon"><BriefcaseBusiness aria-hidden="true" /></span>
+            <span className="brand-text">
+              <strong>Job<span>Finder</span></strong>
+              <small>Find Your Dream Job</small>
+            </span>
           </div>
+          <p>
+            JobFinder brings job circulars from employers across Bangladesh into one place, so candidates can search,
+            apply and track opportunities easily.
+          </p>
         </div>
-        <div className="footer-column">
-          <h3>For Candidates</h3>
+
+        <div>
+          <h4>For Candidates</h4>
           <ul>
-            <li><a href="#">Browse Jobs</a></li>
-            <li><a href="#">Job Alerts</a></li>
-            <li><a href="#">Career Advice</a></li>
-            <li><a href="#">Resume Builder</a></li>
+            <li><Link to={ROUTES.jobList}>Browse Jobs</Link></li>
+            <li><Link to={ROUTES.totalJobs}>Search by Location</Link></li>
+            <li><Link to={ROUTES.candidateSignup}>Create Account</Link></li>
+            <li><Link to={ROUTES.candidateLogin}>Candidate Login</Link></li>
           </ul>
         </div>
-        <div className="footer-column">
-          <h3>For Employers</h3>
+
+        <div>
+          <h4>For Employers</h4>
           <ul>
             <li><Link to={ROUTES.postJob}>Post a Job</Link></li>
             <li><Link to={ROUTES.browseCandidates}>Browse Candidates</Link></li>
-            <li><a href="#">Pricing Plans</a></li>
-            <li><a href="#">HR Solutions</a></li>
+            <li><Link to={ROUTES.employerSignup}>Employer Sign Up</Link></li>
+            <li><Link to={ROUTES.employerLogin}>Employer Login</Link></li>
           </ul>
         </div>
-        <div className="footer-column">
-          <h3>Company</h3>
+
+        <div>
+          <h4>Explore</h4>
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Blog</a></li>
+            <li><a href="#latest-jobs">Latest Circulars</a></li>
+            <li><a href="#companies">Companies</a></li>
+            <li><a href="#career-tips">Career Tips</a></li>
           </ul>
         </div>
       </div>
-      <div className="footer-bottom">
-        <p>&copy; 2023 JobFinder Pro. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+      <div className="container footer-bottom">
+        <p>© {new Date().getFullYear()} JobFinder. All rights reserved.</p>
       </div>
     </footer>
   );

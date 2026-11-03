@@ -5,3 +5,4 @@ export const POPPINS = 'https://fonts.googleapis.com/css2?family=Poppins:wght@40
 export const POPPINS_BOLD = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap';
 export const INTER = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap';
 export const INTER_FULL = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
+export const PLUS_JAKARTA = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';

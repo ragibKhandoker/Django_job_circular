@@ -1,28 +1,55 @@
 import { useHomeController } from '../../controllers/HomeController.js';
-import { FONT_AWESOME } from '../assets.js';
+import { PLUS_JAKARTA } from '../assets.js';
+import CareerTips from '../components/home/CareerTips.jsx';
 import CategoryGrid from '../components/home/CategoryGrid.jsx';
+import CompaniesSection from '../components/home/CompaniesSection.jsx';
 import FeaturedJobs from '../components/home/FeaturedJobs.jsx';
+import FeatureStrip from '../components/home/FeatureStrip.jsx';
+import HeroSection from '../components/home/HeroSection.jsx';
 import SiteFooter from '../components/home/SiteFooter.jsx';
 import SiteHeader from '../components/home/SiteHeader.jsx';
 import Page from '../components/Page.jsx';
 import '../styles/pages/home.css';
 
 export default function HomePage() {
-  const { isAuthenticated, categories, latestJobs, messages, handleLogout } = useHomeController();
+  const home = useHomeController();
 
   return (
-    <Page name="page-home" title="JobFinder Pro - Find Your Dream Job" stylesheets={[FONT_AWESOME]}>
-      <SiteHeader isAuthenticated={isAuthenticated} messages={messages} onLogout={handleLogout} />
+    <Page name="page-home" title="JobFinder - Find Your Dream Job" stylesheets={[PLUS_JAKARTA]}>
+      <SiteHeader
+        isAuthenticated={home.isAuthenticated}
+        username={home.username}
+        categories={home.categories}
+        categoryLink={home.categoryLink}
+        messages={home.messages}
+        onLogout={home.handleLogout}
+      />
 
-      <section className="hero" id="threejs-hero">
-        <div className="hero-content">
-          <h1>Find Your Dream Job Today</h1>
-          <p>Join thousands of companies and candidates who use JobFinder Pro to connect with the best opportunities</p>
-        </div>
-      </section>
+      <main>
+        <HeroSection
+          keyword={home.keyword}
+          location={home.location}
+          locations={home.locations}
+          totalJobs={home.totalJobs}
+          onKeywordChange={home.handleKeywordChange}
+          onLocationChange={home.handleLocationChange}
+          onSearch={home.handleSearch}
+          onQuickSearch={home.searchKeyword}
+        />
+        <FeatureStrip />
+        <CategoryGrid categories={home.categories} jobCounts={home.jobCounts} categoryLink={home.categoryLink} />
+        <FeaturedJobs
+          jobs={home.latestJobs}
+          loading={home.loading}
+          statusLabel={home.statusLabel}
+          salaryLabel={home.salaryLabel}
+          applyLink={home.applyLink}
+          isAuthenticated={home.isAuthenticated}
+        />
+        <CompaniesSection companies={home.companies} />
+        <CareerTips />
+      </main>
 
-      <CategoryGrid categories={categories} />
-      <FeaturedJobs jobs={latestJobs} />
       <SiteFooter />
     </Page>
   );

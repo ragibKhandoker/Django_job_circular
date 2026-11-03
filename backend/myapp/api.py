@@ -9,11 +9,13 @@ from functools import wraps
 from django.contrib import auth
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from .db_status import ping_mongodb
 from .forms import ApplicantForm, EducationalBackgroundForm, JobPostForm, WorkExperienceForm
 from .models import Applicant, JobPost
 
@@ -49,7 +51,7 @@ def serialize_user(user):
         return {'is_authenticated': False}
     return {
         'is_authenticated': True,
-        'id': user.id,
+        'id': str(user.id),
         'username': user.username,
         'first_name': user.first_name,
         'last_name': user.last_name,
@@ -59,7 +61,7 @@ def serialize_user(user):
 
 def serialize_job(job, user=None):
     return {
-        'id': job.id,
+        'id': str(job.id),
         'job_id': job.job_id,
         'title': job.title,
         'company_name': job.company_name,
@@ -77,8 +79,8 @@ def serialize_job(job, user=None):
 
 def serialize_applicant(applicant, detailed=False):
     data = {
-        'id': applicant.id,
-        'job': applicant.job_id,
+        'id': str(applicant.id),
+        'job': str(applicant.job_id),
         'full_name': applicant.full_name,
         'email': applicant.email,
         'phone': applicant.phone,
@@ -114,6 +116,14 @@ def serialize_applicant(applicant, detailed=False):
             for edu in applicant.educational_backgrounds.all()
         ]
     return data
+
+
+# ---------- health ----------
+
+@require_GET
+def health(request):
+    db_ok, db_message = ping_mongodb(timeout_ms=2000)
+    return JsonResponse({'status': 'OK', 'database': 'connected' if db_ok else f'error: {db_message}'})
 
 
 # ---------- auth ----------
@@ -190,6 +200,15 @@ def jobs(request):
         queryset = queryset.filter(title=category)
     if location:
         queryset = queryset.filter(location__icontains=location)
+    keyword = request.GET.get('q', '').strip()
+    if keyword:
+        queryset = queryset.filter(
+            Q(title__icontains=keyword)
+            | Q(company_name__icontains=keyword)
+            | Q(location__icontains=keyword)
+            | Q(requirements__icontains=keyword)
+            | Q(status__icontains=keyword)
+        )
     if request.GET.get('latest') == '1':
         queryset = queryset.order_by('-created_at')
     limit = request.GET.get('limit')

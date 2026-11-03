@@ -33,19 +33,19 @@ SECRET_KEY = 'django-insecure-+rg2iy39cemtct+(=p+%rx^3p1t@+&ndu*0=1%=zdujywzl=*x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'myproject.apps.MongoAdminConfig',
+    'myproject.apps.MongoAuthConfig',
+    'myproject.apps.MongoContentTypesConfig',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'myapp',  # before staticfiles so its runserver (startup banner) is used
     'django.contrib.staticfiles',
-    'myapp',
 ]
 
 MIDDLEWARE = [
@@ -81,18 +81,25 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_POST'),
-    }
+# MongoDB Atlas. Put the connection string in backend/.env:
+#   MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/
+#   MONGODB_DB=jobportal
+import django_mongodb_backend
 
+MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
+MONGODB_DB = os.getenv('MONGODB_DB', 'jobportal')
+
+DATABASES = {
+    'default': django_mongodb_backend.parse_uri(MONGODB_URI, db_name=MONGODB_DB),
 }
 
+# Built-in apps get their migrations from backend/mongo_migrations
+# (generated for ObjectId primary keys).
+MIGRATION_MODULES = {
+    'admin': 'mongo_migrations.admin',
+    'auth': 'mongo_migrations.auth',
+    'contenttypes': 'mongo_migrations.contenttypes',
+}
 
 
 # Password validation
@@ -130,18 +137,20 @@ LOGIN_URL = '/login/'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = '/login_choice/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
 # AUTH_USER_MODEL = 'myapp.CustomerUser'
 LOGIN_REDIRECT_URL = 'home'
 # Email backend for password reset (for testing)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')

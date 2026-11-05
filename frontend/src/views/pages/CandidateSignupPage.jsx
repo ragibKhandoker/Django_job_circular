@@ -16,7 +16,7 @@ const BENEFITS = [
 ];
 
 export default function CandidateSignupPage() {
-  const { values, messages, submitting, handleChange, handleSubmit } = useSignupController();
+  const { values, messages, submitting, handleChange, handleSubmit } = useSignupController('candidate');
 
   return (
     <Page name="page-candidate-signup" title="Job Seeker Sign Up - JobFinder" stylesheets={[PLUS_JAKARTA]}>

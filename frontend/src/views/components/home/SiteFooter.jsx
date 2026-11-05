@@ -1,4 +1,4 @@
-import { BriefcaseBusiness } from 'lucide-react';
+import { BriefcaseBusiness, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../config/routes.js';
 
@@ -51,6 +51,9 @@ export default function SiteFooter() {
       </div>
       <div className="container footer-bottom">
         <p>© {new Date().getFullYear()} JobFinder. All rights reserved.</p>
+        <Link to={ROUTES.adminLogin} className="footer-admin">
+          <ShieldCheck aria-hidden="true" /> Admin login
+        </Link>
       </div>
     </footer>
   );

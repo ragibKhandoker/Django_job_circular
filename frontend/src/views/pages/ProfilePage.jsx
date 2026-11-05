@@ -11,6 +11,7 @@ import {
   FileText,
   Globe,
   Hourglass,
+  Search,
   Link2,
   LoaderCircle,
   Mail,
@@ -31,6 +32,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
 import { useProfileController } from '../../controllers/ProfileController.js';
 import { formatDate } from '../../models/formatters.js';
+import { ROLE_LABELS } from '../../models/roles.js';
 import { PLUS_JAKARTA } from '../assets.js';
 import Page from '../components/Page.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
@@ -100,9 +102,13 @@ function ProfileView({ profile, notices, onDismissNotices }) {
   const live = profile.jobs.filter((job) => job.approval_status === 'approved').length;
   const pending = profile.jobs.filter((job) => job.approval_status === 'pending').length;
   const complete = profile.completeness === 100;
+  // Job posts belong to employers (and admins); job seekers never see that part.
+  const hires = profile.is_staff || profile.role === 'employer';
 
   return (
     <main className="profile-wrap profile-main">
+      <EmployerStatus profile={profile} />
+
       {notices.length > 0 && (
         <div className="profile-notice" role="status">
           <span className="profile-notice-icon"><Check aria-hidden="true" /></span>
@@ -131,8 +137,13 @@ function ProfileView({ profile, notices, onDismissNotices }) {
           <div className="profile-identity">
             <h1>
               {profile.fullName}
-              {profile.is_staff && (
+              {profile.is_staff ? (
                 <span className="profile-badge"><ShieldCheck aria-hidden="true" /> Admin</span>
+              ) : (
+                <span className={`profile-badge role-${profile.role}`}>
+                  {profile.role === 'employer' ? <BriefcaseBusiness aria-hidden="true" /> : <UserRound aria-hidden="true" />}
+                  {ROLE_LABELS[profile.role] ?? 'Member'}
+                </span>
               )}
             </h1>
             <p className={`profile-headline${profile.headline ? '' : ' is-empty'}`}>
@@ -149,16 +160,34 @@ function ProfileView({ profile, notices, onDismissNotices }) {
             <Link to={ROUTES.profileEdit} className="profile-btn profile-btn-primary">
               <PenLine aria-hidden="true" /> Edit profile
             </Link>
-            <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
-              <Plus aria-hidden="true" /> Post a job
-            </Link>
+            {profile.can_post_jobs ? (
+              <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
+                <Plus aria-hidden="true" /> Post a job
+              </Link>
+            ) : (
+              !hires && (
+                <Link to={ROUTES.jobList} className="profile-btn profile-btn-ghost">
+                  <Search aria-hidden="true" /> Browse jobs
+                </Link>
+              )
+            )}
           </div>
         </div>
 
         <ul className="profile-stats">
-          <Stat Icon={BriefcaseBusiness} value={profile.jobs.length} label="Job posts" tone="blue" />
-          <Stat Icon={CircleCheck} value={live} label="Live now" tone="green" />
-          <Stat Icon={Hourglass} value={pending} label="In review" tone="amber" />
+          {hires ? (
+            <>
+              <Stat Icon={BriefcaseBusiness} value={profile.jobs.length} label="Job posts" tone="blue" />
+              <Stat Icon={CircleCheck} value={live} label="Live now" tone="green" />
+              <Stat Icon={Hourglass} value={pending} label="In review" tone="amber" />
+            </>
+          ) : (
+            <>
+              <Stat Icon={UserRound} value="Job seeker" label="Account type" tone="blue" />
+              <Stat Icon={Wrench} value={profile.skillList.length} label="Skills listed" tone="green" />
+              <Stat Icon={CalendarDays} value={new Date(profile.date_joined).getFullYear()} label="Member since" tone="amber" />
+            </>
+          )}
           <Stat Icon={Sparkles} value={`${profile.completeness}%`} label="Profile strength" tone="violet" />
         </ul>
       </section>
@@ -205,25 +234,48 @@ function ProfileView({ profile, notices, onDismissNotices }) {
             )}
           </section>
 
-          <section className="profile-card">
-            <CardTitle Icon={BriefcaseBusiness} count={profile.jobs.length}>My job posts</CardTitle>
-            {profile.jobs.length > 0 ? (
-              <ul className="profile-jobs">
-                {profile.jobs.map((job) => <JobRow key={job.id} job={job} />)}
-              </ul>
-            ) : (
-              <div className="profile-empty-state">
-                <span className="profile-empty-icon"><BriefcaseBusiness aria-hidden="true" /></span>
-                <p>You have not posted any jobs yet.</p>
-                <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
-                  <Plus aria-hidden="true" /> Post your first job
-                </Link>
-              </div>
-            )}
-          </section>
+          {hires && (
+            <section className="profile-card">
+              <CardTitle Icon={BriefcaseBusiness} count={profile.jobs.length}>My job posts</CardTitle>
+              {profile.jobs.length > 0 ? (
+                <ul className="profile-jobs">
+                  {profile.jobs.map((job) => <JobRow key={job.id} job={job} />)}
+                </ul>
+              ) : (
+                <div className="profile-empty-state">
+                  <span className="profile-empty-icon"><BriefcaseBusiness aria-hidden="true" /></span>
+                  <p>You have not posted any jobs yet.</p>
+                  {profile.can_post_jobs && (
+                    <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
+                      <Plus aria-hidden="true" /> Post your first job
+                    </Link>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
         </div>
       </div>
     </main>
+  );
+}
+
+/** Banner for employers still waiting for (or refused) admin approval. */
+function EmployerStatus({ profile }) {
+  if (profile.role !== 'employer' || profile.is_staff || profile.employer_status === 'approved') return null;
+  const rejected = profile.employer_status === 'rejected';
+  return (
+    <div className={`profile-status ${rejected ? 'is-rejected' : 'is-pending'}`} role="status">
+      <span className="profile-status-icon">{rejected ? <CircleX aria-hidden="true" /> : <Hourglass aria-hidden="true" />}</span>
+      <div>
+        <strong>{rejected ? 'Your employer account was not approved' : 'Your employer account is waiting for admin approval'}</strong>
+        <p>
+          {rejected
+            ? profile.employer_rejection_reason || 'Update your company details and contact us to try again.'
+            : 'You can post jobs as soon as an admin verifies your account. Completing your profile helps it get approved faster.'}
+        </p>
+      </div>
+    </div>
   );
 }
 

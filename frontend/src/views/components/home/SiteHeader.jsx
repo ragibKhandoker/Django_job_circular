@@ -16,7 +16,7 @@ import {
   UserPlus,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../config/routes.js';
 import ThemeToggle from '../ThemeToggle.jsx';
@@ -28,7 +28,7 @@ const SECTION_LINKS = [
   { href: '#about', Icon: Info, label: 'About' },
 ];
 
-export default function SiteHeader({ isAuthenticated, username, isStaff, categories, categoryLink, onLogout }) {
+export default function SiteHeader({ isAuthenticated, username, isStaff, canPost = true, roleText = '', categories, categoryLink, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -97,7 +97,7 @@ export default function SiteHeader({ isAuthenticated, username, isStaff, categor
           ))}
 
           <div className="nav-actions-mobile">
-            <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} onLogout={onLogout} />
+            <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} canPost={canPost} roleText={roleText} onLogout={onLogout} />
           </div>
         </nav>
 
@@ -107,28 +107,46 @@ export default function SiteHeader({ isAuthenticated, username, isStaff, categor
             <Search aria-hidden="true" />
           </button>
           <span className="divider" aria-hidden="true"></span>
-          <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} onLogout={onLogout} />
+          <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} canPost={canPost} roleText={roleText} onLogout={onLogout} withMenu />
         </div>
       </div>
     </header>
   );
 }
 
-function HeaderActions({ isAuthenticated, username, isStaff, onLogout }) {
+/**
+ * Desktop (`withMenu`): "Post a Job" plus an account menu holding profile / admin / logout,
+ * so the header never runs out of room. The mobile menu lists them as plain buttons.
+ */
+function HeaderActions({ isAuthenticated, username, isStaff, canPost, roleText, onLogout, withMenu = false }) {
+  if (isAuthenticated && withMenu) {
+    return (
+      <>
+        {canPost && (
+          <Link to={ROUTES.postJob} className="btn btn-outline">
+            <Plus aria-hidden="true" /> Post a Job
+          </Link>
+        )}
+        <AccountMenu username={username} isStaff={isStaff} roleText={roleText} onLogout={onLogout} />
+      </>
+    );
+  }
   if (isAuthenticated) {
     return (
       <>
-        <Link to={ROUTES.profile} className="icon-btn" aria-label="My profile" title={`My profile (${username})`}>
-          <User aria-hidden="true" />
+        <Link to={ROUTES.profile} className="btn btn-outline">
+          <User aria-hidden="true" /> My Profile
         </Link>
         {isStaff && (
           <Link to={ROUTES.adminPanel} className="btn btn-outline">
             <ShieldCheck aria-hidden="true" /> Admin
           </Link>
         )}
-        <Link to={ROUTES.postJob} className="btn btn-outline">
-          <Plus aria-hidden="true" /> Post a Job
-        </Link>
+        {canPost && (
+          <Link to={ROUTES.postJob} className="btn btn-outline">
+            <Plus aria-hidden="true" /> Post a Job
+          </Link>
+        )}
         <button type="button" className="btn btn-primary" onClick={onLogout} title={`Signed in as ${username}`}>
           <LogOut aria-hidden="true" /> Logout
         </button>
@@ -144,5 +162,73 @@ function HeaderActions({ isAuthenticated, username, isStaff, onLogout }) {
         <UserPlus aria-hidden="true" /> Register
       </Link>
     </>
+  );
+}
+
+function AccountMenu({ username, isStaff, roleText, onLogout }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  // Close on a click outside or on Escape.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onPointer = (event) => !ref.current?.contains(event.target) && setOpen(false);
+    const onKey = (event) => event.key === 'Escape' && setOpen(false);
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const close = () => setOpen(false);
+
+  return (
+    <div className={`account-menu${open ? ' is-open' : ''}`} ref={ref}>
+      <button
+        type="button"
+        className="account-trigger"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span className="account-avatar">{(username ?? '?').slice(0, 1).toUpperCase()}</span>
+        <span className="account-name">{username}</span>
+        <ChevronDown className="caret" aria-hidden="true" />
+      </button>
+
+      {open && (
+        <div className="account-dropdown" role="menu">
+          <div className="account-head">
+            <span className="account-avatar is-large">{(username ?? '?').slice(0, 1).toUpperCase()}</span>
+            <span>
+              <strong>{username}</strong>
+              <small>{roleText || (isStaff ? 'Administrator' : 'Signed in')}</small>
+            </span>
+          </div>
+          <Link to={ROUTES.profile} role="menuitem" onClick={close}>
+            <User aria-hidden="true" /> My Profile
+          </Link>
+          {isStaff && (
+            <Link to={ROUTES.adminPanel} role="menuitem" onClick={close}>
+              <ShieldCheck aria-hidden="true" /> Admin Panel
+            </Link>
+          )}
+          <hr />
+          <button
+            type="button"
+            role="menuitem"
+            className="account-logout"
+            onClick={() => {
+              close();
+              onLogout();
+            }}
+          >
+            <LogOut aria-hidden="true" /> Logout
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

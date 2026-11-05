@@ -650,6 +650,123 @@
     box-shadow: 0 0 0 4px rgba(11, 94, 215, 0.12);
 }
 
+/* ---------- section switch (job posts / employers) ---------- */
+.page-admin .admin-sections {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 26px;
+    padding: 5px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.page-admin .admin-sections button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.page-admin .admin-sections button:hover {
+    color: var(--ink);
+}
+
+.page-admin .admin-sections button.is-active {
+    background: var(--primary);
+    color: #fff;
+}
+
+.page-admin .admin-badge {
+    min-width: 22px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--amber);
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* ---------- employer rows ---------- */
+.page-admin .admin-employers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+    transition: opacity 0.2s;
+}
+
+.page-admin .admin-employers.is-refreshing {
+    opacity: 0.6;
+}
+
+.page-admin .admin-employer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--amber);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    animation: admin-fade-up 0.3s ease-out;
+}
+
+.page-admin .admin-employer.status-approved { border-left-color: var(--green); }
+.page-admin .admin-employer.status-rejected { border-left-color: var(--red); }
+
+.page-admin .admin-employer-avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1f6fe5, #6d4ae0);
+    color: #fff;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.page-admin .admin-employer-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 220px;
+    line-height: 1.4;
+}
+
+.page-admin .admin-employer-info strong {
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.page-admin .admin-employer-info > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.page-admin .admin-employer-info .admin-employer-reason {
+    margin-top: 4px;
+    color: var(--red);
+}
+
 /* ---------- job cards ---------- */
 .page-admin .admin-jobs {
     display: flex;

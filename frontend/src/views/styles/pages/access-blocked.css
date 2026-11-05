@@ -1,0 +1,296 @@
+/* Shown instead of /post-job or /apply when the account's role does not allow it. Scoped to .page-access-blocked. */
+
+.page-access-blocked {
+    --primary: #0b5ed7;
+    --primary-dark: #0846a8;
+    --ink: #0f1b3d;
+    --text: #3d4766;
+    --muted: #6b7591;
+    --line: #e4e9f2;
+    --surface: #fff;
+    --surface-2: #f7f9fd;
+    --tone: #0b5ed7;
+    --tone-soft: #e7f0ff;
+
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    overflow: hidden;
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    isolation: isolate;
+}
+
+.page-access-blocked *,
+.page-access-blocked *::before,
+.page-access-blocked *::after {
+    box-sizing: border-box;
+}
+
+.page-access-blocked .lucide {
+    width: 1.1em;
+    height: 1.1em;
+    flex-shrink: 0;
+}
+
+/* real photo behind a brand overlay */
+.page-access-blocked .ab-photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(2px);
+    transform: scale(1.04);
+}
+
+.page-access-blocked::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, rgba(6, 26, 74, 0.9), rgba(11, 94, 215, 0.7) 60%, rgba(109, 74, 224, 0.6));
+}
+
+.page-access-blocked .ab-card {
+    width: 100%;
+    max-width: 540px;
+    padding: 40px 36px 34px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 28px;
+    background: var(--surface);
+    box-shadow: 0 40px 80px rgba(4, 12, 40, 0.45);
+    text-align: center;
+    animation: ab-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+@keyframes ab-pop {
+    from { opacity: 0; transform: translateY(18px) scale(0.96); }
+}
+
+.page-access-blocked .tone-violet { --tone: #6d4ae0; --tone-soft: #f0ebff; }
+.page-access-blocked .tone-amber { --tone: #b45309; --tone-soft: #fff4e0; }
+.page-access-blocked .tone-red { --tone: #c42b3c; --tone-soft: #fdecee; }
+
+.page-access-blocked .ab-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border-radius: 22px;
+    background: var(--tone-soft);
+    color: var(--tone);
+    font-size: 34px;
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--tone-soft) 50%, transparent);
+}
+
+.page-access-blocked .tone-amber .ab-icon .lucide {
+    animation: ab-flip 2.4s ease-in-out infinite;
+}
+
+@keyframes ab-flip {
+    0%, 40% { transform: rotate(0); }
+    50%, 90% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.page-access-blocked .ab-eyebrow {
+    display: block;
+    margin-top: 20px;
+    color: var(--tone);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.page-access-blocked h1 {
+    margin: 6px 0 0;
+    color: var(--ink);
+    font-size: clamp(24px, 3.4vw, 30px);
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    line-height: 1.2;
+}
+
+.page-access-blocked .ab-card > p {
+    margin: 12px 0 0;
+    color: var(--muted);
+}
+
+.page-access-blocked .ab-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 26px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.page-access-blocked .ab-steps li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.page-access-blocked .ab-steps li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: calc(50% + 24px);
+    right: calc(-50% + 24px);
+    height: 3px;
+    border-radius: 3px;
+    background: var(--line);
+}
+
+.page-access-blocked .ab-steps li.is-done::after {
+    background: #15803d;
+}
+
+.page-access-blocked .ab-steps span {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+}
+
+.page-access-blocked .ab-steps .is-done {
+    color: #15803d;
+}
+
+.page-access-blocked .ab-steps .is-done span {
+    border-color: #15803d;
+    background: #15803d;
+    color: #fff;
+}
+
+.page-access-blocked .ab-steps .is-current {
+    color: var(--tone);
+}
+
+.page-access-blocked .ab-steps .is-current span {
+    border-color: var(--tone);
+    color: var(--tone);
+    animation: ab-ring 1.8s ease-out infinite;
+}
+
+@keyframes ab-ring {
+    from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tone) 45%, transparent); }
+    to { box-shadow: 0 0 0 12px transparent; }
+}
+
+.page-access-blocked .ab-reason {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 18px 0 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--tone-soft);
+    color: var(--tone);
+    font-size: 14px;
+    text-align: left;
+}
+
+.page-access-blocked .ab-reason .lucide {
+    margin-top: 3px;
+}
+
+.page-access-blocked .ab-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.page-access-blocked .ab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 1.5px solid transparent;
+    border-radius: 13px;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.page-access-blocked .ab-btn-primary {
+    background: linear-gradient(135deg, #1a6ff0, #0846a8);
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(11, 94, 215, 0.3);
+}
+
+.page-access-blocked .ab-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(11, 94, 215, 0.38);
+}
+
+.page-access-blocked .ab-btn-ghost {
+    border-color: var(--line);
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.page-access-blocked .ab-btn-ghost:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+@media (max-width: 560px) {
+    .page-access-blocked .ab-card {
+        padding: 30px 20px 24px;
+    }
+
+    .page-access-blocked .ab-btn {
+        flex: 1 1 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-access-blocked * {
+        animation: none !important;
+    }
+}
+
+/* ---------- night mode ---------- */
+:root[data-theme='dark'] .page-access-blocked {
+    --primary: #5b9bff;
+    --ink: #eef2fa;
+    --text: #c2cadb;
+    --muted: #8b95ad;
+    --line: #243049;
+    --surface: #121a2c;
+    --surface-2: #0f1626;
+    --tone: #5b9bff;
+    --tone-soft: rgba(91, 155, 255, 0.14);
+}
+
+:root[data-theme='dark'] .page-access-blocked .tone-violet { --tone: #a78bfa; --tone-soft: rgba(167, 139, 250, 0.14); }
+:root[data-theme='dark'] .page-access-blocked .tone-amber { --tone: #fbbf24; --tone-soft: rgba(251, 191, 36, 0.12); }
+:root[data-theme='dark'] .page-access-blocked .tone-red { --tone: #ff7a8a; --tone-soft: rgba(255, 122, 138, 0.12); }
+
+:root[data-theme='dark'] .page-access-blocked::before {
+    background: linear-gradient(135deg, rgba(3, 8, 24, 0.94), rgba(10, 40, 110, 0.82) 60%, rgba(60, 40, 140, 0.75));
+}
+
+:root[data-theme='dark'] .page-access-blocked .ab-card {
+    border-color: var(--line);
+}

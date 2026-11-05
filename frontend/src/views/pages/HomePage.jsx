@@ -21,6 +21,8 @@ export default function HomePage() {
         isAuthenticated={home.isAuthenticated}
         username={home.username}
         isStaff={home.isStaff}
+        canPost={home.canPost}
+        roleText={home.roleText}
         categories={home.categories}
         categoryLink={home.categoryLink}
         onLogout={home.handleLogout}
@@ -46,6 +48,8 @@ export default function HomePage() {
           salaryLabel={home.salaryLabel}
           applyLink={home.applyLink}
           isAuthenticated={home.isAuthenticated}
+          canApply={home.canApply}
+          canPost={home.canPost}
         />
         <CompaniesSection companies={home.companies} />
         <CareerTips />

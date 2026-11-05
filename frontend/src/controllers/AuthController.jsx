@@ -29,6 +29,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   /** After the profile is saved: keep the header etc. in sync with the new name/username. */
+  /** Re-read the session user, e.g. to pick up an employer approval made by an admin. */
+  const refreshUser = useCallback(async () => {
+    try {
+      setUser(await AuthModel.currentUser());
+    } catch {
+      // Keep the current state if the API is unreachable.
+    }
+  }, []);
+
   const updateUser = useCallback((next) => setUser((current) => ({ ...current, ...next })), []);
 
   const logout = useCallback(async () => {
@@ -38,8 +47,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, adminLogin, updateUser, logout }),
-    [user, loading, login, adminLogin, updateUser, logout],
+    () => ({ user, loading, login, adminLogin, refreshUser, updateUser, logout }),
+    [user, loading, login, adminLogin, refreshUser, updateUser, logout],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

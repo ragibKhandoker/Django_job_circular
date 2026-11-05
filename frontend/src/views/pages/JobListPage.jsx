@@ -15,7 +15,9 @@ import {
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { ROUTES, routeTo } from '../../config/routes.js';
+import { useAuth } from '../../controllers/AuthController.jsx';
 import { useJobListController } from '../../controllers/JobsController.js';
+import { showPostJob } from '../../models/roles.js';
 import { JOB_CATEGORIES, STATUS_CHOICES } from '../../models/choices.js';
 import { PLUS_JAKARTA } from '../assets.js';
 import { categoryInfo } from '../components/home/categoryInfo.js';
@@ -33,6 +35,7 @@ const SKELETONS = 4;
 export default function JobListPage() {
   const { category } = useParams();
   const list = useJobListController(category);
+  const { user } = useAuth();
   const heading = category ? categoryInfo(category).label : 'All job circulars';
 
   return (
@@ -47,9 +50,11 @@ export default function JobListPage() {
             <strong>Job<span>Finder</span></strong>
           </Link>
           <div className="jl-topbar-actions">
-            <Link to={ROUTES.postJob} className="jl-glass jl-post">
-              <Plus aria-hidden="true" /> <span>Post a job</span>
-            </Link>
+            {showPostJob(user) && (
+              <Link to={ROUTES.postJob} className="jl-glass jl-post">
+                <Plus aria-hidden="true" /> <span>Post a job</span>
+              </Link>
+            )}
             <ThemeToggle className="jl-glass jl-icon-btn" />
           </div>
         </div>

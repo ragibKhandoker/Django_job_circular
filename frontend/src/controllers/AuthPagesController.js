@@ -74,7 +74,8 @@ export function useRegistrationChooseController() {
   return { role, setRole, handleSubmit };
 }
 
-export function useSignupController() {
+/** role: 'candidate' | 'employer' — saved on the account at sign-up. */
+export function useSignupController(role) {
   const flash = useFlash();
   const navigate = useNavigate();
   const { messages, replace } = useFlashMessages();
@@ -85,7 +86,7 @@ export function useSignupController() {
     event.preventDefault();
     setSubmitting(true);
     try {
-      const result = await AuthModel.signup(values);
+      const result = await AuthModel.signup({ ...values, role });
       flash(result.detail);
       navigate(ROUTES.login);
     } catch (error) {

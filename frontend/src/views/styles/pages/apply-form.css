@@ -1,139 +1,1504 @@
-/* Generated from myapp/templates/apply_form.html by scripts/extract-template-styles.mjs */
+/* /apply/:jobId — step-by-step application. Scoped to .page-apply-form; has its own day + night palette. */
 
 .page-apply-form {
+    --primary: #0b5ed7;
+    --primary-dark: #0846a8;
+    --primary-soft: #e7f0ff;
+    --ink: #0f1b3d;
+    --text: #3d4766;
+    --muted: #6b7591;
+    --line: #e4e9f2;
+    --surface: #fff;
+    --surface-2: #f7f9fd;
+    --bg: #f2f6fc;
+    --green: #15803d;
+    --green-soft: #e8f7ee;
+    --amber: #b45309;
+    --amber-soft: #fff4e0;
+    --red: #c42b3c;
+    --red-soft: #fdecee;
+    --violet: #6d4ae0;
+    --violet-soft: #f0ebff;
+    --shadow-sm: 0 1px 2px rgba(15, 27, 61, 0.04), 0 4px 14px rgba(15, 27, 61, 0.05);
+    --shadow: 0 18px 44px rgba(15, 27, 61, 0.12);
+
     min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.page-apply-form *,
+.page-apply-form *::before,
+.page-apply-form *::after {
     box-sizing: border-box;
 }
 
-.page-apply-form .application-container {
-        max-width: 1000px;
-        margin: 0 auto;
-        background: #ffffff;
-        padding: 40px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.page-apply-form h1,
+.page-apply-form h2,
+.page-apply-form h3,
+.page-apply-form p,
+.page-apply-form ul,
+.page-apply-form ol,
+.page-apply-form dl,
+.page-apply-form dd {
+    margin: 0;
+    padding: 0;
+}
+
+.page-apply-form ul,
+.page-apply-form ol {
+    list-style: none;
+}
+
+.page-apply-form a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.page-apply-form .lucide {
+    width: 1.1em;
+    height: 1.1em;
+    flex-shrink: 0;
+}
+
+.page-apply-form .ap-wrap {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.page-apply-form .ap-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.page-apply-form .ap-spin {
+    animation: ap-spin 0.8s linear infinite;
+}
+
+@keyframes ap-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes ap-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+}
+
+@keyframes ap-slide-in {
+    from { opacity: 0; transform: translateX(18px); }
+}
+
+/* ---------- top bar ---------- */
+.page-apply-form .ap-topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    color: #fff;
+}
+
+.page-apply-form .ap-topbar-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: 72px;
+}
+
+.page-apply-form .ap-glass {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.page-apply-form .ap-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.page-apply-form .ap-back {
+    justify-self: start;
+    padding: 8px 14px;
+    border-radius: 999px;
+}
+
+.page-apply-form .ap-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-apply-form .ap-brand-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--primary);
+}
+
+.page-apply-form .ap-brand strong {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+}
+
+.page-apply-form .ap-brand strong span {
+    color: #9cc2ff;
+}
+
+.page-apply-form .ap-icon-btn {
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.page-apply-form .ap-icon-btn:hover {
+    transform: rotate(-12deg);
+}
+
+/* ---------- hero ---------- */
+.page-apply-form .ap-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 112px 0 120px;
+    color: #fff;
+    isolation: isolate;
+}
+
+.page-apply-form .ap-hero-photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    animation: ap-zoom 18s ease-out both;
+}
+
+@keyframes ap-zoom {
+    from { transform: scale(1.12); }
+    to { transform: scale(1); }
+}
+
+.page-apply-form .ap-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+        linear-gradient(95deg, rgba(6, 26, 74, 0.95) 0%, rgba(8, 52, 140, 0.82) 48%, rgba(11, 94, 215, 0.5) 78%, rgba(109, 74, 224, 0.4) 100%),
+        linear-gradient(180deg, rgba(6, 20, 55, 0.45) 0%, transparent 30%);
+}
+
+.page-apply-form .ap-hero::after {
+    content: '';
+    position: absolute;
+    left: -5%;
+    right: -5%;
+    bottom: -1px;
+    height: 60px;
+    background: var(--bg);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+.page-apply-form .ap-hero-content {
+    animation: ap-fade-up 0.6s ease-out both;
+}
+
+.page-apply-form .ap-crumbs {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-crumbs a:hover {
+    color: #fff;
+}
+
+.page-apply-form .ap-crumbs span {
+    margin: 0 4px;
+    opacity: 0.5;
+}
+
+.page-apply-form .ap-hero-job {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.page-apply-form .ap-hero-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    font-size: 32px;
+}
+
+.page-apply-form .ap-eyebrow {
+    color: #9cc2ff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.page-apply-form .ap-hero h1 {
+    margin-top: 2px;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.2px;
+}
+
+.page-apply-form .ap-company {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+.page-apply-form .ap-hero-tags li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-hero-tags li.is-urgent {
+    border-color: rgba(255, 209, 102, 0.6);
+    background: rgba(255, 209, 102, 0.18);
+    color: #ffd166;
+}
+
+/* ---------- layout ---------- */
+.page-apply-form .ap-main {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 26px;
+    align-items: start;
+    margin-top: -70px;
+    padding-bottom: 80px;
+}
+
+.page-apply-form .ap-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+}
+
+.page-apply-form .ap-card {
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ---------- stepper ---------- */
+.page-apply-form .ap-stepper-card {
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    animation: ap-fade-up 0.5s 0.1s ease-out both;
+}
+
+.page-apply-form .ap-stepper {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding: 18px 14px 16px;
+}
+
+.page-apply-form .ap-stepper li {
+    position: relative;
+}
+
+/* connector */
+.page-apply-form .ap-stepper li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 19px;
+    left: calc(50% + 24px);
+    right: calc(-50% + 24px);
+    height: 3px;
+    border-radius: 3px;
+    background: var(--line);
+    transition: background 0.3s;
+}
+
+.page-apply-form .ap-stepper li.is-done::after {
+    background: var(--green);
+}
+
+.page-apply-form .ap-stepper button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+}
+
+.page-apply-form .ap-stepper button:disabled {
+    cursor: default;
+}
+
+.page-apply-form .ap-step-dot {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--muted);
+    font-weight: 800;
+    transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+.page-apply-form .is-done .ap-step-dot {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+}
+
+.page-apply-form .is-done .ap-step-dot .lucide {
+    stroke-width: 3;
+}
+
+.page-apply-form .is-current .ap-step-dot {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px var(--primary-soft);
+}
+
+.page-apply-form .ap-step-text {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.page-apply-form .is-current .ap-step-text,
+.page-apply-form .is-done .ap-step-text {
+    color: var(--ink);
+}
+
+.page-apply-form .ap-stepper button:not(:disabled):hover .ap-step-dot {
+    border-color: var(--primary);
+}
+
+.page-apply-form .ap-progress {
+    height: 4px;
+    background: var(--surface-2);
+}
+
+.page-apply-form .ap-progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--violet), #22c55e);
+    transition: width 0.5s ease;
+}
+
+.page-apply-form .ap-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+    border-radius: 16px;
+    background: var(--red-soft);
+    color: var(--red);
+    font-weight: 600;
+    animation: ap-fade-up 0.3s ease-out;
+}
+
+/* ---------- step panel ---------- */
+.page-apply-form .ap-panel {
+    padding: 30px 32px 24px;
+    animation: ap-slide-in 0.35s ease-out both;
+}
+
+.page-apply-form .ap-panel-head {
+    margin-bottom: 24px;
+}
+
+.page-apply-form .ap-panel-step {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.page-apply-form .ap-panel-head h2 {
+    margin-top: 10px;
+    color: var(--ink);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.page-apply-form .ap-panel-head p {
+    color: var(--muted);
+}
+
+.page-apply-form .ap-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.page-apply-form .ap-gap-top {
+    margin-top: 22px;
+}
+
+.page-apply-form .ap-wide {
+    grid-column: 1 / -1;
+}
+
+.page-apply-form .ap-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.page-apply-form .ap-label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.page-apply-form .ap-label small {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.page-apply-form .ap-required {
+    color: var(--red);
+}
+
+.page-apply-form .ap-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.page-apply-form .ap-input > .lucide {
+    position: absolute;
+    left: 14px;
+    color: var(--muted);
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.page-apply-form .ap-input input,
+.page-apply-form .ap-input textarea,
+.page-apply-form .ap-input select {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    outline: none;
+    background: var(--surface-2);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    color-scheme: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.page-apply-form .ap-input input,
+.page-apply-form .ap-input select {
+    height: 48px;
+    padding: 0 14px;
+}
+
+.page-apply-form .ap-input.has-icon input,
+.page-apply-form .ap-input.has-icon select {
+    padding-left: 42px;
+}
+
+.page-apply-form .ap-input select {
+    cursor: pointer;
+}
+
+.page-apply-form .ap-input textarea {
+    padding: 14px 16px;
+    line-height: 1.7;
+    resize: vertical;
+}
+
+.page-apply-form .ap-input input::placeholder,
+.page-apply-form .ap-input textarea::placeholder {
+    color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.page-apply-form .ap-input input:hover,
+.page-apply-form .ap-input textarea:hover,
+.page-apply-form .ap-input select:hover {
+    border-color: color-mix(in srgb, var(--primary) 30%, var(--line));
+}
+
+.page-apply-form .ap-input input:focus,
+.page-apply-form .ap-input textarea:focus,
+.page-apply-form .ap-input select:focus {
+    border-color: var(--primary);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.page-apply-form .ap-input input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-apply-form .ap-input:focus-within > .lucide {
+    color: var(--primary);
+}
+
+.page-apply-form .ap-field-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.page-apply-form .ap-hint,
+.page-apply-form .ap-counter {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.page-apply-form .ap-counter {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+}
+
+.page-apply-form .ap-counter.is-near {
+    color: var(--amber);
+    font-weight: 700;
+}
+
+.page-apply-form .ap-error {
+    color: var(--red);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-error-block {
+    display: block;
+    margin-top: 8px;
+}
+
+.page-apply-form .has-error .ap-input input,
+.page-apply-form .has-error .ap-input textarea,
+.page-apply-form .has-error .ap-input select {
+    border-color: var(--red);
+}
+
+.page-apply-form .ap-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--primary);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.page-apply-form .ap-link:hover {
+    text-decoration: underline;
+}
+
+/* resume upload */
+.page-apply-form .ap-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 30px 20px;
+    border: 2px dashed var(--line);
+    border-radius: 18px;
+    background:
+        radial-gradient(260px 120px at 50% 0%, color-mix(in srgb, var(--primary) 7%, transparent), transparent 70%),
+        var(--surface-2);
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.page-apply-form .ap-drop:hover,
+.page-apply-form .ap-drop.is-dragging {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.page-apply-form .ap-drop.is-dragging {
+    transform: scale(1.01);
+}
+
+.page-apply-form .ap-drop.has-error {
+    border-color: var(--red);
+}
+
+.page-apply-form .ap-drop strong {
+    color: var(--ink);
+    font-size: 15px;
+}
+
+.page-apply-form .ap-drop u {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.page-apply-form .ap-drop-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 6px;
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--primary);
+    font-size: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.page-apply-form .ap-file {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1.5px solid color-mix(in srgb, var(--green) 40%, var(--line));
+    border-radius: 16px;
+    background: var(--green-soft);
+    animation: ap-fade-up 0.3s ease-out;
+}
+
+.page-apply-form .ap-file-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--red);
+    font-size: 22px;
+}
+
+.page-apply-form .ap-file-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.35;
+}
+
+.page-apply-form .ap-file-text strong {
+    overflow: hidden;
+    color: var(--ink);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-apply-form .ap-file-text small {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.page-apply-form .ap-file-ok {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-size: 14px;
+}
+
+.page-apply-form .ap-icon-ghost {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.page-apply-form .ap-icon-ghost:hover {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.page-apply-form .ap-icon-ghost.is-danger:hover {
+    background: var(--red-soft);
+    color: var(--red);
+}
+
+.page-apply-form .ap-letter-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 24px;
+}
+
+/* repeatable rows */
+.page-apply-form .ap-row {
+    margin-bottom: 16px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--surface-2);
+    animation: ap-fade-up 0.3s ease-out;
+}
+
+.page-apply-form .ap-row-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.page-apply-form .ap-row-head strong {
+    flex: 1;
+    min-width: 0;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+
+.page-apply-form .ap-row-head small {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-row-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.page-apply-form .ap-row-icon.is-violet {
+    background: var(--violet-soft);
+    color: var(--violet);
+}
+
+.page-apply-form .ap-row .ap-input input,
+.page-apply-form .ap-row .ap-input textarea,
+.page-apply-form .ap-row .ap-input select {
+    background: var(--surface);
+}
+
+.page-apply-form .ap-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    border: 2px dashed color-mix(in srgb, var(--primary) 35%, var(--line));
+    border-radius: 16px;
+    background: none;
+    color: var(--primary);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.page-apply-form .ap-add:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.page-apply-form .ap-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 16px;
+    padding: 26px 20px;
+    border-radius: 18px;
+    background: var(--surface-2);
+    color: var(--muted);
+    text-align: center;
+}
+
+.page-apply-form .ap-empty strong {
+    color: var(--ink);
+}
+
+.page-apply-form .ap-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 6px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 24px;
+}
+
+/* toggle switch */
+.page-apply-form .ap-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.page-apply-form .ap-switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.page-apply-form .ap-switch-track {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--line);
+    transition: background 0.2s;
+}
+
+.page-apply-form .ap-switch-track span {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s;
+}
+
+.page-apply-form .ap-switch input:checked + .ap-switch-track {
+    background: var(--green);
+}
+
+.page-apply-form .ap-switch input:checked + .ap-switch-track span {
+    transform: translateX(18px);
+}
+
+.page-apply-form .ap-switch input:focus-visible + .ap-switch-track {
+    box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+/* review */
+.page-apply-form .ap-review {
+    margin-bottom: 14px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface-2);
+}
+
+.page-apply-form .ap-review header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.page-apply-form .ap-review h3 {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.page-apply-form .ap-dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 20px;
+}
+
+.page-apply-form .ap-dl dt {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.page-apply-form .ap-dl dd {
+    color: var(--ink);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.page-apply-form .ap-review-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.page-apply-form .ap-review-file small {
+    color: var(--muted);
+}
+
+.page-apply-form .ap-review-letter {
+    display: -webkit-box;
+    margin-top: 10px;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 14px;
+    white-space: pre-line;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+.page-apply-form .is-empty {
+    color: var(--muted);
+    font-style: italic;
+}
+
+.page-apply-form .ap-review-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 10px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-review-links span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    overflow-wrap: anywhere;
+}
+
+.page-apply-form .ap-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.page-apply-form .ap-review-list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+    color: var(--text);
+}
+
+.page-apply-form .ap-review-list strong {
+    color: var(--ink);
+}
+
+.page-apply-form .ap-review-list small {
+    flex-basis: 100%;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.page-apply-form .ap-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 16px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.page-apply-form .ap-consent:has(input:checked) {
+    border-color: var(--green);
+    background: var(--green-soft);
+}
+
+.page-apply-form .ap-consent.has-error {
+    border-color: var(--red);
+}
+
+.page-apply-form .ap-consent input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.page-apply-form .ap-check {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+    border: 2px solid var(--line);
+    border-radius: 7px;
+    background: var(--surface);
+    color: transparent;
+    font-size: 13px;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.page-apply-form .ap-check .lucide {
+    stroke-width: 3.5;
+}
+
+.page-apply-form .ap-consent input:checked + .ap-check {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+}
+
+.page-apply-form .ap-consent input:focus-visible + .ap-check {
+    box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+/* step navigation */
+.page-apply-form .ap-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+.page-apply-form .ap-secure {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-secure .lucide {
+    color: var(--green);
+}
+
+.page-apply-form .ap-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 13px 24px;
+    border: 1.5px solid transparent;
+    border-radius: 14px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.page-apply-form .ap-btn .lucide {
+    transition: transform 0.2s;
+}
+
+.page-apply-form .ap-btn-ghost {
+    border-color: var(--line);
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.page-apply-form .ap-btn-ghost:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.page-apply-form .ap-btn-ghost:hover .lucide {
+    transform: translateX(-3px);
+}
+
+.page-apply-form .ap-btn-primary {
+    background: linear-gradient(135deg, #1a6ff0, #0846a8);
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(11, 94, 215, 0.3);
+}
+
+.page-apply-form .ap-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(11, 94, 215, 0.38);
+}
+
+.page-apply-form .ap-btn-primary:hover .lucide {
+    transform: translateX(3px);
+}
+
+.page-apply-form .ap-btn-submit {
+    background: linear-gradient(135deg, #16a34a, #15803d 50%, #0f7f86);
+    color: #fff;
+    box-shadow: 0 12px 26px rgba(21, 128, 61, 0.32);
+}
+
+.page-apply-form .ap-btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(21, 128, 61, 0.4);
+}
+
+.page-apply-form .ap-btn-submit:hover:not(:disabled) .lucide {
+    transform: translateX(3px) rotate(-8deg);
+}
+
+.page-apply-form .ap-btn:disabled {
+    opacity: 0.7;
+    cursor: progress;
+}
+
+/* ---------- sidebar ---------- */
+.page-apply-form .ap-aside {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: ap-fade-up 0.5s 0.2s ease-out both;
+}
+
+.page-apply-form .ap-summary {
+    padding: 22px;
+    box-shadow: var(--shadow);
+}
+
+.page-apply-form .ap-summary-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-apply-form .ap-summary-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    color: #fff;
+    font-size: 22px;
+}
+
+.page-apply-form .ap-summary-head div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+.page-apply-form .ap-summary-head strong {
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.page-apply-form .ap-summary-head small {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.page-apply-form .ap-summary-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+}
+
+.page-apply-form .ap-summary-meta li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.page-apply-form .ap-summary-meta .lucide {
+    color: var(--primary);
+}
+
+.page-apply-form .ap-summary-desc {
+    position: relative;
+    max-height: 9.5em;
+    margin-top: 16px;
+    padding-top: 16px;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+}
+
+.page-apply-form .ap-summary-desc:not(.is-open)::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2.4em;
+    background: linear-gradient(transparent, var(--surface));
+}
+
+.page-apply-form .ap-summary-desc.is-open {
+    max-height: none;
+}
+
+.page-apply-form .ap-summary-desc h3 {
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.page-apply-form .ap-summary-desc p {
+    color: var(--text);
+    font-size: 14px;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.page-apply-form .ap-summary > .ap-link {
+    margin-top: 8px;
+}
+
+.page-apply-form .ap-tip {
+    display: flex;
+    gap: 12px;
+    padding: 18px;
+    border-color: color-mix(in srgb, var(--amber) 30%, var(--line));
+    background: var(--amber-soft);
+    animation: ap-fade-up 0.35s ease-out;
+}
+
+.page-apply-form .ap-tip-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--amber);
+}
+
+.page-apply-form .ap-tip strong {
+    color: var(--ink);
+}
+
+.page-apply-form .ap-tip p {
+    color: var(--text);
+    font-size: 13px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1024px) {
+    .page-apply-form .ap-main {
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .page-apply-form .form-section {
-        margin-bottom: 30px;
-        padding: 20px;
-        border: 1px solid #f0f0f0;
-        border-radius: 8px;
-        background-color: #f9f9f9;
+    .page-apply-form .ap-aside {
+        position: static;
+        order: -1;
     }
 
-    .page-apply-form .form-section h3 {
-        margin-bottom: 20px;
-        color: #0d6efd;
-        font-size: 1.5rem;
-        border-bottom: 2px solid #0d6efd;
-        padding-bottom: 10px;
+    .page-apply-form .ap-tip {
+        display: none;
+    }
+}
+
+@media (max-width: 720px) {
+    .page-apply-form .ap-wrap {
+        padding: 0 16px;
     }
 
-    .page-apply-form .form-label {
-        font-weight: bold;
-        color: #333;
+    .page-apply-form .ap-back span {
+        display: none;
     }
 
-    .page-apply-form .btn-secondary {
-        background-color: #f0f0f0;
-        border-color: #ccc;
-        color: #333;
+    .page-apply-form .ap-hero {
+        padding: 100px 0 100px;
     }
 
-    .page-apply-form .btn-secondary:hover {
-        background-color: #e0e0e0;
-        border-color: #bbb;
-        color: #000;
+    .page-apply-form .ap-hero-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 26px;
     }
 
-    .page-apply-form .btn-primary {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
+    .page-apply-form .ap-step-text {
+        display: none;
     }
 
-    .page-apply-form .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #004085;
+    .page-apply-form .ap-stepper li:not(:last-child)::after {
+        left: calc(50% + 22px);
+        right: calc(-50% + 22px);
     }
 
-    .page-apply-form .btn-add-more {
-        font-size: 0.9rem;
-        padding: 6px 12px;
-        border-radius: 4px;
-        margin-top: 10px;
+    .page-apply-form .ap-panel {
+        padding: 22px 18px 18px;
     }
 
-    .page-apply-form .edu-form, .page-apply-form .work-form {
-        background: #ffffff;
-        padding: 15px;
-        margin-bottom: 15px;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
+    .page-apply-form .ap-grid,
+    .page-apply-form .ap-dl {
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .page-apply-form input, .page-apply-form select, .page-apply-form textarea {
-        width: 100%;
-        padding: 8px 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        margin-top: 5px;
+    .page-apply-form .ap-nav {
+        flex-direction: column-reverse;
+        align-items: stretch;
     }
 
-    .page-apply-form input:focus, .page-apply-form select:focus, .page-apply-form textarea:focus {
-        border-color: #0d6efd;
-        outline: none;
+    .page-apply-form .ap-secure {
+        justify-content: center;
     }
+}
 
-    .page-apply-form .d-grid .btn-lg {
-        padding: 15px;
-        font-size: 1.2rem;
+@media (prefers-reduced-motion: reduce) {
+    .page-apply-form *,
+    .page-apply-form *::before,
+    .page-apply-form *::after {
+        animation: none !important;
+        transition: none !important;
     }
+}
 
-    .page-apply-form .alert {
-        margin-bottom: 20px; /* Adds space below the alert box */
-    }
+/* ---------- night mode ---------- */
+:root[data-theme='dark'] .page-apply-form {
+    --primary: #5b9bff;
+    --primary-dark: #2f74f0;
+    --primary-soft: rgba(91, 155, 255, 0.14);
+    --ink: #eef2fa;
+    --text: #c2cadb;
+    --muted: #8b95ad;
+    --line: #243049;
+    --surface: #121a2c;
+    --surface-2: #0f1626;
+    --bg: #0a0f1c;
+    --green: #34d399;
+    --green-soft: rgba(52, 211, 153, 0.12);
+    --amber: #fbbf24;
+    --amber-soft: rgba(251, 191, 36, 0.1);
+    --red: #ff7a8a;
+    --red-soft: rgba(255, 122, 138, 0.12);
+    --violet: #a78bfa;
+    --violet-soft: rgba(167, 139, 250, 0.14);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.25);
+    --shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+}
 
-    .page-apply-form .error {
-        border: 2px solid red; /* Highlights the field with a red border */
-    }
+:root[data-theme='dark'] .page-apply-form .ap-hero::before {
+    background:
+        linear-gradient(95deg, rgba(4, 12, 34, 0.95) 0%, rgba(8, 30, 84, 0.86) 48%, rgba(20, 60, 150, 0.58) 78%, rgba(80, 50, 170, 0.48) 100%),
+        linear-gradient(180deg, rgba(4, 10, 28, 0.5) 0%, transparent 30%);
+}
 
-    @media (max-width: 767px) {
-        .page-apply-form .row > .col-md-6 {
-            margin-bottom: 30px;
-        }
-    }
+:root[data-theme='dark'] .page-apply-form .ap-hero-photo {
+    filter: brightness(0.75);
+}
 
-/* Responsive */
-@media (max-width: 767px) {
-    .page-apply-form .application-container {
-        padding: 20px 16px;
-        margin-top: 16px !important;
-        margin-bottom: 16px !important;
-    }
+:root[data-theme='dark'] .page-apply-form .ap-icon-btn {
+    color: #f5c451;
+}
 
-    .page-apply-form .form-section {
-        padding: 16px;
-    }
+:root[data-theme='dark'] .page-apply-form .is-done .ap-step-dot,
+:root[data-theme='dark'] .page-apply-form .is-current .ap-step-dot,
+:root[data-theme='dark'] .page-apply-form .ap-file-ok,
+:root[data-theme='dark'] .page-apply-form .ap-consent input:checked + .ap-check {
+    color: #0a0f1c;
+}
 
-    .page-apply-form .form-section h3 {
-        font-size: 1.25rem;
-    }
+:root[data-theme='dark'] .page-apply-form .ap-btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2f5fd0);
+}
 
-    /* Bootstrap's row gutters shift the stacked columns sideways; drop them when stacked. */
-    .page-apply-form .row {
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    .page-apply-form .row > [class*='col']:not(.form-section) {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .page-apply-form input,
-    .page-apply-form select,
-    .page-apply-form textarea {
-        font-size: 16px; /* stops iOS zooming into the field */
-    }
+:root[data-theme='dark'] .page-apply-form .ap-btn-submit {
+    background: linear-gradient(135deg, #22c55e, #15803d 55%, #0f7f86);
 }

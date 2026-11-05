@@ -334,6 +334,57 @@
     color: var(--red);
 }
 
+/* employer approval banner */
+.page-profile .profile-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent);
+    border-radius: 16px;
+    background: var(--amber-soft);
+    color: var(--amber);
+    animation: profile-fade-up 0.35s ease-out;
+}
+
+.page-profile .profile-status.is-rejected {
+    border-color: color-mix(in srgb, var(--red) 35%, transparent);
+    background: var(--red-soft);
+    color: var(--red);
+}
+
+.page-profile .profile-status-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface);
+    font-size: 19px;
+}
+
+.page-profile .profile-status strong {
+    color: var(--ink);
+}
+
+.page-profile .profile-status p {
+    margin-top: 2px;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.page-profile .profile-badge.role-candidate {
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+.page-profile .profile-badge.role-employer {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
 /* ---------- hero ---------- */
 .page-profile .profile-hero {
     overflow: hidden;

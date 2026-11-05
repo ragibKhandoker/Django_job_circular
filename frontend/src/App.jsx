@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ROUTES } from './config/routes.js';
 import { AuthProvider } from './controllers/AuthController.jsx';
 import { FlashProvider } from './controllers/FlashController.jsx';
-import { RequireAdmin, RequireAuth } from './controllers/RequireAuth.jsx';
+import { RequireAdmin, RequireAuth, RequireRole } from './controllers/RequireAuth.jsx';
 import { ThemeProvider } from './controllers/ThemeController.jsx';
 import AdminLoginPage from './views/pages/AdminLoginPage.jsx';
 import AdminPanelPage from './views/pages/AdminPanelPage.jsx';
@@ -45,11 +45,13 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
 ]);
 // Category pages share the job list design (and its toggle).
 const CATEGORY_PREFIX = ROUTES.jobCategory.replace(':category', '');
+// The apply form (/apply/:jobId) and its confirmation (/apply/:jobId/submitted) have their own toggle.
+const APPLY_FORM_PATH = /^\/apply\/[^/]+(\/submitted)?$/;
 
 function FloatingThemeToggle() {
   const { pathname } = useLocation();
   const path = pathname.replace(/\/+$/, '') || '/';
-  if (PAGES_WITH_OWN_TOGGLE.has(path) || path.startsWith(CATEGORY_PREFIX)) return null;
+  if (PAGES_WITH_OWN_TOGGLE.has(path) || path.startsWith(CATEGORY_PREFIX) || APPLY_FORM_PATH.test(path)) return null;
   return <ThemeToggle className="theme-toggle-floating" />;
 }
 
@@ -76,11 +78,19 @@ export default function App() {
               <Route path={ROUTES.totalJobs} element={<TotalJobsPage />} />
               <Route
                 path={ROUTES.postJob}
-                element={<RequireAuth redirectTo={ROUTES.employerLogin}><PostJobPage /></RequireAuth>}
+                element={
+                  <RequireAuth redirectTo={ROUTES.employerLogin}>
+                    <RequireRole need="post"><PostJobPage /></RequireRole>
+                  </RequireAuth>
+                }
               />
               <Route
                 path={ROUTES.applyForm}
-                element={<RequireAuth redirectTo={ROUTES.candidateLogin}><ApplyFormPage /></RequireAuth>}
+                element={
+                  <RequireAuth redirectTo={ROUTES.candidateLogin}>
+                    <RequireRole need="apply"><ApplyFormPage /></RequireRole>
+                  </RequireAuth>
+                }
               />
               <Route path={ROUTES.applicationSubmitted} element={<ApplicationSubmittedPage />} />
               <Route path={ROUTES.applicationSuccess} element={<ApplicationSuccessPage />} />

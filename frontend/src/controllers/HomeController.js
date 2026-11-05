@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES, routeTo } from '../config/routes.js';
 import { BD_DIVISIONS, JOB_CATEGORIES, SALARY_CHOICES, STATUS_CHOICES } from '../models/choices.js';
 import { JobModel } from '../models/JobModel.js';
+import { roleLabel, showApply, showPostJob } from '../models/roles.js';
 import { useAuth } from './AuthController.jsx';
 import { useFlashMessages } from './FlashController.jsx';
 import { useAsync } from './useAsync.js';
@@ -65,6 +66,9 @@ export function useHomeController() {
     isAuthenticated: user.is_authenticated,
     username: user.username,
     isStaff: Boolean(user.is_staff),
+    canPost: showPostJob(user),
+    canApply: showApply(user),
+    roleText: user.is_authenticated ? roleLabel(user) : '',
     messages: messagesVisible ? messages : [],
     messageTimeout: MESSAGE_TIMEOUT_MS,
     dismissMessages: useCallback(() => setMessagesVisible(false), []),

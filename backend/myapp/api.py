@@ -63,10 +63,21 @@ def _can_see_job(job, user):
 
 # ---------- serializers ----------
 
+def get_profile(user):
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    return profile
+
+
 def serialize_user(user):
     if not user.is_authenticated:
         return {'is_authenticated': False}
+    profile = get_profile(user)
     return {
+        'role': profile.role,
+        'employer_status': profile.employer_status if profile.is_employer else None,
+        'employer_rejection_reason': profile.employer_rejection_reason if profile.is_employer else '',
+        'can_post_jobs': profile.can_post_jobs,
+        'can_apply': profile.can_apply,
         'is_authenticated': True,
         'id': str(user.id),
         'username': user.username,
@@ -214,14 +225,22 @@ def signup(request):
         return JsonResponse({'detail': 'Username is already taken'}, status=400)
     if User.objects.filter(email=email).exists():
         return JsonResponse({'detail': 'Email is already taken'}, status=400)
-    User.objects.create_user(
+    role = data.get('role')
+    if role not in dict(UserProfile.ROLE_CHOICES):
+        return JsonResponse({'detail': 'Choose job seeker or employer.'}, status=400)
+    user = User.objects.create_user(
         username=username,
         password=data.get('password1'),
         email=email,
         first_name=data.get('first_name', ''),
         last_name=data.get('last_name', ''),
     )
-    return JsonResponse({'detail': 'User created successfully'}, status=201)
+    UserProfile.objects.create(user=user, role=role)
+    if role == UserProfile.ROLE_EMPLOYER:
+        detail = 'Employer account created. An admin will verify it before you can post jobs.'
+    else:
+        detail = 'User created successfully'
+    return JsonResponse({'detail': detail}, status=201)
 
 
 @require_POST
@@ -266,6 +285,9 @@ def jobs(request):
 
 @api_login_required
 def _create_job(request):
+    denied = _post_job_denied(request.user)
+    if denied:
+        return JsonResponse({'detail': denied}, status=403)
     form = JobPostForm(_json_body(request))
     if not form.is_valid():
         return JsonResponse({'detail': 'Please correct the errors below.', 'errors': _form_errors(form)}, status=400)
@@ -275,6 +297,18 @@ def _create_job(request):
     job.approval_status = JobPost.APPROVAL_APPROVED if request.user.is_staff else JobPost.APPROVAL_PENDING
     job.save()
     return JsonResponse(serialize_job(job, request.user), status=201)
+
+
+def _post_job_denied(user):
+    """Why `user` may not post a job, or '' if they may."""
+    profile = get_profile(user)
+    if profile.can_post_jobs:
+        return ''
+    if not profile.is_employer:
+        return 'Job seekers cannot post jobs. Create an employer account to hire.'
+    if profile.employer_status == UserProfile.EMPLOYER_REJECTED:
+        return 'Your employer account was not approved, so you cannot post jobs.'
+    return 'Your employer account is waiting for admin approval. You can post jobs once it is approved.'
 
 
 @require_http_methods(['GET', 'DELETE'])
@@ -293,6 +327,8 @@ def job_detail(request, job_id):
 @require_POST
 @api_login_required
 def apply(request, job_id):
+    if not get_profile(request.user).can_apply:
+        return JsonResponse({'detail': 'Employers cannot apply for jobs. Use a job seeker account to apply.'}, status=403)
     job = get_object_or_404(JobPost, id=job_id, approval_status=JobPost.APPROVAL_APPROVED)
     applicant_form = ApplicantForm(request.POST, request.FILES)
     work_forms = [WorkExperienceForm(item) for item in json.loads(request.POST.get('work_experiences', '[]'))]
@@ -374,7 +410,7 @@ def admin_reject_job(request, job_id):
 # ---------- profile ----------
 
 def serialize_profile(request, user):
-    profile, _ = UserProfile.objects.get_or_create(user=user)
+    profile = get_profile(user)
     jobs = JobPost.objects.filter(employer=user).order_by('-created_at')
     return {
         **serialize_user(user),
@@ -428,3 +464,59 @@ def password_change(request):
     user = form.save()
     auth.update_session_auth_hash(request, user)  # keep the user logged in
     return JsonResponse({'detail': 'Password changed successfully'})
+
+
+# ---------- admin panel: employer accounts ----------
+
+def serialize_employer(profile):
+    user = profile.user
+    return {
+        'id': str(user.id),
+        'username': user.username,
+        'name': user.get_full_name(),
+        'email': user.email,
+        'date_joined': user.date_joined.isoformat(),
+        'status': profile.employer_status,
+        'rejection_reason': profile.employer_rejection_reason,
+        'reviewed_at': profile.employer_reviewed_at.isoformat() if profile.employer_reviewed_at else None,
+        'job_count': JobPost.objects.filter(employer=user).count(),
+    }
+
+
+@require_GET
+@api_admin_required
+def admin_employers(request):
+    """Employer accounts, newest first; ?status=pending|approved|rejected narrows the list."""
+    employers = UserProfile.objects.filter(role=UserProfile.ROLE_EMPLOYER).select_related('user')
+    counts = {
+        value: employers.filter(employer_status=value).count()
+        for value, _ in UserProfile.EMPLOYER_STATUS_CHOICES
+    }
+    counts['all'] = sum(counts.values())
+    status = request.GET.get('status', '')
+    if status in dict(UserProfile.EMPLOYER_STATUS_CHOICES):
+        employers = employers.filter(employer_status=status)
+    employers = sorted(employers, key=lambda p: p.user.date_joined, reverse=True)
+    return JsonResponse({'results': [serialize_employer(p) for p in employers], 'counts': counts})
+
+
+def _review_employer(user_id, status, reason=''):
+    profile = get_object_or_404(UserProfile, user_id=user_id, role=UserProfile.ROLE_EMPLOYER)
+    profile.employer_status = status
+    profile.employer_rejection_reason = reason
+    profile.employer_reviewed_at = timezone.now()
+    profile.save(update_fields=['employer_status', 'employer_rejection_reason', 'employer_reviewed_at'])
+    return JsonResponse(serialize_employer(profile))
+
+
+@require_POST
+@api_admin_required
+def admin_approve_employer(request, user_id):
+    return _review_employer(user_id, UserProfile.EMPLOYER_APPROVED)
+
+
+@require_POST
+@api_admin_required
+def admin_reject_employer(request, user_id):
+    reason = str(_json_body(request).get('reason', '')).strip()
+    return _review_employer(user_id, UserProfile.EMPLOYER_REJECTED, reason)

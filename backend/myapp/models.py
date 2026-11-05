@@ -208,8 +208,26 @@ class EducationalBackground(models.Model):
 
 
 class UserProfile(models.Model):
-    """Extra details shown on /profile; created on first visit for every account."""
+    """Extra details shown on /profile, plus the account's role; created at sign-up (or on first use)."""
+    ROLE_CANDIDATE = 'candidate'
+    ROLE_EMPLOYER = 'employer'
+    ROLE_CHOICES = [(ROLE_CANDIDATE, 'Job seeker'), (ROLE_EMPLOYER, 'Employer')]
+
+    # Employer accounts must be approved by an admin before they can post jobs.
+    EMPLOYER_PENDING = 'pending'
+    EMPLOYER_APPROVED = 'approved'
+    EMPLOYER_REJECTED = 'rejected'
+    EMPLOYER_STATUS_CHOICES = [
+        (EMPLOYER_PENDING, 'Pending review'),
+        (EMPLOYER_APPROVED, 'Approved'),
+        (EMPLOYER_REJECTED, 'Rejected'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_CANDIDATE)
+    employer_status = models.CharField(max_length=20, choices=EMPLOYER_STATUS_CHOICES, default=EMPLOYER_PENDING)
+    employer_rejection_reason = models.TextField(blank=True)
+    employer_reviewed_at = models.DateTimeField(null=True, blank=True)
     headline = models.CharField(max_length=120, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     location = models.CharField(max_length=100, blank=True)
@@ -222,3 +240,15 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile of {self.user.username}"
+
+    @property
+    def is_employer(self):
+        return self.role == self.ROLE_EMPLOYER
+
+    @property
+    def can_post_jobs(self):
+        return self.user.is_staff or (self.is_employer and self.employer_status == self.EMPLOYER_APPROVED)
+
+    @property
+    def can_apply(self):
+        return not self.is_employer

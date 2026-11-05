@@ -1,8 +1,10 @@
-import { ArrowRight, BriefcaseBusiness, CalendarClock, Clock, GraduationCap, MapPin, Trash2, Wallet } from 'lucide-react';
+import { ArrowRight, Ban, BriefcaseBusiness, CalendarClock, Clock, GraduationCap, MapPin, Trash2, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { routeTo } from '../../../config/routes.js';
+import { useAuth } from '../../../controllers/AuthController.jsx';
 import { EDUCATION_CHOICES, EXPERIENCE_CHOICES, SALARY_CHOICES, STATUS_CHOICES } from '../../../models/choices.js';
+import { showApply } from '../../../models/roles.js';
 import { categoryInfo } from '../home/categoryInfo.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -29,6 +31,7 @@ function deadlineInfo(job) {
 
 export default function JobListingCard({ job, canDelete, onDelete, style }) {
   const [expanded, setExpanded] = useState(false);
+  const { user } = useAuth();
   const { label: category, Icon } = categoryInfo(job.title);
   const isNew = Date.now() - new Date(job.created_at) < NEW_FOR_DAYS * DAY_MS;
   const deadline = deadlineInfo(job);
@@ -78,6 +81,10 @@ export default function JobListingCard({ job, canDelete, onDelete, style }) {
           )}
           {deadline.tone === 'closed' ? (
             <span className="jl-apply is-disabled">Closed</span>
+          ) : !showApply(user) ? (
+            <span className="jl-apply is-disabled" title="Employer accounts cannot apply for jobs">
+              <Ban aria-hidden="true" /> Employers can’t apply
+            </span>
           ) : (
             <Link to={routeTo.applyForm(job.id)} className="jl-apply">
               Apply now <ArrowRight aria-hidden="true" />

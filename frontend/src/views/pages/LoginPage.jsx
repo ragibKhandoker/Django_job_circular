@@ -1,4 +1,4 @@
-import { ArrowRight, AtSign, Building, CircleAlert, CircleCheck, LoaderCircle, Lock, UserRound, X } from 'lucide-react';
+import { ArrowRight, AtSign, Building, CircleAlert, CircleCheck, LoaderCircle, Lock, ShieldCheck, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
@@ -133,6 +133,15 @@ export default function LoginPage({ role: routeRole = 'candidate' }) {
             )}
           </button>
         </form>
+
+        <Link to={ROUTES.adminLogin} className="login-admin">
+          <span className="login-admin-icon"><ShieldCheck aria-hidden="true" /></span>
+          <span className="login-admin-text">
+            <strong>Admin Panel</strong>
+            <small>Sign in as admin to review job posts</small>
+          </span>
+          <ArrowRight className="login-admin-arrow" aria-hidden="true" />
+        </Link>
 
         <div className="auth-divider"><span>New to JobFinder?</span></div>
         <Link to={signupRoute} className="auth-secondary">{copy.signupText}</Link>

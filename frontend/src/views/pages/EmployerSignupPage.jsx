@@ -16,7 +16,7 @@ const BENEFITS = [
 ];
 
 export default function EmployerSignupPage() {
-  const { values, messages, submitting, handleChange, handleSubmit } = useSignupController();
+  const { values, messages, submitting, handleChange, handleSubmit } = useSignupController('employer');
 
   return (
     <Page name="page-employer-signup" title="Employer Sign Up - JobFinder" stylesheets={[PLUS_JAKARTA]}>

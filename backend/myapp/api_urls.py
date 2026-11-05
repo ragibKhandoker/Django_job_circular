@@ -24,4 +24,7 @@ urlpatterns = [
     path('admin/jobs/', api.admin_jobs),
     path('admin/jobs/<oid:job_id>/approve/', api.admin_approve_job),
     path('admin/jobs/<oid:job_id>/reject/', api.admin_reject_job),
+    path('admin/employers/', api.admin_employers),
+    path('admin/employers/<oid:user_id>/approve/', api.admin_approve_employer),
+    path('admin/employers/<oid:user_id>/reject/', api.admin_reject_employer),
 ]

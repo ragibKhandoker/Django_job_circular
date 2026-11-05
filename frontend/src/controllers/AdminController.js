@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../config/routes.js';
-import { AdminModel } from '../models/AdminModel.js';
+import { AdminModel, EmployerAdminModel } from '../models/AdminModel.js';
 import { useAuth } from './AuthController.jsx';
 import { useAsync } from './useAsync.js';
 import { useForm } from './useForm.js';
@@ -119,5 +119,67 @@ export function useAdminPanelController() {
     confirmReject,
     remove,
     handleLogout,
+  };
+}
+
+const EMPTY_EMPLOYER_COUNTS = { pending: 0, approved: 0, rejected: 0, all: 0 };
+
+/** Employers section of /admin-panel: approve or reject new employer accounts. */
+export function useAdminEmployersController() {
+  const navigate = useNavigate();
+  const [tab, setTab] = useState('pending');
+  const [busyId, setBusyId] = useState(null);
+  const [rejecting, setRejecting] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  const { data, loading, error, reload } = useAsync(() => EmployerAdminModel.list(tab), [tab], {
+    employers: [],
+    counts: EMPTY_EMPLOYER_COUNTS,
+  });
+
+  useEffect(() => {
+    if (error?.status === 401 || error?.status === 403) navigate(ROUTES.adminLogin, { replace: true });
+  }, [error, navigate]);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = setTimeout(() => setToast(null), TOAST_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const run = async (employer, action, message, tone) => {
+    setBusyId(employer.id);
+    try {
+      await action();
+      setToast({ message, tone });
+      reload();
+    } catch (err) {
+      setToast({ message: err.message, tone: 'error' });
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const name = (employer) => employer.name || employer.username;
+
+  return {
+    tab,
+    setTab,
+    employers: data.employers,
+    counts: data.counts,
+    loading,
+    busyId,
+    toast,
+    dismissToast: () => setToast(null),
+    approve: (employer) =>
+      run(employer, () => EmployerAdminModel.approve(employer.id), `${name(employer)} can now post jobs.`, 'success'),
+    rejecting,
+    startReject: setRejecting,
+    cancelReject: () => setRejecting(null),
+    confirmReject: async (reason) => {
+      const employer = rejecting;
+      setRejecting(null);
+      await run(employer, () => EmployerAdminModel.reject(employer.id, reason), `${name(employer)} was not approved.`, 'error');
+    },
   };
 }

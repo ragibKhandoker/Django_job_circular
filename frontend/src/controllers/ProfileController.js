@@ -31,6 +31,7 @@ export function useProfileEditController() {
   const { data: profile, loading } = useAsync(() => ProfileModel.get(), [], null);
 
   const [values, setValues] = useState(null);
+  const [initialValues, setInitialValues] = useState(null);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
@@ -38,7 +39,10 @@ export function useProfileEditController() {
   const [removePhoto, setRemovePhoto] = useState(false);
 
   useEffect(() => {
-    if (profile) setValues(Object.fromEntries(PROFILE_FIELDS.map((field) => [field, profile[field] ?? ''])));
+    if (!profile) return;
+    const loaded = Object.fromEntries(PROFILE_FIELDS.map((field) => [field, profile[field] ?? '']));
+    setValues(loaded);
+    setInitialValues(loaded);
   }, [profile]);
 
   // Local preview of a newly picked photo.
@@ -46,14 +50,16 @@ export function useProfileEditController() {
   useEffect(() => () => photoPreview && URL.revokeObjectURL(photoPreview), [photoPreview]);
   const shownPhoto = photoPreview ?? (removePhoto ? '' : profile?.photo ?? '');
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setValues((current) => ({ ...current, [name]: value }));
-  };
+  const dirty =
+    Boolean(photo) ||
+    (removePhoto && Boolean(profile?.photo)) ||
+    Boolean(values && initialValues && PROFILE_FIELDS.some((field) => values[field] !== initialValues[field]));
 
-  const handlePhotoChange = (event) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
+  const setField = (name, value) => setValues((current) => ({ ...current, [name]: value }));
+  const handleChange = (event) => setField(event.target.name, event.target.value);
+
+  /** From the file input or a drag-and-drop. */
+  const pickPhoto = (file) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setErrors((current) => ({ ...current, photo: ['Please choose an image file.'] }));
@@ -66,6 +72,19 @@ export function useProfileEditController() {
     setErrors(({ photo: _ignored, ...rest }) => rest);
     setPhoto(file);
     setRemovePhoto(false);
+  };
+
+  const handlePhotoChange = (event) => {
+    pickPhoto(event.target.files?.[0]);
+    event.target.value = '';
+  };
+
+  const handleReset = () => {
+    setValues(initialValues);
+    setPhoto(null);
+    setRemovePhoto(false);
+    setErrors({});
+    setMessage('');
   };
 
   const handleRemovePhoto = () => {
@@ -103,8 +122,12 @@ export function useProfileEditController() {
     saving,
     shownPhoto,
     hasNewPhoto: Boolean(photo),
+    dirty,
+    setField,
     handleChange,
+    pickPhoto,
     handlePhotoChange,
+    handleReset,
     handleRemovePhoto,
     handleSubmit,
     password,

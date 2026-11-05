@@ -1,10 +1,14 @@
 import {
   ArrowLeft,
   AtSign,
+  BadgeCheck,
   BriefcaseBusiness,
   CalendarDays,
+  Check,
   CircleCheck,
   CircleX,
+  Copy,
+  FileText,
   Globe,
   Hourglass,
   Link2,
@@ -15,11 +19,14 @@ import {
   PenLine,
   Phone,
   Plus,
+  Quote,
   ShieldCheck,
   Sparkles,
   UserRound,
+  Wrench,
   X,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
 import { useProfileController } from '../../controllers/ProfileController.js';
@@ -32,22 +39,26 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 import coverPhoto from '../images/login-office.jpg';
 import '../styles/pages/profile.css';
 
-const FIELD_LABELS = {
-  first_name: 'first name',
-  last_name: 'last name',
-  headline: 'headline',
-  phone: 'phone',
-  location: 'location',
-  bio: 'about you',
-  skills: 'skills',
-  photo: 'photo',
-};
+// Checklist under "Profile strength"; same fields as Profile.completeness.
+const CHECKLIST = [
+  ['photo', 'Profile photo'],
+  ['first_name', 'First name'],
+  ['last_name', 'Last name'],
+  ['headline', 'Headline'],
+  ['phone', 'Phone number'],
+  ['location', 'Location'],
+  ['bio', 'About you'],
+  ['skills', 'Skills'],
+];
 
 const JOB_STATUS = {
   pending: { text: 'Pending review', Icon: Hourglass },
   approved: { text: 'Live', Icon: CircleCheck },
   rejected: { text: 'Rejected', Icon: CircleX },
 };
+
+const SKILL_TONES = 5;
+const COPIED_MS = 1600;
 
 export function ProfileTopbar() {
   return (
@@ -79,142 +90,222 @@ export default function ProfilePage() {
           <p>{loading ? 'Loading your profile...' : error?.message ?? 'Could not load your profile.'}</p>
         </div>
       ) : (
-        <main className="profile-wrap profile-main">
-          {notices.length > 0 && (
-            <div className="profile-notice" role="status">
-              <CircleCheck aria-hidden="true" />
-              <span>{notices.join(' ')}</span>
-              <button type="button" onClick={dismissNotices} aria-label="Dismiss">
-                <X aria-hidden="true" />
-              </button>
-            </div>
-          )}
-
-          <section className="profile-hero">
-            <div className="profile-cover">
-              <img src={coverPhoto} alt="" />
-            </div>
-            <div className="profile-hero-body">
-              <Avatar profile={profile} />
-              <div className="profile-identity">
-                <h1>
-                  {profile.fullName}
-                  {profile.is_staff && (
-                    <span className="profile-badge"><ShieldCheck aria-hidden="true" /> Admin</span>
-                  )}
-                </h1>
-                <p className="profile-headline">{profile.headline || 'Add a headline so employers know what you do.'}</p>
-                <ul className="profile-quick">
-                  <li><AtSign aria-hidden="true" /> {profile.username}</li>
-                  {profile.location && <li><MapPin aria-hidden="true" /> {profile.location}</li>}
-                  <li><CalendarDays aria-hidden="true" /> Joined {formatDate(profile.date_joined)}</li>
-                </ul>
-              </div>
-              <Link to={ROUTES.profileEdit} className="profile-btn profile-btn-primary">
-                <PenLine aria-hidden="true" /> Edit profile
-              </Link>
-            </div>
-          </section>
-
-          <div className="profile-grid">
-            <div className="profile-col">
-              <StrengthCard profile={profile} />
-
-              <section className="profile-card">
-                <h2>Contact</h2>
-                <ul className="profile-contact">
-                  <ContactRow Icon={Mail} label="Email" value={profile.email} href={`mailto:${profile.email}`} />
-                  <ContactRow Icon={Phone} label="Phone" value={profile.phone} href={profile.phone && `tel:${profile.phone}`} />
-                  <ContactRow Icon={MapPin} label="Location" value={profile.location} />
-                  <ContactRow Icon={Globe} label="Website" value={profile.website} href={profile.website} external />
-                  <ContactRow Icon={Link2} label="LinkedIn" value={profile.linkedin} href={profile.linkedin} external />
-                </ul>
-              </section>
-            </div>
-
-            <div className="profile-col profile-col-wide">
-              <section className="profile-card">
-                <h2>About</h2>
-                {profile.bio ? (
-                  <p className="profile-bio">{profile.bio}</p>
-                ) : (
-                  <EmptyHint text="Tell employers a little about yourself, your experience and what you are looking for." />
-                )}
-              </section>
-
-              <section className="profile-card">
-                <h2>Skills</h2>
-                {profile.skillList.length > 0 ? (
-                  <ul className="profile-skills">
-                    {profile.skillList.map((skill) => <li key={skill}>{skill}</li>)}
-                  </ul>
-                ) : (
-                  <EmptyHint text="Add skills like React, Accounting or Customer Service." />
-                )}
-              </section>
-
-              <section className="profile-card">
-                <div className="profile-card-head">
-                  <h2>My job posts</h2>
-                  <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
-                    <Plus aria-hidden="true" /> Post a job
-                  </Link>
-                </div>
-                {profile.jobs.length > 0 ? (
-                  <ul className="profile-jobs">
-                    {profile.jobs.map((job) => {
-                      const status = JOB_STATUS[job.approval_status] ?? JOB_STATUS.pending;
-                      return (
-                        <li key={job.id} className="profile-job">
-                          <span className="profile-job-initials" aria-hidden="true">{job.initials}</span>
-                          <div className="profile-job-text">
-                            <strong>{job.title}</strong>
-                            <span>{job.company_name} · {job.location} · {job.postedAgo} ago</span>
-                            {job.approval_status === 'rejected' && job.rejection_reason && (
-                              <span className="profile-job-reason">
-                                <MessageSquareWarning aria-hidden="true" /> {job.rejection_reason}
-                              </span>
-                            )}
-                          </div>
-                          <span className={`profile-pill pill-${job.approval_status}`}>
-                            <status.Icon aria-hidden="true" /> {status.text}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <p className="profile-empty">You have not posted any jobs yet.</p>
-                )}
-              </section>
-            </div>
-          </div>
-        </main>
+        <ProfileView profile={profile} notices={notices} onDismissNotices={dismissNotices} />
       )}
     </Page>
   );
 }
 
+function ProfileView({ profile, notices, onDismissNotices }) {
+  const live = profile.jobs.filter((job) => job.approval_status === 'approved').length;
+  const pending = profile.jobs.filter((job) => job.approval_status === 'pending').length;
+  const complete = profile.completeness === 100;
+
+  return (
+    <main className="profile-wrap profile-main">
+      {notices.length > 0 && (
+        <div className="profile-notice" role="status">
+          <span className="profile-notice-icon"><Check aria-hidden="true" /></span>
+          <span className="profile-notice-text">{notices.join(' ')}</span>
+          <button type="button" onClick={onDismissNotices} aria-label="Dismiss">
+            <X aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
+      <section className="profile-hero">
+        <div className="profile-cover">
+          <img src={coverPhoto} alt="" />
+        </div>
+
+        <div className="profile-hero-body">
+          <div className="profile-avatar-ring" style={{ '--progress': profile.completeness }}>
+            <Avatar profile={profile} />
+            {complete && (
+              <span className="profile-verified" title="Profile complete">
+                <BadgeCheck aria-hidden="true" />
+              </span>
+            )}
+          </div>
+
+          <div className="profile-identity">
+            <h1>
+              {profile.fullName}
+              {profile.is_staff && (
+                <span className="profile-badge"><ShieldCheck aria-hidden="true" /> Admin</span>
+              )}
+            </h1>
+            <p className={`profile-headline${profile.headline ? '' : ' is-empty'}`}>
+              {profile.headline || 'Add a headline so employers know what you do'}
+            </p>
+            <ul className="profile-quick">
+              <li><AtSign aria-hidden="true" /> {profile.username}</li>
+              {profile.location && <li><MapPin aria-hidden="true" /> {profile.location}</li>}
+              <li><CalendarDays aria-hidden="true" /> Joined {formatDate(profile.date_joined)}</li>
+            </ul>
+          </div>
+
+          <div className="profile-hero-actions">
+            <Link to={ROUTES.profileEdit} className="profile-btn profile-btn-primary">
+              <PenLine aria-hidden="true" /> Edit profile
+            </Link>
+            <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
+              <Plus aria-hidden="true" /> Post a job
+            </Link>
+          </div>
+        </div>
+
+        <ul className="profile-stats">
+          <Stat Icon={BriefcaseBusiness} value={profile.jobs.length} label="Job posts" tone="blue" />
+          <Stat Icon={CircleCheck} value={live} label="Live now" tone="green" />
+          <Stat Icon={Hourglass} value={pending} label="In review" tone="amber" />
+          <Stat Icon={Sparkles} value={`${profile.completeness}%`} label="Profile strength" tone="violet" />
+        </ul>
+      </section>
+
+      <div className="profile-grid">
+        <aside className="profile-col">
+          <StrengthCard profile={profile} />
+
+          <section className="profile-card">
+            <CardTitle Icon={Mail}>Contact</CardTitle>
+            <ul className="profile-contact">
+              <ContactRow Icon={Mail} label="Email" value={profile.email} href={`mailto:${profile.email}`} copyable />
+              <ContactRow Icon={Phone} label="Phone" value={profile.phone} href={profile.phone && `tel:${profile.phone}`} copyable />
+              <ContactRow Icon={MapPin} label="Location" value={profile.location} />
+              <ContactRow Icon={Globe} label="Website" value={profile.website} href={profile.website} external />
+              <ContactRow Icon={Link2} label="LinkedIn" value={profile.linkedin} href={profile.linkedin} external />
+            </ul>
+          </section>
+        </aside>
+
+        <div className="profile-col">
+          <section className="profile-card">
+            <CardTitle Icon={UserRound}>About</CardTitle>
+            {profile.bio ? (
+              <blockquote className="profile-bio">
+                <Quote aria-hidden="true" />
+                <p>{profile.bio}</p>
+              </blockquote>
+            ) : (
+              <EmptyState Icon={FileText} text="Tell employers about your experience and what you are looking for." action="Write your bio" />
+            )}
+          </section>
+
+          <section className="profile-card">
+            <CardTitle Icon={Wrench}>Skills</CardTitle>
+            {profile.skillList.length > 0 ? (
+              <ul className="profile-skills">
+                {profile.skillList.map((skill, index) => (
+                  <li key={skill} className={`tone-${index % SKILL_TONES}`}>{skill}</li>
+                ))}
+              </ul>
+            ) : (
+              <EmptyState Icon={Wrench} text="Add skills like React, Accounting or Customer Service." action="Add skills" />
+            )}
+          </section>
+
+          <section className="profile-card">
+            <CardTitle Icon={BriefcaseBusiness} count={profile.jobs.length}>My job posts</CardTitle>
+            {profile.jobs.length > 0 ? (
+              <ul className="profile-jobs">
+                {profile.jobs.map((job) => <JobRow key={job.id} job={job} />)}
+              </ul>
+            ) : (
+              <div className="profile-empty-state">
+                <span className="profile-empty-icon"><BriefcaseBusiness aria-hidden="true" /></span>
+                <p>You have not posted any jobs yet.</p>
+                <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
+                  <Plus aria-hidden="true" /> Post your first job
+                </Link>
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function CardTitle({ Icon, count, children }) {
+  return (
+    <h2 className="profile-card-title">
+      <span className="profile-card-icon"><Icon aria-hidden="true" /></span>
+      {children}
+      {count > 0 && <span className="profile-count">{count}</span>}
+    </h2>
+  );
+}
+
+function Stat({ Icon, value, label, tone }) {
+  return (
+    <li className={`profile-stat tone-${tone}`}>
+      <span className="profile-stat-icon"><Icon aria-hidden="true" /></span>
+      <span className="profile-stat-text">
+        <strong>{value}</strong>
+        <small>{label}</small>
+      </span>
+    </li>
+  );
+}
+
 function StrengthCard({ profile }) {
-  const missing = profile.missingFields.map((field) => FIELD_LABELS[field]);
+  const done = CHECKLIST.filter(([field]) => String(profile[field] ?? '').trim()).length;
+  const complete = profile.completeness === 100;
+
   return (
     <section className="profile-card profile-strength">
-      <div className="profile-card-head">
-        <h2>Profile strength</h2>
-        <strong>{profile.completeness}%</strong>
+      <CardTitle Icon={Sparkles}>Profile strength</CardTitle>
+      <div className="profile-strength-top">
+        <div className="profile-ring" style={{ '--progress': profile.completeness }}>
+          <span>{profile.completeness}%</span>
+        </div>
+        <div>
+          <strong>{complete ? 'All-star profile!' : profile.completeness >= 50 ? 'Looking good' : 'Getting started'}</strong>
+          <p>
+            {complete
+              ? 'Employers can see everything about you.'
+              : `${done} of ${CHECKLIST.length} done. Complete profiles get noticed more.`}
+          </p>
+        </div>
       </div>
-      <div className="profile-meter" role="progressbar" aria-valuenow={profile.completeness} aria-valuemin={0} aria-valuemax={100}>
-        <span style={{ width: `${profile.completeness}%` }} />
-      </div>
-      {missing.length > 0 ? (
-        <p>
-          Add your {missing.slice(0, 3).join(', ')}
-          {missing.length > 3 ? ` and ${missing.length - 3} more` : ''} to stand out to employers.
-        </p>
-      ) : (
-        <p className="is-complete"><Sparkles aria-hidden="true" /> Your profile is complete. Nice work!</p>
-      )}
+      <ul className="profile-checklist">
+        {CHECKLIST.map(([field, text]) => {
+          const filled = Boolean(String(profile[field] ?? '').trim());
+          return (
+            <li key={field} className={filled ? 'is-done' : ''}>
+              <span className="profile-check">{filled && <Check aria-hidden="true" />}</span>
+              {filled ? text : <Link to={ROUTES.profileEdit}>{text}</Link>}
+            </li>
+          );
+        })}
+      </ul>
     </section>
+  );
+}
+
+function JobRow({ job }) {
+  const status = JOB_STATUS[job.approval_status] ?? JOB_STATUS.pending;
+  return (
+    <li className={`profile-job status-${job.approval_status}`}>
+      <span className="profile-job-initials" aria-hidden="true">{job.initials}</span>
+      <div className="profile-job-text">
+        <strong>{job.title}</strong>
+        <span className="profile-job-meta">
+          <span><BriefcaseBusiness aria-hidden="true" /> {job.company_name}</span>
+          <span><MapPin aria-hidden="true" /> {job.location}</span>
+          <span><CalendarDays aria-hidden="true" /> {job.postedAgo} ago</span>
+        </span>
+        {job.approval_status === 'rejected' && job.rejection_reason && (
+          <span className="profile-job-reason">
+            <MessageSquareWarning aria-hidden="true" /> {job.rejection_reason}
+          </span>
+        )}
+      </div>
+      <span className={`profile-pill pill-${job.approval_status}`}>
+        <status.Icon aria-hidden="true" /> {status.text}
+      </span>
+    </li>
   );
 }
 
@@ -226,7 +317,19 @@ export function Avatar({ profile, src = profile.photo, className = '' }) {
   );
 }
 
-function ContactRow({ Icon, label, value, href, external }) {
+function ContactRow({ Icon, label, value, href, external, copyable }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), COPIED_MS);
+    } catch {
+      // Clipboard blocked (e.g. insecure context): nothing to do.
+    }
+  };
+
   return (
     <li>
       <span className="profile-contact-icon"><Icon aria-hidden="true" /></span>
@@ -239,18 +342,32 @@ function ContactRow({ Icon, label, value, href, external }) {
             <span>{value}</span>
           )
         ) : (
-          <span className="is-empty">Not added</span>
+          <Link to={ROUTES.profileEdit} className="is-empty">+ Add {label.toLowerCase()}</Link>
         )}
       </span>
+      {copyable && value && (
+        <button
+          type="button"
+          className={`profile-copy${copied ? ' is-copied' : ''}`}
+          onClick={copy}
+          aria-label={copied ? 'Copied' : `Copy ${label.toLowerCase()}`}
+          title={copied ? 'Copied!' : 'Copy'}
+        >
+          {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+        </button>
+      )}
     </li>
   );
 }
 
-function EmptyHint({ text }) {
+function EmptyState({ Icon, text, action }) {
   return (
-    <p className="profile-empty">
-      {text}{' '}
-      <Link to={ROUTES.profileEdit}>Add now</Link>
-    </p>
+    <div className="profile-empty-state">
+      <span className="profile-empty-icon"><Icon aria-hidden="true" /></span>
+      <p>{text}</p>
+      <Link to={ROUTES.profileEdit} className="profile-btn profile-btn-ghost">
+        <Plus aria-hidden="true" /> {action}
+      </Link>
+    </div>
   );
 }

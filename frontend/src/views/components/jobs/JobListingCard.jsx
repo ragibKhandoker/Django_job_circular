@@ -29,7 +29,19 @@ function deadlineInfo(job) {
   return { text: `Apply by ${job.deadlineDisplay}`, tone: 'ok' };
 }
 
-export default function JobListingCard({ job, canDelete, onDelete, style }) {
+/** Wraps each (case-insensitive) occurrence of `term` in <mark>. */
+function Highlight({ text, term }) {
+  const value = text ?? '';
+  const needle = term?.trim();
+  if (!needle) return value;
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return value.split(new RegExp(`(${escaped})`, 'gi')).map((part, index) =>
+    index % 2 ? <mark key={index} className="jl-mark">{part}</mark> : part,
+  );
+}
+
+/** `highlight`: search keyword to mark in the company name and description. */
+export default function JobListingCard({ job, canDelete, onDelete, style, highlight = '' }) {
   const [expanded, setExpanded] = useState(false);
   const { user } = useAuth();
   const { label: category, Icon } = categoryInfo(job.title);
@@ -44,13 +56,13 @@ export default function JobListingCard({ job, canDelete, onDelete, style }) {
         <span className="jl-card-icon"><Icon aria-hidden="true" /></span>
         <div className="jl-card-title">
           <h2>{category}</h2>
-          <p>{job.company_name}</p>
+          <p><Highlight text={job.company_name} term={highlight} /></p>
         </div>
         {isNew && <span className="jl-new">New</span>}
       </header>
 
       <ul className="jl-tags">
-        <li><MapPin aria-hidden="true" /> {job.location}</li>
+        <li><MapPin aria-hidden="true" /> <Highlight text={job.location} term={highlight} /></li>
         <li><Wallet aria-hidden="true" /> {label(SALARY_CHOICES, job.salary)} ৳</li>
         <li><Clock aria-hidden="true" /> {label(STATUS_CHOICES, job.status)}</li>
         <li><BriefcaseBusiness aria-hidden="true" /> {label(EXPERIENCE_CHOICES, job.experience_level).split(' (')[0]}</li>
@@ -58,7 +70,7 @@ export default function JobListingCard({ job, canDelete, onDelete, style }) {
       </ul>
 
       <div className={`jl-desc${expanded || !long ? ' is-open' : ''}`}>
-        <p>{description}</p>
+        <p><Highlight text={description} term={highlight} /></p>
       </div>
       {long && (
         <button type="button" className="jl-more" onClick={() => setExpanded((open) => !open)}>

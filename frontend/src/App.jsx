@@ -42,6 +42,7 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
   ROUTES.profileEdit,
   ROUTES.postJob,
   ROUTES.jobList,
+  ROUTES.totalJobs,
 ]);
 // Category pages share the job list design (and its toggle).
 const CATEGORY_PREFIX = ROUTES.jobCategory.replace(':category', '');

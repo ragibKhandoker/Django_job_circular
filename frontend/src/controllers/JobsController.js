@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ROUTES } from '../config/routes.js';
 import {
@@ -71,14 +71,21 @@ export function useJobListController(category) {
   };
 }
 
-/** /jobs/total (views.total_jobs_view): location search + "top 10 latest". */
+/** /jobs/total (views.total_jobs_view): keyword + location search, "top 10 latest", and side filters. */
 export function useTotalJobsController() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = searchParams.get('location') ?? '';
   const latest = searchParams.get('latest') ?? '';
-  // Keyword from the home page search bar; kept across location searches.
+  // Keyword from the home page search bar (or the search panel here).
   const q = searchParams.get('q') ?? '';
+  const [keywordInput, setKeywordInput] = useState(q);
   const [locationInput, setLocationInput] = useState(location);
+  const [filters, setFilters] = useState({ status: [], salary: '', experience_level: '' });
+  const [sort, setSort] = useState('newest');
+
+  // Keep the search boxes in step with the URL (links, back/forward).
+  useEffect(() => setKeywordInput(q), [q]);
+  useEffect(() => setLocationInput(location), [location]);
 
   const { data: jobs, loading } = useAsync(
     () => JobModel.list(latest === '1' ? { q, location, latest, limit: 10 } : { q, location }),
@@ -86,20 +93,79 @@ export function useTotalJobsController() {
     [],
   );
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const params = { location: locationInput };
-    if (q) params.q = q;
-    if (event.nativeEvent.submitter?.name === 'latest') params.latest = '1';
+  const search = (next) => {
+    const params = Object.fromEntries(Object.entries(next).filter(([, value]) => value));
     setSearchParams(params);
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    search({ q: keywordInput.trim(), location: locationInput.trim(), latest });
+  };
+
+  const pickLocation = (value) => {
+    const next = value === location ? '' : value;
+    setLocationInput(next);
+    search({ q, location: next, latest });
+  };
+
+  const toggleLatest = () => search({ q, location, latest: latest === '1' ? '' : '1' });
+
+  const clearSearch = (key) => {
+    if (key === 'q') setKeywordInput('');
+    if (key === 'location') setLocationInput('');
+    search({ q, location, latest, [key]: '' });
+  };
+
+  const toggleStatus = (value) =>
+    setFilters((current) => ({
+      ...current,
+      status: current.status.includes(value) ? current.status.filter((item) => item !== value) : [...current.status, value],
+    }));
+  const setFilter = (name, value) => setFilters((current) => ({ ...current, [name]: current[name] === value ? '' : value }));
+  const clearFilters = () => setFilters({ status: [], salary: '', experience_level: '' });
+
+  // How many of the loaded jobs have each value, for the filter counts.
+  const counts = useMemo(() => {
+    const tally = (field) => jobs.reduce((acc, job) => ({ ...acc, [job[field]]: (acc[job[field]] ?? 0) + 1 }), {});
+    return { status: tally('status'), salary: tally('salary'), experience_level: tally('experience_level') };
+  }, [jobs]);
+
+  const visibleJobs = useMemo(() => {
+    const filtered = jobs.filter(
+      (job) =>
+        (!filters.status.length || filters.status.includes(job.status)) &&
+        (!filters.salary || job.salary === filters.salary) &&
+        (!filters.experience_level || job.experience_level === filters.experience_level),
+    );
+    const byNewest = (a, b) => new Date(b.created_at) - new Date(a.created_at);
+    const byDeadline = (a, b) => (a.deadline ?? '9999').localeCompare(b.deadline ?? '9999');
+    return [...filtered].sort(sort === 'deadline' ? byDeadline : byNewest);
+  }, [jobs, filters, sort]);
+
   return {
-    jobs,
+    jobs: visibleJobs,
+    totalJobs: jobs.length,
     loading,
+    q,
+    location,
+    latest: latest === '1',
+    keywordInput,
     locationInput,
+    handleKeywordChange: (event) => setKeywordInput(event.target.value),
     handleLocationChange: (event) => setLocationInput(event.target.value),
     handleSubmit,
+    pickLocation,
+    toggleLatest,
+    clearSearch,
+    filters,
+    counts,
+    toggleStatus,
+    setFilter,
+    clearFilters,
+    activeFilterCount: filters.status.length + (filters.salary ? 1 : 0) + (filters.experience_level ? 1 : 0),
+    sort,
+    handleSortChange: (event) => setSort(event.target.value),
   };
 }
 

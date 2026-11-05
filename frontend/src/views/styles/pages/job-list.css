@@ -917,6 +917,14 @@
     color: var(--red);
 }
 
+/* search keyword highlight (used on /jobs/total) */
+.page-job-list .jl-mark {
+    padding: 0 3px;
+    border-radius: 4px;
+    background: color-mix(in srgb, #ffd166 55%, transparent);
+    color: inherit;
+}
+
 /* loading skeleton */
 .page-job-list .jl-skeleton {
     min-height: 260px;

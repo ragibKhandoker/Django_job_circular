@@ -106,7 +106,7 @@ class JobPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     salary = models.CharField(max_length=100, choices=SALARY_CHOICES)
     status = models.CharField(choices=STATUS_CHOICES, max_length=100)
-    requirements = models.TextField(max_length=400)
+    requirements = models.TextField(max_length=10000)
     educational_level = models.CharField(max_length=50, choices=EDUCATION_CHOICES)
     experience_level = models.CharField(max_length=20, choices=EXPERIENCE_CHOICES)
     deadline = models.DateField(null=True, blank=True)

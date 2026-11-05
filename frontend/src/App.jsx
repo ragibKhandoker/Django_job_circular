@@ -40,11 +40,16 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
   ROUTES.adminPanel,
   ROUTES.profile,
   ROUTES.profileEdit,
+  ROUTES.postJob,
+  ROUTES.jobList,
 ]);
+// Category pages share the job list design (and its toggle).
+const CATEGORY_PREFIX = ROUTES.jobCategory.replace(':category', '');
 
 function FloatingThemeToggle() {
   const { pathname } = useLocation();
-  if (PAGES_WITH_OWN_TOGGLE.has(pathname.replace(/\/+$/, '') || '/')) return null;
+  const path = pathname.replace(/\/+$/, '') || '/';
+  if (PAGES_WITH_OWN_TOGGLE.has(path) || path.startsWith(CATEGORY_PREFIX)) return null;
   return <ThemeToggle className="theme-toggle-floating" />;
 }
 

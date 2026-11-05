@@ -4,6 +4,7 @@ import CareerTips from '../components/home/CareerTips.jsx';
 import CategoryGrid from '../components/home/CategoryGrid.jsx';
 import CompaniesSection from '../components/home/CompaniesSection.jsx';
 import FeaturedJobs from '../components/home/FeaturedJobs.jsx';
+import FlashModal from '../components/home/FlashModal.jsx';
 import FeatureStrip from '../components/home/FeatureStrip.jsx';
 import HeroSection from '../components/home/HeroSection.jsx';
 import SiteFooter from '../components/home/SiteFooter.jsx';
@@ -19,9 +20,9 @@ export default function HomePage() {
       <SiteHeader
         isAuthenticated={home.isAuthenticated}
         username={home.username}
+        isStaff={home.isStaff}
         categories={home.categories}
         categoryLink={home.categoryLink}
-        messages={home.messages}
         onLogout={home.handleLogout}
       />
 
@@ -51,6 +52,14 @@ export default function HomePage() {
       </main>
 
       <SiteFooter />
+
+      <FlashModal
+        messages={home.messages}
+        isAuthenticated={home.isAuthenticated}
+        username={home.username}
+        duration={home.messageTimeout}
+        onClose={home.dismissMessages}
+      />
     </Page>
   );
 }

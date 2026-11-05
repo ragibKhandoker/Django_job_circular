@@ -22,7 +22,7 @@ export function useLoginController(role) {
   const flash = useFlash();
   const navigate = useNavigate();
   const location = useLocation();
-  const { messages, replace } = useFlashMessages();
+  const { notices, errors, replace, dismissNotices } = useFlashMessages();
   const { values, handleChange } = useForm({ username: '', password: '' });
   const [submitting, setSubmitting] = useState(false);
 
@@ -46,7 +46,9 @@ export function useLoginController(role) {
     role,
     setRole,
     values,
-    messages,
+    notices,
+    errors,
+    dismissNotices,
     submitting,
     signupRoute: SIGNUP_ROUTES[role],
     handleChange,

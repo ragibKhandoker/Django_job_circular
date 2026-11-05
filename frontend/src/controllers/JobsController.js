@@ -9,7 +9,6 @@ import {
   STATUS_CHOICES,
 } from '../models/choices.js';
 import { EMPTY_JOB_POST, JobModel } from '../models/JobModel.js';
-import { useFlash } from './FlashController.jsx';
 import { useAsync } from './useAsync.js';
 import { useForm } from './useForm.js';
 
@@ -18,7 +17,8 @@ export function useJobListController(category) {
   const [searchParams] = useSearchParams();
   const { data: jobs, loading, reload } = useAsync(() => JobModel.list({ category }), [category], []);
 
-  const postedJobId = searchParams.get('posted') === 'true' ? searchParams.get('job_id') : null;
+  // After posting: 'pending' (waiting for an admin) or 'approved' (admins' own posts).
+  const submitted = searchParams.get('submitted');
 
   const handleDelete = async (jobId) => {
     if (!window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) return;
@@ -29,7 +29,7 @@ export function useJobListController(category) {
   return {
     jobs,
     loading,
-    postedJobId,
+    submitted,
     // Delete is only offered on the full list, never on a category page.
     canDelete: (job) => !category && job.is_owner,
     handleDelete,
@@ -70,7 +70,6 @@ export function useTotalJobsController() {
 
 /** /post-job (views.post_job). */
 export function usePostJobController() {
-  const flash = useFlash();
   const navigate = useNavigate();
   const { values, handleChange } = useForm(EMPTY_JOB_POST);
   const [errors, setErrors] = useState({});
@@ -79,8 +78,7 @@ export function usePostJobController() {
     event.preventDefault();
     try {
       const job = await JobModel.create(values);
-      flash('Job posted successfully!');
-      navigate(`${ROUTES.jobList}?posted=true&job_id=${job.id}`);
+      navigate(`${ROUTES.jobList}?submitted=${job.approval_status}`);
     } catch (error) {
       if (error.status === 401) navigate(ROUTES.employerLogin);
       setErrors(error.errors ?? {});

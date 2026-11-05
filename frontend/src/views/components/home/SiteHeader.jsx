@@ -2,7 +2,6 @@ import {
   BriefcaseBusiness,
   Building,
   ChevronDown,
-  CircleCheck,
   House,
   Info,
   Lightbulb,
@@ -12,6 +11,7 @@ import {
   Menu,
   Plus,
   Search,
+  ShieldCheck,
   User,
   UserPlus,
   X,
@@ -28,7 +28,7 @@ const SECTION_LINKS = [
   { href: '#about', Icon: Info, label: 'About' },
 ];
 
-export default function SiteHeader({ isAuthenticated, username, categories, categoryLink, messages, onLogout }) {
+export default function SiteHeader({ isAuthenticated, username, isStaff, categories, categoryLink, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -97,7 +97,7 @@ export default function SiteHeader({ isAuthenticated, username, categories, cate
           ))}
 
           <div className="nav-actions-mobile">
-            <HeaderActions isAuthenticated={isAuthenticated} username={username} onLogout={onLogout} />
+            <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} onLogout={onLogout} />
           </div>
         </nav>
 
@@ -107,27 +107,25 @@ export default function SiteHeader({ isAuthenticated, username, categories, cate
             <Search aria-hidden="true" />
           </button>
           <span className="divider" aria-hidden="true"></span>
-          <HeaderActions isAuthenticated={isAuthenticated} username={username} onLogout={onLogout} />
+          <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} onLogout={onLogout} />
         </div>
       </div>
-
-      {messages.length > 0 && (
-        <div className="flash-messages" role="status">
-          {messages.map((message, index) => (
-            <div key={index} className="flash-message">
-              <CircleCheck aria-hidden="true" /> {message}
-            </div>
-          ))}
-        </div>
-      )}
     </header>
   );
 }
 
-function HeaderActions({ isAuthenticated, username, onLogout }) {
+function HeaderActions({ isAuthenticated, username, isStaff, onLogout }) {
   if (isAuthenticated) {
     return (
       <>
+        <Link to={ROUTES.profile} className="icon-btn" aria-label="My profile" title={`My profile (${username})`}>
+          <User aria-hidden="true" />
+        </Link>
+        {isStaff && (
+          <Link to={ROUTES.adminPanel} className="btn btn-outline">
+            <ShieldCheck aria-hidden="true" /> Admin
+          </Link>
+        )}
         <Link to={ROUTES.postJob} className="btn btn-outline">
           <Plus aria-hidden="true" /> Post a Job
         </Link>

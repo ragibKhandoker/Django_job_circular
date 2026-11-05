@@ -25,6 +25,7 @@ export default function EmployerSignupPage() {
         photoPosition="40% center"
         heading="Hire the right people, faster."
         benefits={BENEFITS}
+        compact
         backTo={ROUTES.signup}
         backLabel="Change account type"
       >

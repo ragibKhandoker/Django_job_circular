@@ -508,6 +508,70 @@
     color: var(--primary);
 }
 
+/* ---------- compact (sign-up forms): fit the whole form in one screen ---------- */
+.auth-split--compact .auth-main {
+    padding: 72px 24px 24px;
+}
+
+.auth-split--compact .auth-content {
+    max-width: 520px;
+}
+
+.auth-split--compact .auth-step {
+    padding: 3px 10px;
+    font-size: 12px;
+}
+
+.auth-split--compact .auth-title {
+    margin-top: 10px;
+    font-size: clamp(22px, 2.2vw, 28px);
+}
+
+.auth-split--compact .auth-lead {
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+.auth-split--compact .auth-form {
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.auth-split--compact .auth-row {
+    gap: 12px;
+}
+
+.auth-split--compact .auth-field {
+    gap: 4px;
+}
+
+.auth-split--compact .auth-label {
+    font-size: 13px;
+}
+
+.auth-split--compact .auth-input input {
+    height: 42px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.auth-split--compact .auth-hint-text,
+.auth-split--compact .auth-error-text {
+    font-size: 12px;
+}
+
+.auth-split--compact .auth-form .auth-submit {
+    margin-top: 6px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+.auth-split--compact .auth-hint {
+    margin-top: 14px;
+    font-size: 14px;
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
     .auth-split {

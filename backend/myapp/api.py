@@ -3,17 +3,19 @@ import json
 from functools import wraps
 
 from django.contrib import auth
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .db_status import ping_mongodb
-from .forms import ApplicantForm, EducationalBackgroundForm, JobPostForm, WorkExperienceForm
-from .models import Applicant, JobPost
+from .forms import (AccountForm, ApplicantForm, EducationalBackgroundForm, JobPostForm, UserProfileForm,
+                    WorkExperienceForm)
+from .models import Applicant, JobPost, UserProfile
 
 
 def _json_body(request):
@@ -40,6 +42,25 @@ def api_login_required(view_func):
     return wrapper
 
 
+def api_admin_required(view_func):
+    """Staff users only: they review job posts in the admin panel."""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return JsonResponse({'detail': 'Authentication required.'}, status=401)
+        if not request.user.is_staff:
+            return JsonResponse({'detail': 'Admin access required.'}, status=403)
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def _can_see_job(job, user):
+    """Unapproved jobs are only visible to the employer who posted them and to admins."""
+    if job.approval_status == JobPost.APPROVAL_APPROVED:
+        return True
+    return user.is_authenticated and (user.is_staff or job.employer_id == user.id)
+
+
 # ---------- serializers ----------
 
 def serialize_user(user):
@@ -52,6 +73,7 @@ def serialize_user(user):
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
+        'is_staff': user.is_staff,
     }
 
 
@@ -70,7 +92,21 @@ def serialize_job(job, user=None):
         'deadline': job.deadline.isoformat() if job.deadline else None,
         'created_at': job.created_at.isoformat(),
         'is_owner': bool(user and user.is_authenticated and job.employer_id == user.id),
+        'approval_status': job.approval_status,
+        'rejection_reason': job.rejection_reason,
+        'reviewed_at': job.reviewed_at.isoformat() if job.reviewed_at else None,
     }
+
+
+def serialize_admin_job(job):
+    data = serialize_job(job)
+    employer = job.employer
+    data['employer'] = {
+        'username': employer.username,
+        'email': employer.email,
+        'name': employer.get_full_name(),
+    }
+    return data
 
 
 def serialize_applicant(applicant, detailed=False):
@@ -147,6 +183,21 @@ def login(request):
 
 
 @require_POST
+def admin_login(request):
+    """Admin panel login with email + password; only staff accounts get in."""
+    data = _json_body(request)
+    email = data.get('email', '').strip()
+    account = User.objects.filter(email__iexact=email).first() if email else None
+    user = account and auth.authenticate(request, username=account.username, password=data.get('password', ''))
+    if not user:
+        return JsonResponse({'detail': 'Invalid email or password.'}, status=400)
+    if not user.is_staff:
+        return JsonResponse({'detail': 'This account does not have admin access.'}, status=403)
+    auth.login(request, user)
+    return JsonResponse({'detail': 'Welcome to the admin panel', 'user': serialize_user(user)})
+
+
+@require_POST
 def logout(request):
     auth.logout(request)
     return JsonResponse({'detail': 'Successfully logged out'})
@@ -189,7 +240,7 @@ def jobs(request):
     if request.method == 'POST':
         return _create_job(request)
 
-    queryset = JobPost.objects.all()
+    queryset = JobPost.objects.filter(approval_status=JobPost.APPROVAL_APPROVED)
     category = request.GET.get('category')
     location = request.GET.get('location', '')
     if category:
@@ -220,6 +271,8 @@ def _create_job(request):
         return JsonResponse({'detail': 'Please correct the errors below.', 'errors': _form_errors(form)}, status=400)
     job = form.save(commit=False)
     job.employer = request.user
+    # Admins' own posts need no review.
+    job.approval_status = JobPost.APPROVAL_APPROVED if request.user.is_staff else JobPost.APPROVAL_PENDING
     job.save()
     return JsonResponse(serialize_job(job, request.user), status=201)
 
@@ -228,17 +281,19 @@ def _create_job(request):
 def job_detail(request, job_id):
     job = get_object_or_404(JobPost, id=job_id)
     if request.method == 'DELETE':
-        if not request.user.is_authenticated or job.employer_id != request.user.id:
+        if not request.user.is_authenticated or not (job.employer_id == request.user.id or request.user.is_staff):
             return JsonResponse({'detail': 'You are not allowed to delete this job.'}, status=403)
         job.delete()
         return HttpResponse(status=204)
+    if not _can_see_job(job, request.user):
+        return JsonResponse({'detail': 'Not found.'}, status=404)
     return JsonResponse(serialize_job(job, request.user))
 
 
 @require_POST
 @api_login_required
 def apply(request, job_id):
-    job = get_object_or_404(JobPost, id=job_id)
+    job = get_object_or_404(JobPost, id=job_id, approval_status=JobPost.APPROVAL_APPROVED)
     applicant_form = ApplicantForm(request.POST, request.FILES)
     work_forms = [WorkExperienceForm(item) for item in json.loads(request.POST.get('work_experiences', '[]'))]
     edu_forms = [EducationalBackgroundForm(item) for item in json.loads(request.POST.get('educational_backgrounds', '[]'))]
@@ -274,3 +329,102 @@ def candidates(request):
 def candidate_detail(request, applicant_id):
     applicant = get_object_or_404(Applicant, id=applicant_id)
     return JsonResponse(serialize_applicant(applicant))
+
+
+# ---------- admin panel ----------
+
+@require_GET
+@api_admin_required
+def admin_jobs(request):
+    """All job posts for review, newest first; ?status=pending|approved|rejected narrows the list."""
+    queryset = JobPost.objects.select_related('employer').order_by('-created_at')
+    status = request.GET.get('status', '')
+    if status in dict(JobPost.APPROVAL_CHOICES):
+        queryset = queryset.filter(approval_status=status)
+    counts = {
+        value: JobPost.objects.filter(approval_status=value).count()
+        for value, _ in JobPost.APPROVAL_CHOICES
+    }
+    counts['all'] = sum(counts.values())
+    return JsonResponse({'results': [serialize_admin_job(job) for job in queryset], 'counts': counts})
+
+
+def _review_job(job_id, approval_status, reason=''):
+    job = get_object_or_404(JobPost, id=job_id)
+    job.approval_status = approval_status
+    job.rejection_reason = reason
+    job.reviewed_at = timezone.now()
+    job.save(update_fields=['approval_status', 'rejection_reason', 'reviewed_at'])
+    return JsonResponse(serialize_admin_job(job))
+
+
+@require_POST
+@api_admin_required
+def admin_approve_job(request, job_id):
+    return _review_job(job_id, JobPost.APPROVAL_APPROVED)
+
+
+@require_POST
+@api_admin_required
+def admin_reject_job(request, job_id):
+    reason = str(_json_body(request).get('reason', '')).strip()
+    return _review_job(job_id, JobPost.APPROVAL_REJECTED, reason)
+
+
+# ---------- profile ----------
+
+def serialize_profile(request, user):
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    jobs = JobPost.objects.filter(employer=user).order_by('-created_at')
+    return {
+        **serialize_user(user),
+        'date_joined': user.date_joined.isoformat(),
+        'headline': profile.headline,
+        'phone': profile.phone,
+        'location': profile.location,
+        'bio': profile.bio,
+        'skills': profile.skills,
+        'website': profile.website,
+        'linkedin': profile.linkedin,
+        'photo': request.build_absolute_uri(profile.photo.url) if profile.photo else '',
+        'updated_at': profile.updated_at.isoformat(),
+        'jobs': [serialize_job(job, user) for job in jobs],
+    }
+
+
+@require_http_methods(['GET', 'POST'])
+@api_login_required
+def profile(request):
+    """GET: the logged-in user's profile. POST (multipart): update it; remove_photo=1 clears the photo."""
+    user = request.user
+    if request.method == 'GET':
+        return JsonResponse(serialize_profile(request, user))
+
+    profile_obj, _ = UserProfile.objects.get_or_create(user=user)
+    old_photo = profile_obj.photo.name if profile_obj.photo else ''
+    account_form = AccountForm(request.POST, instance=user)
+    profile_form = UserProfileForm(request.POST, request.FILES, instance=profile_obj)
+    if not (account_form.is_valid() & profile_form.is_valid()):
+        errors = _form_errors(account_form, profile_form)
+        return JsonResponse({'detail': 'Please correct the errors below.', 'errors': errors}, status=400)
+
+    account_form.save()
+    profile_obj = profile_form.save(commit=False)
+    if request.POST.get('remove_photo') == '1' and 'photo' not in request.FILES:
+        profile_obj.photo = None
+    profile_obj.save()
+    new_photo = profile_obj.photo.name if profile_obj.photo else ''
+    if old_photo and old_photo != new_photo:
+        profile_obj.photo.storage.delete(old_photo)
+    return JsonResponse({'detail': 'Profile updated successfully', 'profile': serialize_profile(request, user)})
+
+
+@require_POST
+@api_login_required
+def password_change(request):
+    form = PasswordChangeForm(request.user, _json_body(request))
+    if not form.is_valid():
+        return JsonResponse({'detail': 'Please correct the errors below.', 'errors': _form_errors(form)}, status=400)
+    user = form.save()
+    auth.update_session_auth_hash(request, user)  # keep the user logged in
+    return JsonResponse({'detail': 'Password changed successfully'})

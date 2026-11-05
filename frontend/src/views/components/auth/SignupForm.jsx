@@ -31,41 +31,45 @@ export default function SignupForm({ values, messages, submitting, onChange, onS
         </Field>
       </div>
 
-      <Field label="Username" Icon={AtSign}>
-        <input name="username" value={values.username} onChange={onChange} autoComplete="username" placeholder="rahim.uddin" required />
-      </Field>
+      <div className="auth-row">
+        <Field label="Username" Icon={AtSign}>
+          <input name="username" value={values.username} onChange={onChange} autoComplete="username" placeholder="rahim.uddin" required />
+        </Field>
 
-      <Field label="Email address" Icon={Mail}>
-        <input type="email" name="email" value={values.email} onChange={onChange} autoComplete="email" placeholder="you@example.com" required />
-      </Field>
+        <Field label="Email address" Icon={Mail}>
+          <input type="email" name="email" value={values.email} onChange={onChange} autoComplete="email" placeholder="you@example.com" required />
+        </Field>
+      </div>
 
-      <Field label="Password" Icon={Lock} hint={`Use ${MIN_PASSWORD_LENGTH} or more characters.`}>
-        <PasswordInput
-          name="password1"
-          value={values.password1}
-          onChange={onChange}
-          autoComplete="new-password"
-          placeholder="Create a password"
-          minLength={MIN_PASSWORD_LENGTH}
-          required
-          visible={showPassword}
-          onToggle={() => setShowPassword((visible) => !visible)}
-        />
-      </Field>
+      <div className="auth-row">
+        <Field label="Password" Icon={Lock} hint={`Use ${MIN_PASSWORD_LENGTH} or more characters.`}>
+          <PasswordInput
+            name="password1"
+            value={values.password1}
+            onChange={onChange}
+            autoComplete="new-password"
+            placeholder="Create a password"
+            minLength={MIN_PASSWORD_LENGTH}
+            required
+            visible={showPassword}
+            onToggle={() => setShowPassword((visible) => !visible)}
+          />
+        </Field>
 
-      <Field label="Confirm password" Icon={Lock} error={passwordsDiffer ? 'Passwords do not match.' : ''}>
-        <PasswordInput
-          name="password2"
-          value={values.password2}
-          onChange={onChange}
-          autoComplete="new-password"
-          placeholder="Repeat your password"
-          minLength={MIN_PASSWORD_LENGTH}
-          required
-          visible={showPassword}
-          onToggle={() => setShowPassword((visible) => !visible)}
-        />
-      </Field>
+        <Field label="Confirm password" Icon={Lock} error={passwordsDiffer ? 'Passwords do not match.' : ''}>
+          <PasswordInput
+            name="password2"
+            value={values.password2}
+            onChange={onChange}
+            autoComplete="new-password"
+            placeholder="Repeat your password"
+            minLength={MIN_PASSWORD_LENGTH}
+            required
+            visible={showPassword}
+            onToggle={() => setShowPassword((visible) => !visible)}
+          />
+        </Field>
+      </div>
 
       <button type="submit" className="auth-submit" disabled={submitting || passwordsDiffer}>
         {submitting ? (

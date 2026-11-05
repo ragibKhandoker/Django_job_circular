@@ -2,8 +2,10 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ROUTES } from './config/routes.js';
 import { AuthProvider } from './controllers/AuthController.jsx';
 import { FlashProvider } from './controllers/FlashController.jsx';
-import { RequireAuth } from './controllers/RequireAuth.jsx';
+import { RequireAdmin, RequireAuth } from './controllers/RequireAuth.jsx';
 import { ThemeProvider } from './controllers/ThemeController.jsx';
+import AdminLoginPage from './views/pages/AdminLoginPage.jsx';
+import AdminPanelPage from './views/pages/AdminPanelPage.jsx';
 import ApplicationSubmittedPage from './views/pages/ApplicationSubmittedPage.jsx';
 import ApplicationSuccessPage from './views/pages/ApplicationSuccessPage.jsx';
 import ApplyFormPage from './views/pages/ApplyFormPage.jsx';
@@ -18,6 +20,8 @@ import LoginPage from './views/pages/LoginPage.jsx';
 import NotFoundPage from './views/pages/NotFoundPage.jsx';
 import PasswordResetDonePage from './views/pages/PasswordResetDonePage.jsx';
 import PasswordResetPage from './views/pages/PasswordResetPage.jsx';
+import ProfileEditPage from './views/pages/ProfileEditPage.jsx';
+import ProfilePage from './views/pages/ProfilePage.jsx';
 import PostJobPage from './views/pages/PostJobPage.jsx';
 import RegistrationChoosePage from './views/pages/RegistrationChoosePage.jsx';
 import ThemeToggle from './views/components/ThemeToggle.jsx';
@@ -32,6 +36,10 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
   ROUTES.login,
   ROUTES.employerLogin,
   ROUTES.candidateLogin,
+  ROUTES.adminLogin,
+  ROUTES.adminPanel,
+  ROUTES.profile,
+  ROUTES.profileEdit,
 ]);
 
 function FloatingThemeToggle() {
@@ -77,6 +85,19 @@ export default function App() {
                 element={<RequireAuth redirectTo={ROUTES.login}><BrowseCandidatesPage /></RequireAuth>}
               />
               <Route path={ROUTES.candidateDetail} element={<CandidateDetailPage />} />
+              <Route
+                path={ROUTES.profile}
+                element={<RequireAuth redirectTo={ROUTES.login}><ProfilePage /></RequireAuth>}
+              />
+              <Route
+                path={ROUTES.profileEdit}
+                element={<RequireAuth redirectTo={ROUTES.login}><ProfileEditPage /></RequireAuth>}
+              />
+              <Route path={ROUTES.adminLogin} element={<AdminLoginPage />} />
+              <Route
+                path={ROUTES.adminPanel}
+                element={<RequireAdmin redirectTo={ROUTES.adminLogin}><AdminPanelPage /></RequireAdmin>}
+              />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </FlashProvider>

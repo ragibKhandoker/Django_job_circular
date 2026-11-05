@@ -1,4 +1,4 @@
-import { ArrowRight, AtSign, Building, CircleAlert, LoaderCircle, Lock, UserRound } from 'lucide-react';
+import { ArrowRight, AtSign, Building, CircleAlert, CircleCheck, LoaderCircle, Lock, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
@@ -38,7 +38,7 @@ const ROLES = {
 };
 
 export default function LoginPage({ role: routeRole = 'candidate' }) {
-  const { role, setRole, values, messages, submitting, signupRoute, handleChange, handleSubmit } =
+  const { role, setRole, values, notices, errors, dismissNotices, submitting, signupRoute, handleChange, handleSubmit } =
     useLoginController(routeRole);
   const [showPassword, setShowPassword] = useState(false);
   const copy = ROLES[role];
@@ -46,6 +46,22 @@ export default function LoginPage({ role: routeRole = 'candidate' }) {
   return (
     <Page name="page-login" title="Log in - JobFinder" stylesheets={[PLUS_JAKARTA]}>
       <AuthSplitLayout photo={copy.photo} photoPosition={copy.photoPosition} heading={copy.heading} benefits={copy.benefits}>
+        {notices.length > 0 && (
+          <div className="login-notice" role="status">
+            <span className="login-notice-icon"><CircleCheck aria-hidden="true" /></span>
+            <div className="login-notice-body">
+              <strong>You're all set!</strong>
+              {notices.map((notice, index) => (
+                <p key={index}>{notice}</p>
+              ))}
+              <p className="login-notice-next">Log in below to get started.</p>
+            </div>
+            <button type="button" className="login-notice-close" onClick={dismissNotices} aria-label="Dismiss message">
+              <X aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
         <h1 className="auth-title">Log in to JobFinder</h1>
         <p className="auth-lead">{copy.lead}</p>
 
@@ -65,11 +81,11 @@ export default function LoginPage({ role: routeRole = 'candidate' }) {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          {messages.length > 0 && (
+          {errors.length > 0 && (
             <div className="auth-alert" role="alert">
               <CircleAlert aria-hidden="true" />
               <div>
-                {messages.map((message, index) => (
+                {errors.map((message, index) => (
                   <p key={index}>{message}</p>
                 ))}
               </div>

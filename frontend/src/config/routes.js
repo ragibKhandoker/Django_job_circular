@@ -19,6 +19,10 @@ export const ROUTES = {
   applySuccess: '/apply-success',
   browseCandidates: '/browse-candidates',
   candidateDetail: '/candidate/:applicantId',
+  adminLogin: '/admin-panel/login',
+  adminPanel: '/admin-panel',
+  profile: '/profile',
+  profileEdit: '/profile/edit',
 };
 
 export const routeTo = {

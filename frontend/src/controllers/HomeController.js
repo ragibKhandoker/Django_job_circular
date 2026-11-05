@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES, routeTo } from '../config/routes.js';
 import { BD_DIVISIONS, JOB_CATEGORIES, SALARY_CHOICES, STATUS_CHOICES } from '../models/choices.js';
@@ -64,7 +64,10 @@ export function useHomeController() {
   return {
     isAuthenticated: user.is_authenticated,
     username: user.username,
+    isStaff: Boolean(user.is_staff),
     messages: messagesVisible ? messages : [],
+    messageTimeout: MESSAGE_TIMEOUT_MS,
+    dismissMessages: useCallback(() => setMessagesVisible(false), []),
     loading,
     totalJobs: jobs.length,
     jobCounts,

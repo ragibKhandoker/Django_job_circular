@@ -14,7 +14,8 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': toDjango,
-      '/admin': toDjango,
+      // Trailing slash so the React /admin-panel route is not sent to Django.
+      '/admin/': toDjango,
       '/static': toDjango,
       '/media': toDjango,
       '/reset': toDjango, // password reset link from the email

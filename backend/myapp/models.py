@@ -111,6 +111,19 @@ class JobPost(models.Model):
     experience_level = models.CharField(max_length=20, choices=EXPERIENCE_CHOICES)
     deadline = models.DateField(null=True, blank=True)
 
+    # New posts wait for an admin (staff user) to verify them before they are public.
+    APPROVAL_PENDING = 'pending'
+    APPROVAL_APPROVED = 'approved'
+    APPROVAL_REJECTED = 'rejected'
+    APPROVAL_CHOICES = [
+        (APPROVAL_PENDING, 'Pending review'),
+        (APPROVAL_APPROVED, 'Approved'),
+        (APPROVAL_REJECTED, 'Rejected'),
+    ]
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default=APPROVAL_PENDING)
+    rejection_reason = models.TextField(blank=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.title} ({self.status})"
 
@@ -192,3 +205,20 @@ class EducationalBackground(models.Model):
         if self.start_year and self.end_year and self.end_year < self.start_year:
             raise ValueError("End year cannot be before start year.")
         super().save(*args, **kwargs)
+
+
+class UserProfile(models.Model):
+    """Extra details shown on /profile; created on first visit for every account."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    headline = models.CharField(max_length=120, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    location = models.CharField(max_length=100, blank=True)
+    bio = models.TextField(max_length=1000, blank=True)
+    skills = models.CharField(max_length=300, blank=True, help_text='Comma-separated.')
+    website = models.URLField(max_length=200, blank=True)
+    linkedin = models.URLField(max_length=200, blank=True)
+    photo = models.ImageField(upload_to='profile_photos/', blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"

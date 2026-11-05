@@ -321,26 +321,191 @@
     display: none;
 }
 
-.page-home .flash-messages {
-    position: absolute;
-    top: calc(100% + 12px);
-    right: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+/* ---------- flash pop-up (login / logout message) ---------- */
+.page-home .flash-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(8, 18, 45, 0.45);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: flash-fade-in 0.25s ease-out;
 }
 
-.page-home .flash-message {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
-    border-radius: 12px;
-    background: #12965a;
+.page-home .flash-modal {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+    padding: 40px 32px 32px;
+    border-radius: 24px;
+    background: var(--white);
+    box-shadow: 0 30px 70px rgba(8, 18, 45, 0.3);
+    text-align: center;
+    animation: flash-pop-in 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+
+/* soft green glow behind the badge */
+.page-home .flash-modal::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    width: 320px;
+    height: 240px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(22, 163, 74, 0.16), transparent 70%);
+    pointer-events: none;
+}
+
+.page-home .flash-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.page-home .flash-modal-close:hover {
+    background: var(--bg);
+    color: var(--ink);
+}
+
+.page-home .flash-modal-badge {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #15803d);
     color: #fff;
-    font-weight: 600;
-    box-shadow: var(--shadow);
-    animation: home-slide-in 0.3s ease;
+    font-size: 38px;
+    box-shadow: 0 12px 28px rgba(22, 163, 74, 0.35);
+    animation: flash-badge-in 0.5s 0.15s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+/* ripple ring */
+.page-home .flash-modal-badge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid #22c55e;
+    animation: flash-ring 1.4s 0.4s ease-out 2;
+    opacity: 0;
+}
+
+.page-home .flash-modal-badge .lucide {
+    width: 1em;
+    height: 1em;
+    stroke-width: 3;
+}
+
+.page-home .flash-modal h2 {
+    margin: 22px 0 0;
+    color: var(--ink);
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    overflow-wrap: anywhere;
+}
+
+.page-home .flash-modal-message {
+    display: inline-block;
+    margin: 12px 0 0;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(22, 163, 74, 0.1);
+    color: #15803d;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.page-home .flash-modal-sub {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.page-home .flash-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 26px;
+}
+
+.page-home .flash-modal-actions .btn {
+    flex: 1;
+    justify-content: center;
+}
+
+/* shrinking bar = time left before the pop-up closes itself */
+.page-home .flash-modal-timer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #22c55e, #15803d);
+    transform-origin: left;
+    animation: flash-timer linear forwards;
+}
+
+@keyframes flash-fade-in {
+    from { opacity: 0; }
+}
+
+@keyframes flash-pop-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.92); }
+}
+
+@keyframes flash-badge-in {
+    from { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+}
+
+@keyframes flash-ring {
+    from { opacity: 0.8; transform: scale(1); }
+    to { opacity: 0; transform: scale(1.7); }
+}
+
+@keyframes flash-timer {
+    to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-home .flash-modal-backdrop,
+    .page-home .flash-modal,
+    .page-home .flash-modal-badge,
+    .page-home .flash-modal-badge::after {
+        animation: none;
+    }
+}
+
+:root[data-theme='dark'] .page-home .flash-modal {
+    border: 1px solid var(--line);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme='dark'] .page-home .flash-modal-backdrop {
+    background: rgba(2, 6, 18, 0.65);
+}
+
+:root[data-theme='dark'] .page-home .flash-modal-message {
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
 }
 
 /* ---------- hero ---------- */
@@ -1502,11 +1667,6 @@
 }
 
 :root[data-theme='dark'] .page-home .company-openings,
-:root[data-theme='dark'] .page-home .flash-message {
-    background: rgba(18, 150, 90, 0.18);
-    color: #4ade80;
-}
-
 :root[data-theme='dark'] .page-home .site-footer {
     background: #070b16;
     border-top: 1px solid var(--line);

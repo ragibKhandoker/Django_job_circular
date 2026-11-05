@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 
 from .models import (Applicant, Candidate, EducationalBackground, Employee,
-                     JobApplicationForm, JobPost, WorkExperience)
+                     JobApplicationForm, JobPost, UserProfile, WorkExperience)
 
 # class CandidateRegistrationForm(forms.ModelForm):
 #     class Meta:
@@ -142,3 +142,35 @@ class JobApplicationForm(forms.ModelForm):
             'linkedin_profile': forms.URLInput(attrs={'placeholder':'LinkedIn Profile URL'}),
             'portfolio_website':forms.URLInput(attrs={'placeholder':'Portfolio Website URL'}),
         }
+
+
+MAX_PHOTO_BYTES = 2 * 1024 * 1024
+
+
+class AccountForm(forms.ModelForm):
+    """The django.contrib.auth User fields a user may edit on /profile/edit."""
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].required = True
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip()
+        if User.objects.exclude(pk=self.instance.pk).filter(email__iexact=email).exists():
+            raise forms.ValidationError('This email is already used by another account.')
+        return email
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['headline', 'phone', 'location', 'bio', 'skills', 'website', 'linkedin', 'photo']
+
+    def clean_photo(self):
+        photo = self.cleaned_data.get('photo')
+        if photo and photo.size > MAX_PHOTO_BYTES:
+            raise forms.ValidationError('Photo must be 2 MB or smaller.')
+        return photo

@@ -626,3 +626,10 @@
         animation: none;
     }
 }
+
+/* short screens */
+@media (max-height: 860px) {
+    .page-company .company-aside {
+        position: static;
+    }
+}

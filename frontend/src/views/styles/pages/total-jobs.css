@@ -526,19 +526,35 @@
 }
 
 @media (max-width: 680px) {
+    /* mobile search bar */
     .page-total-jobs .ts-search {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 4px;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 16px;
+    }
+
+    .page-total-jobs .ts-field:first-child {
+        flex: 1 1 100%;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .page-total-jobs .ts-field input {
+        height: 46px;
+        font-size: 15px;
     }
 
     .page-total-jobs .ts-divider {
-        width: auto;
-        height: 1px;
+        display: none;
     }
 
     .page-total-jobs .ts-submit {
-        justify-content: center;
+        flex: none;
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 11px;
+        font-size: 15px;
+        box-shadow: 0 6px 14px rgba(11, 94, 215, 0.3);
     }
 
     .page-total-jobs .ts-results-head {
@@ -568,4 +584,11 @@
     background:
         radial-gradient(160px 80px at 100% 0%, rgba(255, 255, 255, 0.1), transparent 70%),
         linear-gradient(135deg, #0a2a66, #1d4fb8 60%, #4b32a8);
+}
+
+/* short screens */
+@media (max-height: 860px) {
+    .page-total-jobs .ts-filters {
+        position: static;
+    }
 }

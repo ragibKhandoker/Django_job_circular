@@ -3,3 +3,5 @@ django-mongodb-backend>=5.2,<5.3
 pymongo
 python-dotenv
 pillow
+gunicorn
+whitenoise

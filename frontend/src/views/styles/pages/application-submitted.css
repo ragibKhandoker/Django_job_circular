@@ -866,7 +866,8 @@
 
 @media (max-width: 680px) {
     .page-application-submitted .as-wrap {
-        padding: 0 16px;
+        padding-right: 16px;
+        padding-left: 16px;
     }
 
     .page-application-submitted .as-hero {

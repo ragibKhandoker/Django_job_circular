@@ -1185,7 +1185,8 @@
 
 @media (max-width: 600px) {
     .page-admin .admin-wrap {
-        padding: 0 16px;
+        padding-right: 16px;
+        padding-left: 16px;
     }
 
     .page-admin .admin-hide-sm {

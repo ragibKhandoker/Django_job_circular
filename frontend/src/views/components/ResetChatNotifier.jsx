@@ -4,7 +4,7 @@ import '../styles/components/reset-notifier.css';
 
 /** Tells a logged-out user that the admin answered their forgot-password request. */
 export default function ResetChatNotifier() {
-  const { visible, pinned, unread, reply, openChat, dismiss } = useResetChatNotifier();
+  const { visible, unread, reply, openChat, dismiss } = useResetChatNotifier();
   if (!visible) return null;
   const Icon = reply.ready ? KeyRound : MessagesSquare;
 
@@ -21,11 +21,9 @@ export default function ResetChatNotifier() {
           {reply.ready ? 'Get my temporary password' : 'Open chat'} <ArrowRight aria-hidden="true" />
         </button>
       </div>
-      {!pinned && (
-        <button type="button" className="reset-notice-close" onClick={dismiss} aria-label="Dismiss">
-          <X aria-hidden="true" />
-        </button>
-      )}
+      <button type="button" className="reset-notice-close" onClick={dismiss} aria-label="Dismiss">
+        <X aria-hidden="true" />
+      </button>
     </div>
   );
 }

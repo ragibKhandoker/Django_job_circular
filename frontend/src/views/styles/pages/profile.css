@@ -1713,11 +1713,8 @@
     margin-top: 20px;
 }
 
-/* sticky save bar */
+/* save bar */
 .page-profile .edit-save-bar {
-    position: sticky;
-    bottom: 16px;
-    z-index: 20;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1725,9 +1722,7 @@
     padding: 12px 12px 12px 18px;
     border: 1px solid var(--line);
     border-radius: 18px;
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    background: var(--surface);
     box-shadow: var(--shadow);
     transition: border-color 0.3s, box-shadow 0.3s;
 }
@@ -1807,7 +1802,8 @@
 
 @media (max-width: 640px) {
     .page-profile .profile-wrap {
-        padding: 0 16px;
+        padding-right: 16px;
+        padding-left: 16px;
     }
 
     .page-profile .profile-topbar-inner {
@@ -2035,4 +2031,11 @@
     align-items: center;
     gap: 8px;
     justify-self: end;
+}
+
+/* short screens */
+@media (max-height: 860px) {
+    .page-profile .edit-aside {
+        position: static;
+    }
 }

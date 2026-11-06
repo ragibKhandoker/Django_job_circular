@@ -52,7 +52,7 @@ export default function HeroSection({
             </label>
             <LocationSelect value={location} options={locations} onChange={onLocationChange} />
             <button type="submit" className="btn btn-primary search-submit">
-              <Search aria-hidden="true" /> Search Jobs
+              <Search aria-hidden="true" /> Search<span className="search-submit-extra"> Jobs</span>
             </button>
           </form>
 

@@ -103,16 +103,19 @@ export function useResetChatNotifier() {
     return () => clearTimeout(timer);
   }, [unread, path]);
 
+  const reply = status ? describeReply(status) : null;
+  // login pages: show waiting temp password
+  const pinned = Boolean(reply?.ready && status?.temp_password_ready && LOGIN_PATHS.has(path));
+  // notice to dismiss
+  const noticeKey = unread > 0 ? latestId : pinned ? `ready:${latestId ?? ''}` : null;
+
   const dismiss = () => {
-    if (!latestId) return;
-    writeSession(DISMISSED_KEY, latestId);
-    setDismissed(latestId);
+    if (!noticeKey) return;
+    writeSession(DISMISSED_KEY, noticeKey);
+    setDismissed(noticeKey);
   };
 
-  const reply = status ? describeReply(status) : null;
-  // On the login pages a waiting temporary password always shows, even if the notice was dismissed.
-  const pinned = Boolean(reply?.ready && status?.temp_password_ready && LOGIN_PATHS.has(path));
-  const visible = !onChat && Boolean(status) && (pinned || (unread > 0 && dismissed !== latestId));
+  const visible = !onChat && Boolean(status) && Boolean(noticeKey) && dismissed !== noticeKey;
 
-  return { visible, pinned, unread, reply, openChat, dismiss };
+  return { visible, unread, reply, openChat, dismiss };
 }

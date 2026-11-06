@@ -1396,7 +1396,8 @@
 
 @media (max-width: 720px) {
     .page-apply-form .ap-wrap {
-        padding: 0 16px;
+        padding-right: 16px;
+        padding-left: 16px;
     }
 
     .page-apply-form .ap-back span {
@@ -1544,4 +1545,11 @@
     color: #fff;
     font-weight: 700;
     text-decoration: none;
+}
+
+/* short screens */
+@media (max-height: 860px) {
+    .page-apply-form .ap-aside {
+        position: static;
+    }
 }

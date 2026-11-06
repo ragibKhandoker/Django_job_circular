@@ -652,3 +652,17 @@
 :root[data-theme='dark'] .auth-split .auth-overlay {
     background: linear-gradient(180deg, rgba(5, 12, 30, 0.65) 0%, rgba(5, 12, 30, 0.3) 35%, rgba(5, 12, 30, 0.92) 100%);
 }
+
+/* mobile buttons */
+@media (max-width: 480px) {
+    .auth-split .auth-submit,
+    .auth-split .auth-secondary {
+        padding: 12px 18px;
+        border-radius: 11px;
+        font-size: 15px;
+    }
+
+    .auth-split .auth-form .auth-submit {
+        margin-top: 4px;
+    }
+}

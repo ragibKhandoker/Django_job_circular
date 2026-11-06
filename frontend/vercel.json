@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://job-circular-api.onrender.com/api/:path*" },
+    { "source": "/admin/:path*", "destination": "https://job-circular-api.onrender.com/admin/:path*" },
+    { "source": "/static/:path*", "destination": "https://job-circular-api.onrender.com/static/:path*" },
+    { "source": "/media/:path*", "destination": "https://job-circular-api.onrender.com/media/:path*" },
+    { "source": "/reset/:path*", "destination": "https://job-circular-api.onrender.com/reset/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

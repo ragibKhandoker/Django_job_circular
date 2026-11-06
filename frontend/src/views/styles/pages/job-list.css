@@ -985,7 +985,8 @@
 
 @media (max-width: 680px) {
     .page-job-list .jl-wrap {
-        padding: 0 16px;
+        padding-right: 16px;
+        padding-left: 16px;
     }
 
     .page-job-list .jl-back span,
@@ -1007,7 +1008,14 @@
     }
 
     .page-job-list .jl-search input {
-        height: 54px;
+        height: 48px;
+        padding-left: 48px;
+        border-radius: 14px;
+        font-size: 15px;
+    }
+
+    .page-job-list .jl-search .lucide {
+        left: 16px;
     }
 
     .page-job-list .jl-submitted {

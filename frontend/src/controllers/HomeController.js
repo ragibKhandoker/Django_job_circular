@@ -67,6 +67,7 @@ export function useHomeController() {
     username: user.username,
     isStaff: Boolean(user.is_staff),
     canPost: showPostJob(user),
+    isEmployer: Boolean(user.is_authenticated && (user.role === 'employer' || user.is_staff)),
     canApply: showApply(user),
     roleText: user.is_authenticated ? roleLabel(user) : '',
     messages: messagesVisible ? messages : [],

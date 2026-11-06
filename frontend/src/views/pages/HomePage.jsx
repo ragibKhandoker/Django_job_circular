@@ -21,6 +21,7 @@ export default function HomePage() {
         isAuthenticated={home.isAuthenticated}
         username={home.username}
         isStaff={home.isStaff}
+        isEmployer={home.isEmployer}
         canPost={home.canPost}
         roleText={home.roleText}
         categories={home.categories}

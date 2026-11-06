@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from . import api, models
-from .models import CompanyVerification, PasswordResetRequest, UserProfile
+from .models import Applicant, ApplicantBan, CompanyVerification, JobPost, PasswordResetRequest, UserProfile
 
 
 def login_tab(client, user):
@@ -426,3 +426,105 @@ class PasswordResetRequestTests(TestCase):
         self.open_request()
         login_tab(self.client, self.seeker)
         self.assertEqual(self.client.get('/api/admin/password-requests/').status_code, 403)
+
+
+class JobApplicantsTests(TestCase):
+    def setUp(self):
+        self.media = tempfile.mkdtemp()
+        self.override = self.settings(MEDIA_ROOT=self.media)
+        self.override.enable()
+        self.employer = User.objects.create_user('acme', 'acme@example.com', 'pass12345')
+        UserProfile.objects.create(user=self.employer, role=UserProfile.ROLE_EMPLOYER,
+                                   employer_status=UserProfile.EMPLOYER_APPROVED)
+        self.other_employer = User.objects.create_user('globex', 'globex@example.com', 'pass12345')
+        UserProfile.objects.create(user=self.other_employer, role=UserProfile.ROLE_EMPLOYER)
+        self.seeker = User.objects.create_user('seeker', 'seeker@example.com', 'pass12345', first_name='Rahim')
+        UserProfile.objects.create(user=self.seeker, role=UserProfile.ROLE_CANDIDATE)
+        self.job = self.make_job(self.employer)
+
+    def tearDown(self):
+        self.override.disable()
+        shutil.rmtree(self.media, ignore_errors=True)
+
+    def make_job(self, employer):
+        return JobPost.objects.create(
+            employer=employer, company_name='Acme Ltd', title='Technology', location='Dhaka',
+            salary='20000-40000', status='full_time', requirements='Python', educational_level='bachelors',
+            experience_level='entry_level', approval_status=JobPost.APPROVAL_APPROVED,
+        )
+
+    def apply(self, job=None):
+        login_tab(self.client, self.seeker)
+        return self.client.post(f'/api/jobs/{(job or self.job).id}/apply/', {
+            'full_name': 'Rahim Uddin', 'email': 'seeker@example.com', 'phone': '01700000000',
+            'address': 'Dhaka', 'resume': pdf('rahim-cv.pdf'),
+        })
+
+    def test_employer_sees_applicants_and_cv(self):
+        self.assertEqual(self.apply().status_code, 201)
+        applicant = Applicant.objects.get(job=self.job)
+        self.assertEqual(applicant.user, self.seeker)
+
+        login_tab(self.client, self.employer)
+        data = self.client.get(f'/api/jobs/{self.job.id}/applicants/').json()
+        self.assertEqual(data['counts']['all'], 1)
+        row = data['results'][0]
+        self.assertEqual(row['full_name'], 'Rahim Uddin')
+        self.assertEqual(row['resume_name'], 'rahim-cv.pdf')
+        self.assertEqual(self.client.get(row['resume_url']).status_code, 200)
+        # The profile shows how many applied.
+        jobs = self.client.get('/api/auth/profile/').json()['jobs']
+        self.assertEqual(jobs[0]['applicant_count'], 1)
+
+        # Other employers see neither the list nor the CV.
+        login_tab(self.client, self.other_employer)
+        self.assertEqual(self.client.get(f'/api/jobs/{self.job.id}/applicants/').status_code, 403)
+        self.assertEqual(self.client.get(row['resume_url']).status_code, 403)
+        # The job seeker can open their own CV.
+        login_tab(self.client, self.seeker)
+        self.assertEqual(self.client.get(row['resume_url']).status_code, 200)
+
+    def test_ban_blocks_applying_to_all_of_that_employers_jobs(self):
+        self.apply()
+        applicant = Applicant.objects.get(job=self.job)
+        login_tab(self.client, self.employer)
+        response = self.client.post('/api/employer/bans/', {'applicant_id': str(applicant.id), 'reason': 'Spam'},
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201, response.content)
+        ban_id = response.json()['ban']['id']
+        self.assertTrue(self.client.get(f'/api/jobs/{self.job.id}/applicants/').json()['results'][0]['banned'])
+
+        # Blocked on this employer's jobs (including new ones), told up front, not on other employers' jobs.
+        second_job = self.make_job(self.employer)
+        self.assertEqual(self.apply(second_job).status_code, 403)
+        self.assertTrue(self.client.get(f'/api/jobs/{second_job.id}/').json()['apply_blocked'])
+        self.assertEqual(self.apply(self.make_job(self.other_employer)).status_code, 201)
+
+        # Unban: they can apply again.
+        login_tab(self.client, self.employer)
+        self.assertEqual(self.client.delete(f'/api/employer/bans/{ban_id}/').status_code, 200)
+        self.assertEqual(self.apply(second_job).status_code, 201)
+
+    def test_employer_sees_all_applicants_across_jobs(self):
+        second_job = self.make_job(self.employer)
+        self.apply()
+        self.apply(second_job)
+        self.apply(self.make_job(self.other_employer))  # not this employer's
+        login_tab(self.client, self.employer)
+        data = self.client.get('/api/employer/applicants/').json()
+        self.assertEqual(data['counts']['all'], 2)
+        self.assertEqual(data['counts']['people'], 1)  # same person, two jobs
+        self.assertEqual(sorted(j['applicant_count'] for j in data['jobs']), [1, 1])
+        self.assertEqual({r['job'] for r in data['results']}, {str(self.job.id), str(second_job.id)})
+        # Another employer sees only their own.
+        login_tab(self.client, self.other_employer)
+        self.assertEqual(self.client.get('/api/employer/applicants/').json()['counts']['all'], 1)
+
+    def test_cannot_ban_applicants_of_other_employers(self):
+        self.apply()
+        applicant = Applicant.objects.get(job=self.job)
+        login_tab(self.client, self.other_employer)
+        response = self.client.post('/api/employer/bans/', {'applicant_id': str(applicant.id)},
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(ApplicantBan.objects.exists())

@@ -1458,9 +1458,9 @@
     --ink: #eef2fa;
     --text: #c2cadb;
     --muted: #8b95ad;
-    --line: #243049;
-    --surface: #121a2c;
-    --surface-2: #0f1626;
+    --line: #2e3c5e;
+    --surface: #18223a;
+    --surface-2: #121a2d;
     --bg: #0a0f1c;
     --green: #34d399;
     --green-soft: rgba(52, 211, 153, 0.12);
@@ -1470,7 +1470,7 @@
     --red-soft: rgba(255, 122, 138, 0.12);
     --violet: #a78bfa;
     --violet-soft: rgba(167, 139, 250, 0.14);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.02), 0 8px 24px rgba(0, 0, 0, 0.5);
     --shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
 }
 
@@ -1501,4 +1501,47 @@
 
 :root[data-theme='dark'] .page-apply-form .ap-btn-submit {
     background: linear-gradient(135deg, #22c55e, #15803d 55%, #0f7f86);
+}
+
+/* ---------- banned by this employer ---------- */
+.page-apply-form .ap-blocked {
+    padding: 40px 28px;
+    text-align: center;
+}
+
+.page-apply-form .ap-blocked-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: var(--red-soft, #fdecee);
+    color: var(--red, #c42b3c);
+    font-size: 30px;
+}
+
+.page-apply-form .ap-blocked h2 {
+    margin: 18px 0 8px;
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.page-apply-form .ap-blocked p {
+    max-width: 440px;
+    margin: 0 auto;
+    color: var(--muted);
+}
+
+.page-apply-form .ap-blocked-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
 }

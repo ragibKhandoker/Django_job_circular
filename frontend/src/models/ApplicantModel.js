@@ -49,3 +49,25 @@ export const ApplicantModel = {
     return httpClient.get(`/candidates/${id}/`);
   },
 };
+
+/** Employers: who applied to their job posts, their CVs, and banning job seekers. */
+export const EmployerApplicantsModel = {
+  /** Returns { job, results, counts }. */
+  list(jobId) {
+    return httpClient.get(`/jobs/${jobId}/applicants/`);
+  },
+
+  /** Everyone who applied to any of the employer's jobs. Returns { jobs, results, counts }. */
+  all() {
+    return httpClient.get('/employer/applicants/');
+  },
+
+  /** Stops the person behind this application from applying to any of the employer's jobs. */
+  ban(applicantId, reason) {
+    return httpClient.post('/employer/bans/', { applicant_id: applicantId, reason });
+  },
+
+  unban(banId) {
+    return httpClient.delete(`/employer/bans/${banId}/`);
+  },
+};

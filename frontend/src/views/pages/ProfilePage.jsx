@@ -26,11 +26,12 @@ import {
   ShieldCheck,
   Sparkles,
   UserRound,
+  Users,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ROUTES } from '../../config/routes.js';
+import { ROUTES, routeTo } from '../../config/routes.js';
 import { useProfileController } from '../../controllers/ProfileController.js';
 import { COMPANY_STATUS } from '../../models/CompanyModel.js';
 import { formatDate } from '../../models/formatters.js';
@@ -43,6 +44,7 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 // https://unsplash.com/photos/two-colleagues-collaborating-on-a-laptop-in-office-YDWdxElP3XI
 import coverPhoto from '../images/login-office.jpg';
 import '../styles/pages/profile.css';
+import '../styles/pages/job-applicants.css';
 
 // Checklist under "Profile strength"; same fields as Profile.completeness.
 const CHECKLIST = [
@@ -63,12 +65,12 @@ const JOB_STATUS = {
 
 const COPIED_MS = 1600;
 
-export function ProfileTopbar() {
+export function ProfileTopbar({ backTo = ROUTES.home, backLabel = 'Back to home' }) {
   return (
     <header className="profile-topbar">
       <div className="profile-wrap profile-topbar-inner">
-        <Link to={ROUTES.home} className="profile-back">
-          <ArrowLeft aria-hidden="true" /> Back to home
+        <Link to={backTo} className="profile-back">
+          <ArrowLeft aria-hidden="true" /> {backLabel}
         </Link>
         <Link to={ROUTES.home} className="profile-brand">
           <span className="profile-brand-icon"><BriefcaseBusiness aria-hidden="true" /></span>
@@ -108,6 +110,7 @@ function ProfileView({ profile, notices, onDismissNotices }) {
   const complete = profile.completeness === 100;
   // Job posts belong to employers (and admins); job seekers never see that part.
   const hires = profile.is_staff || profile.role === 'employer';
+  const applicantTotal = profile.jobs.reduce((sum, job) => sum + (job.applicant_count ?? 0), 0);
 
   return (
     <main className="profile-wrap profile-main">
@@ -167,6 +170,11 @@ function ProfileView({ profile, notices, onDismissNotices }) {
             <Link to={ROUTES.profileEdit} className="profile-btn profile-btn-primary">
               <PenLine aria-hidden="true" /> Edit profile
             </Link>
+            {hires && (
+              <Link to={ROUTES.myApplicants} className="profile-btn profile-btn-ghost">
+                <Users aria-hidden="true" /> Applicants ({applicantTotal})
+              </Link>
+            )}
             {profile.can_post_jobs ? (
               <Link to={ROUTES.postJob} className="profile-btn profile-btn-ghost">
                 <Plus aria-hidden="true" /> Post a job
@@ -187,6 +195,15 @@ function ProfileView({ profile, notices, onDismissNotices }) {
               <Stat Icon={BriefcaseBusiness} value={profile.jobs.length} label="Job posts" tone="blue" />
               <Stat Icon={CircleCheck} value={live} label="Live now" tone="green" />
               <Stat Icon={Hourglass} value={pending} label="In review" tone="amber" />
+              <li className="profile-stat-link">
+                <Link to={ROUTES.myApplicants} className="profile-stat tone-teal">
+                  <span className="profile-stat-icon"><Users aria-hidden="true" /></span>
+                  <span className="profile-stat-text">
+                    <strong>{applicantTotal}</strong>
+                    <small>Applicants · view all</small>
+                  </span>
+                </Link>
+              </li>
             </>
           ) : (
             <>
@@ -230,7 +247,14 @@ function ProfileView({ profile, notices, onDismissNotices }) {
 
           {hires && (
             <section className="profile-card">
-              <CardTitle Icon={BriefcaseBusiness} count={profile.jobs.length}>My job posts</CardTitle>
+              <div className="profile-jobs-head">
+                <CardTitle Icon={BriefcaseBusiness} count={profile.jobs.length}>My job posts</CardTitle>
+                {applicantTotal > 0 && (
+                  <Link to={ROUTES.myApplicants} className="profile-job-applicants">
+                    <Users aria-hidden="true" /> See all {applicantTotal} applicants
+                  </Link>
+                )}
+              </div>
               {profile.jobs.length > 0 ? (
                 <ul className="profile-jobs">
                   {profile.jobs.map((job) => <JobRow key={job.id} job={job} />)}
@@ -372,9 +396,14 @@ function JobRow({ job }) {
           </span>
         )}
       </div>
-      <span className={`profile-pill pill-${job.approval_status}`}>
-        <status.Icon aria-hidden="true" /> {status.text}
-      </span>
+      <div className="profile-job-side">
+        <span className={`profile-pill pill-${job.approval_status}`}>
+          <status.Icon aria-hidden="true" /> {status.text}
+        </span>
+        <Link to={routeTo.jobApplicants(job.id)} className="profile-job-applicants">
+          <Users aria-hidden="true" /> {job.applicant_count ?? 0} {job.applicant_count === 1 ? 'applicant' : 'applicants'}
+        </Link>
+      </div>
     </li>
   );
 }

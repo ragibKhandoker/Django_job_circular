@@ -24,6 +24,8 @@ export const ROUTES = {
   adminPanel: '/admin-panel',
   profile: '/profile',
   profileEdit: '/profile/edit',
+  jobApplicants: '/my-jobs/:jobId/applicants',
+  myApplicants: '/my-applicants',
   companyVerification: '/company-verification',
 };
 
@@ -32,4 +34,5 @@ export const routeTo = {
   applyForm: (jobId) => `/apply/${jobId}`,
   applicationSubmitted: (jobId) => `/apply/${jobId}/submitted`,
   candidateDetail: (applicantId) => `/candidate/${applicantId}`,
+  jobApplicants: (jobId) => `/my-jobs/${jobId}/applicants`,
 };

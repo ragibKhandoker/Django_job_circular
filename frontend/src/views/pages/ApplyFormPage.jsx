@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  ShieldBan,
   ArrowRight,
   AtSign,
   Award,
@@ -119,6 +120,9 @@ export default function ApplyFormPage() {
       </section>
 
       <main className="ap-wrap ap-main">
+        {job?.apply_blocked ? (
+          <ApplyBlocked company={job.company_name} />
+        ) : (
         <form className="ap-form" onSubmit={form.handleSubmit} noValidate>
           <div className="ap-card ap-stepper-card">
             <ol className="ap-stepper">
@@ -178,6 +182,7 @@ export default function ApplyFormPage() {
             </footer>
           </div>
         </form>
+        )}
 
         <aside className="ap-aside">
           {job && <JobSummary job={job} category={category} Icon={CategoryIcon} />}
@@ -570,4 +575,23 @@ function Field({ label: text, Icon, errors, hint, required, wide, counter, child
 function Errors({ list }) {
   if (!list?.length) return null;
   return <small className="ap-error ap-error-block">{list.join(' ')}</small>;
+}
+
+/** The employer banned this job seeker from applying to their jobs. */
+function ApplyBlocked({ company }) {
+  return (
+    <div className="ap-form">
+      <div className="ap-card ap-blocked" role="alert">
+        <span className="ap-blocked-icon"><ShieldBan aria-hidden="true" /></span>
+        <h2>You can't apply to this job</h2>
+        <p>
+          {company} is no longer accepting applications from your account. You can still apply to jobs from
+          other employers.
+        </p>
+        <Link to={ROUTES.jobList} className="ap-blocked-link">
+          <ArrowLeft aria-hidden="true" /> Browse other jobs
+        </Link>
+      </div>
+    </div>
+  );
 }

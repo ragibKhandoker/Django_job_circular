@@ -153,6 +153,8 @@ class JobApplicationForm(models.Model):
 
 class Applicant(models.Model):
     job = models.ForeignKey(JobPost,on_delete=models.CASCADE,db_column='job')
+    # The job seeker's account (empty for applications made before accounts were linked).
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='applications')
     full_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=20,blank=True)
@@ -440,3 +442,20 @@ class PasswordResetMessage(models.Model):
 
     def __str__(self):
         return f"{self.get_sender_display()}: {self.body[:40]}"
+
+
+class ApplicantBan(models.Model):
+    """An employer stops a job seeker from applying to any of that employer's jobs."""
+    employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applicant_bans')
+    candidate = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='bans_received')
+    # Also matched on email, so older applications without a linked account can be banned too.
+    email = models.EmailField(max_length=150, blank=True)
+    candidate_name = models.CharField(max_length=150, blank=True)
+    reason = models.TextField(max_length=500, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.employer.username} banned {self.candidate_name or self.email}"

@@ -16,6 +16,7 @@ import CandidateSignupPage from './views/pages/CandidateSignupPage.jsx';
 import CompanyVerificationPage from './views/pages/CompanyVerificationPage.jsx';
 import EmployerSignupPage from './views/pages/EmployerSignupPage.jsx';
 import HomePage from './views/pages/HomePage.jsx';
+import JobApplicantsPage from './views/pages/JobApplicantsPage.jsx';
 import JobListPage from './views/pages/JobListPage.jsx';
 import LoginPage from './views/pages/LoginPage.jsx';
 import NotFoundPage from './views/pages/NotFoundPage.jsx';
@@ -46,6 +47,7 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
   ROUTES.adminPanel,
   ROUTES.profile,
   ROUTES.profileEdit,
+  ROUTES.myApplicants,
   ROUTES.companyVerification,
   ROUTES.postJob,
   ROUTES.jobList,
@@ -55,11 +57,13 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
 const CATEGORY_PREFIX = ROUTES.jobCategory.replace(':category', '');
 // The apply form (/apply/:jobId) and its confirmation (/apply/:jobId/submitted) have their own toggle.
 const APPLY_FORM_PATH = /^\/apply\/[^/]+(\/submitted)?$/;
+// The employer's applicants page (/my-jobs/:jobId/applicants) uses the profile top bar and its toggle.
+const JOB_APPLICANTS_PATH = /^\/my-jobs\/[^/]+\/applicants$/;
 
 function FloatingThemeToggle() {
   const { pathname } = useLocation();
   const path = pathname.replace(/\/+$/, '') || '/';
-  if (PAGES_WITH_OWN_TOGGLE.has(path) || path.startsWith(CATEGORY_PREFIX) || APPLY_FORM_PATH.test(path)) return null;
+  if (PAGES_WITH_OWN_TOGGLE.has(path) || path.startsWith(CATEGORY_PREFIX) || APPLY_FORM_PATH.test(path) || JOB_APPLICANTS_PATH.test(path)) return null;
   return <ThemeToggle className="theme-toggle-floating" />;
 }
 
@@ -126,6 +130,14 @@ export default function App() {
               <Route
                 path={ROUTES.profileEdit}
                 element={<RequireAuth redirectTo={ROUTES.login}><ProfileEditPage /></RequireAuth>}
+              />
+              <Route
+                path={ROUTES.myApplicants}
+                element={<RequireAuth redirectTo={ROUTES.employerLogin}><JobApplicantsPage /></RequireAuth>}
+              />
+              <Route
+                path={ROUTES.jobApplicants}
+                element={<RequireAuth redirectTo={ROUTES.employerLogin}><JobApplicantsPage /></RequireAuth>}
               />
               <Route
                 path={ROUTES.companyVerification}

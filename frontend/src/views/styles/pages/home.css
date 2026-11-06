@@ -1792,10 +1792,10 @@
     --ink: #eef2fa;
     --text: #c2cadb;
     --muted: #8b95ad;
-    --line: #243049;
+    --line: #2e3c5e;
     --bg: #0f1727;
-    --white: #131c2f;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --white: #18223a;
+    --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.02), 0 8px 24px rgba(0, 0, 0, 0.5);
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
 

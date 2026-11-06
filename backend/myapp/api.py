@@ -23,7 +23,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from .db_status import ping_mongodb
 from .forms import (AccountForm, ApplicantForm, CompanyVerificationForm, EducationalBackgroundForm, JobPostForm,
                     UserProfileForm, WorkExperienceForm)
-from .models import Applicant, CompanyVerification, JobPost, Notification, PasswordResetMessage, PasswordResetRequest, UserProfile
+from .models import Applicant, ApplicantBan, CompanyVerification, JobPost, Notification, PasswordResetMessage, PasswordResetRequest, UserProfile
 
 
 def _json_body(request):
@@ -873,7 +873,11 @@ def job_detail(request, job_id):
         return HttpResponse(status=204)
     if not _can_see_job(job, request.user):
         return JsonResponse({'detail': 'Not found.'}, status=404)
-    return JsonResponse(serialize_job(job, request.user))
+    data = serialize_job(job, request.user)
+    data['apply_blocked'] = request.user.is_authenticated and _is_banned_from(job, request.user)
+    if _can_manage_job(job, request.user):
+        data['applicant_count'] = Applicant.objects.filter(job=job).count()
+    return JsonResponse(data)
 
 
 @require_POST
@@ -882,6 +886,8 @@ def apply(request, job_id):
     if not get_profile(request.user).can_apply:
         return JsonResponse({'detail': 'Employers cannot apply for jobs. Use a job seeker account to apply.'}, status=403)
     job = get_object_or_404(JobPost, id=job_id, approval_status=JobPost.APPROVAL_APPROVED)
+    if _is_banned_from(job, request.user):
+        return JsonResponse({'detail': BANNED_DETAIL, 'code': 'banned'}, status=403)
     applicant_form = ApplicantForm(request.POST, request.FILES)
     work_forms = [WorkExperienceForm(item) for item in json.loads(request.POST.get('work_experiences', '[]'))]
     edu_forms = [EducationalBackgroundForm(item) for item in json.loads(request.POST.get('educational_backgrounds', '[]'))]
@@ -897,6 +903,7 @@ def apply(request, job_id):
 
     applicant = applicant_form.save(commit=False)
     applicant.job = job
+    applicant.user = request.user
     applicant.save()
     for form in [*work_forms, *edu_forms]:
         item = form.save(commit=False)
@@ -906,9 +913,180 @@ def apply(request, job_id):
            f'Your application to {job.company_name} was delivered. Good luck!', '/job-list')
     if job.employer_id and job.employer_id != request.user.id:
         notify(job.employer, Notification.KIND_NEW_APPLICANT, f'New applicant for {job.title}',
-               f'{applicant.full_name} just applied. Open their profile to review the CV.',
-               f'/candidate/{applicant.id}')
+               f'{applicant.full_name} just applied. Open the applicants list to review their CV.',
+               f'/my-jobs/{job.id}/applicants')
     return JsonResponse(serialize_applicant(applicant, detailed=True), status=201)
+
+
+# ---------- employers: applicants of their job posts, and banning job seekers ----------
+
+BANNED_DETAIL = 'This employer is no longer accepting applications from you.'
+
+
+def _ban_query(employer, user=None, email=''):
+    """Bans by `employer` that match this account and/or email."""
+    match = Q(pk__in=[])
+    if user is not None:
+        match |= Q(candidate=user)
+    if email:
+        match |= Q(email__iexact=email.strip())
+    return ApplicantBan.objects.filter(match, employer=employer)
+
+
+def _is_banned_from(job, user):
+    return bool(job.employer_id) and _ban_query(job.employer_id, user, user.email).exists()
+
+
+def _can_manage_job(job, user):
+    return user.is_authenticated and (user.is_staff or job.employer_id == user.id)
+
+
+def _resume_url(applicant):
+    return f'/api/applicants/{applicant.id}/resume/' if applicant.resume else ''
+
+
+def serialize_ban(ban):
+    return {
+        'id': str(ban.id),
+        'candidate_id': str(ban.candidate_id) if ban.candidate_id else None,
+        'name': ban.candidate_name,
+        'email': ban.email,
+        'reason': ban.reason,
+        'created_at': ban.created_at.isoformat(),
+    }
+
+
+def _applicants_payload(applicants, employer_id):
+    """Applicant rows (newest first) with CV link and ban state, plus the summary counts."""
+    applicants = sorted(applicants, key=lambda a: a.date_applied, reverse=True)
+    bans = list(ApplicantBan.objects.filter(employer_id=employer_id)) if employer_id else []
+
+    def ban_for(applicant):
+        email = applicant.email.strip().lower()
+        return next(
+            (b for b in bans if (applicant.user_id and b.candidate_id == applicant.user_id)
+             or (email and b.email.lower() == email)),
+            None,
+        )
+
+    results = []
+    for applicant in applicants:
+        ban = ban_for(applicant)
+        results.append({
+            **serialize_applicant(applicant, detailed=True),
+            'resume': '',  # the public file path is not shared; use resume_url
+            'resume_name': applicant.resume.name.rsplit('/', 1)[-1] if applicant.resume else '',
+            'resume_url': _resume_url(applicant),
+            'has_account': applicant.user_id is not None,
+            'banned': ban is not None,
+            'ban': serialize_ban(ban) if ban else None,
+            'job_title': applicant.job.title,
+            'job_company': applicant.job.company_name,
+        })
+    week_ago = timezone.now() - timedelta(days=7)
+    counts = {
+        'all': len(results),
+        'banned': sum(1 for r in results if r['banned']),
+        'new_this_week': sum(1 for a in applicants if a.date_applied >= week_ago),
+        # The same person applying to several jobs counts once.
+        'people': len({(a.user_id or a.email.strip().lower()) for a in applicants}),
+    }
+    return results, counts
+
+
+@require_GET
+@api_login_required
+def job_applicants(request, job_id):
+    """Everyone who applied to one of the employer's job posts (the employer and admins only)."""
+    job = get_object_or_404(JobPost, id=job_id)
+    if not _can_manage_job(job, request.user):
+        return JsonResponse({'detail': 'Only the employer who posted this job can see its applicants.'}, status=403)
+    results, counts = _applicants_payload(Applicant.objects.filter(job=job).select_related('user', 'job'), job.employer_id)
+    return JsonResponse({'job': serialize_job(job, request.user), 'results': results, 'counts': counts})
+
+
+@require_GET
+@api_login_required
+def employer_applicants(request):
+    """Everyone who applied to any of this employer's job posts, with a per-job breakdown."""
+    jobs = list(JobPost.objects.filter(employer=request.user).order_by('-created_at'))
+    applicants = list(Applicant.objects.filter(job__in=jobs).select_related('user', 'job'))
+    results, counts = _applicants_payload(applicants, request.user.id)
+    per_job = {}
+    for applicant in applicants:
+        per_job[applicant.job_id] = per_job.get(applicant.job_id, 0) + 1
+    return JsonResponse({
+        'jobs': [{**serialize_job(job, request.user), 'applicant_count': per_job.get(job.id, 0)} for job in jobs],
+        'results': results,
+        'counts': counts,
+    })
+
+
+@require_GET
+@api_login_required
+def applicant_resume(request, applicant_id):
+    """Streams a CV: only for the job's employer, admins and the job seeker who sent it."""
+    applicant = get_object_or_404(Applicant.objects.select_related('job'), id=applicant_id)
+    allowed = _can_manage_job(applicant.job, request.user) or (
+        applicant.user_id is not None and applicant.user_id == request.user.id
+    )
+    if not allowed:
+        return JsonResponse({'detail': 'You cannot view this CV.'}, status=403)
+    if not applicant.resume:
+        raise Http404
+    try:
+        handle = applicant.resume.open('rb')
+    except FileNotFoundError:
+        raise Http404
+    response = FileResponse(handle, filename=applicant.resume.name.rsplit('/', 1)[-1])
+    response['X-Content-Type-Options'] = 'nosniff'
+    response['Cache-Control'] = 'private, no-store'
+    return response
+
+
+@require_http_methods(['GET', 'POST'])
+@api_login_required
+def employer_bans(request):
+    """GET: job seekers this employer banned. POST {applicant_id, reason}: ban the person behind an application."""
+    if request.method == 'GET':
+        return JsonResponse({'results': [serialize_ban(b) for b in ApplicantBan.objects.filter(employer=request.user)]})
+
+    data = _json_body(request)
+    applicant = Applicant.objects.select_related('job', 'user').filter(id=_object_id(data.get('applicant_id'))).first()
+    if applicant is None or not applicant.job.employer_id:
+        return JsonResponse({'detail': 'Application not found.'}, status=404)
+    if applicant.job.employer_id != request.user.id:
+        return JsonResponse({'detail': 'You can only ban people who applied to your own jobs.'}, status=403)
+
+    existing = _ban_query(request.user, applicant.user, applicant.email).first()
+    if existing:
+        return JsonResponse({'detail': f'{applicant.full_name} is already banned.', 'ban': serialize_ban(existing)})
+    ban = ApplicantBan.objects.create(
+        employer=request.user,
+        candidate=applicant.user,
+        email=applicant.email.strip().lower(),
+        candidate_name=applicant.full_name,
+        reason=str(data.get('reason', '')).strip()[:500],
+    )
+    return JsonResponse(
+        {'detail': f'{applicant.full_name} can no longer apply to your jobs.', 'ban': serialize_ban(ban)}, status=201,
+    )
+
+
+@require_http_methods(['DELETE'])
+@api_login_required
+def employer_ban_detail(request, ban_id):
+    ban = get_object_or_404(ApplicantBan, id=ban_id, employer=request.user)
+    name = ban.candidate_name or ban.email
+    ban.delete()
+    return JsonResponse({'detail': f'{name} can apply to your jobs again.'})
+
+
+def _object_id(value):
+    try:
+        return ObjectId(str(value))
+    except Exception:
+        return None
 
 
 # ---------- candidates ----------
@@ -983,7 +1161,10 @@ def serialize_profile(request, user):
         'linkedin': profile.linkedin,
         'photo': request.build_absolute_uri(profile.photo.url) if profile.photo else '',
         'updated_at': profile.updated_at.isoformat(),
-        'jobs': [serialize_job(job, user) for job in jobs],
+        'jobs': [
+            {**serialize_job(job, user), 'applicant_count': Applicant.objects.filter(job=job).count()}
+            for job in jobs
+        ],
     }
 
 

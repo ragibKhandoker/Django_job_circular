@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   User,
   UserPlus,
+  Users,
   X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -43,7 +44,7 @@ function useCompactHeader() {
   return compact;
 }
 
-export default function SiteHeader({ isAuthenticated, username, isStaff, canPost = true, roleText = '', categories, categoryLink, onLogout }) {
+export default function SiteHeader({ isAuthenticated, username, isStaff, isEmployer = false, canPost = true, roleText = '', categories, categoryLink, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
   const compact = useCompactHeader();
@@ -116,7 +117,7 @@ export default function SiteHeader({ isAuthenticated, username, isStaff, canPost
           ))}
 
           <div className="nav-actions-mobile">
-            <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} canPost={canPost} roleText={roleText} onLogout={onLogout} />
+            <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} isEmployer={isEmployer} canPost={canPost} roleText={roleText} onLogout={onLogout} />
           </div>
         </nav>
 
@@ -127,7 +128,7 @@ export default function SiteHeader({ isAuthenticated, username, isStaff, canPost
           </button>
           {!compact && bell}
           <span className="divider" aria-hidden="true"></span>
-          <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} canPost={canPost} roleText={roleText} onLogout={onLogout} withMenu />
+          <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} isEmployer={isEmployer} canPost={canPost} roleText={roleText} onLogout={onLogout} withMenu />
         </div>
       </div>
     </header>
@@ -138,7 +139,7 @@ export default function SiteHeader({ isAuthenticated, username, isStaff, canPost
  * Desktop (`withMenu`): "Post a Job" plus an account menu holding profile / admin / logout,
  * so the header never runs out of room. The mobile menu lists them as plain buttons.
  */
-function HeaderActions({ isAuthenticated, username, isStaff, canPost, roleText, onLogout, withMenu = false }) {
+function HeaderActions({ isAuthenticated, username, isStaff, isEmployer, canPost, roleText, onLogout, withMenu = false }) {
   if (isAuthenticated && withMenu) {
     return (
       <>
@@ -147,7 +148,7 @@ function HeaderActions({ isAuthenticated, username, isStaff, canPost, roleText, 
             <Plus aria-hidden="true" /> Post a Job
           </Link>
         )}
-        <AccountMenu username={username} isStaff={isStaff} roleText={roleText} onLogout={onLogout} />
+        <AccountMenu username={username} isStaff={isStaff} isEmployer={isEmployer} roleText={roleText} onLogout={onLogout} />
       </>
     );
   }
@@ -157,6 +158,11 @@ function HeaderActions({ isAuthenticated, username, isStaff, canPost, roleText, 
         <Link to={ROUTES.profile} className="btn btn-outline">
           <User aria-hidden="true" /> My Profile
         </Link>
+        {isEmployer && (
+          <Link to={ROUTES.myApplicants} className="btn btn-outline">
+            <Users aria-hidden="true" /> Applicants
+          </Link>
+        )}
         {isStaff && (
           <Link to={ROUTES.adminPanel} className="btn btn-outline">
             <ShieldCheck aria-hidden="true" /> Admin
@@ -185,7 +191,7 @@ function HeaderActions({ isAuthenticated, username, isStaff, canPost, roleText, 
   );
 }
 
-function AccountMenu({ username, isStaff, roleText, onLogout }) {
+function AccountMenu({ username, isStaff, isEmployer, roleText, onLogout }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -230,6 +236,11 @@ function AccountMenu({ username, isStaff, roleText, onLogout }) {
           <Link to={ROUTES.profile} role="menuitem" onClick={close}>
             <User aria-hidden="true" /> My Profile
           </Link>
+          {isEmployer && (
+            <Link to={ROUTES.myApplicants} role="menuitem" onClick={close}>
+              <Users aria-hidden="true" /> Applicants
+            </Link>
+          )}
           {isStaff && (
             <Link to={ROUTES.adminPanel} role="menuitem" onClick={close}>
               <ShieldCheck aria-hidden="true" /> Admin Panel

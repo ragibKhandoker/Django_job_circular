@@ -1252,8 +1252,8 @@
     --ink: #eef2fa;
     --text: #c2cadb;
     --muted: #8b95ad;
-    --line: #26324d;
-    --surface: #131c2f;
+    --line: #2e3c5e;
+    --surface: #18223a;
     --bg: #0b1120;
     --green: #22c55e;
     --green-soft: rgba(34, 197, 94, 0.14);
@@ -1261,7 +1261,7 @@
     --amber-soft: rgba(245, 165, 36, 0.14);
     --red: #ff6b7d;
     --red-soft: rgba(255, 107, 125, 0.12);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.02), 0 8px 24px rgba(0, 0, 0, 0.5);
     --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 

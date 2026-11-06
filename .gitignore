@@ -5,3 +5,4 @@ dev.sqlite3
 __pycache__/
 .venv/
 venv/
+private_media/

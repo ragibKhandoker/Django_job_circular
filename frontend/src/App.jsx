@@ -13,6 +13,7 @@ import ApplySuccessPage from './views/pages/ApplySuccessPage.jsx';
 import BrowseCandidatesPage from './views/pages/BrowseCandidatesPage.jsx';
 import CandidateDetailPage from './views/pages/CandidateDetailPage.jsx';
 import CandidateSignupPage from './views/pages/CandidateSignupPage.jsx';
+import CompanyVerificationPage from './views/pages/CompanyVerificationPage.jsx';
 import EmployerSignupPage from './views/pages/EmployerSignupPage.jsx';
 import HomePage from './views/pages/HomePage.jsx';
 import JobListPage from './views/pages/JobListPage.jsx';
@@ -40,6 +41,7 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
   ROUTES.adminPanel,
   ROUTES.profile,
   ROUTES.profileEdit,
+  ROUTES.companyVerification,
   ROUTES.postJob,
   ROUTES.jobList,
   ROUTES.totalJobs,
@@ -108,6 +110,10 @@ export default function App() {
               <Route
                 path={ROUTES.profileEdit}
                 element={<RequireAuth redirectTo={ROUTES.login}><ProfileEditPage /></RequireAuth>}
+              />
+              <Route
+                path={ROUTES.companyVerification}
+                element={<RequireAuth redirectTo={ROUTES.employerLogin}><CompanyVerificationPage /></RequireAuth>}
               />
               <Route path={ROUTES.adminLogin} element={<AdminLoginPage />} />
               <Route

@@ -3,7 +3,9 @@ import {
   AtSign,
   BadgeCheck,
   BriefcaseBusiness,
+  Building2,
   CalendarDays,
+  ChevronRight,
   Check,
   CircleCheck,
   CircleX,
@@ -24,16 +26,17 @@ import {
   ShieldCheck,
   Sparkles,
   UserRound,
-  Wrench,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
 import { useProfileController } from '../../controllers/ProfileController.js';
+import { COMPANY_STATUS } from '../../models/CompanyModel.js';
 import { formatDate } from '../../models/formatters.js';
 import { ROLE_LABELS } from '../../models/roles.js';
 import { PLUS_JAKARTA } from '../assets.js';
+import NotificationBell from '../components/NotificationBell.jsx';
 import Page from '../components/Page.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 // Photo: Vitaly Gariev on Unsplash (Unsplash License)
@@ -50,7 +53,6 @@ const CHECKLIST = [
   ['phone', 'Phone number'],
   ['location', 'Location'],
   ['bio', 'About you'],
-  ['skills', 'Skills'],
 ];
 
 const JOB_STATUS = {
@@ -59,7 +61,6 @@ const JOB_STATUS = {
   rejected: { text: 'Rejected', Icon: CircleX },
 };
 
-const SKILL_TONES = 5;
 const COPIED_MS = 1600;
 
 export function ProfileTopbar() {
@@ -73,7 +74,10 @@ export function ProfileTopbar() {
           <span className="profile-brand-icon"><BriefcaseBusiness aria-hidden="true" /></span>
           <strong>Job<span>Finder</span></strong>
         </Link>
-        <ThemeToggle className="profile-icon-btn" />
+        <div className="profile-topbar-actions">
+          <NotificationBell />
+          <ThemeToggle className="profile-icon-btn" />
+        </div>
       </div>
     </header>
   );
@@ -86,7 +90,7 @@ export default function ProfilePage() {
     <Page name="page-profile" title="My Profile - JobFinder" stylesheets={[PLUS_JAKARTA]}>
       <ProfileTopbar />
 
-      {loading || !profile ? (
+      {!profile ? (
         <div className="profile-wrap profile-state">
           {loading ? <LoaderCircle className="profile-spin" aria-hidden="true" /> : <CircleX aria-hidden="true" />}
           <p>{loading ? 'Loading your profile...' : error?.message ?? 'Could not load your profile.'}</p>
@@ -145,6 +149,9 @@ function ProfileView({ profile, notices, onDismissNotices }) {
                   {ROLE_LABELS[profile.role] ?? 'Member'}
                 </span>
               )}
+              {profile.company_status === 'verified' && (
+                <span className="profile-badge company-verified-badge"><BadgeCheck aria-hidden="true" /> Verified company</span>
+              )}
             </h1>
             <p className={`profile-headline${profile.headline ? '' : ' is-empty'}`}>
               {profile.headline || 'Add a headline so employers know what you do'}
@@ -184,7 +191,6 @@ function ProfileView({ profile, notices, onDismissNotices }) {
           ) : (
             <>
               <Stat Icon={UserRound} value="Job seeker" label="Account type" tone="blue" />
-              <Stat Icon={Wrench} value={profile.skillList.length} label="Skills listed" tone="green" />
               <Stat Icon={CalendarDays} value={new Date(profile.date_joined).getFullYear()} label="Member since" tone="amber" />
             </>
           )}
@@ -194,6 +200,7 @@ function ProfileView({ profile, notices, onDismissNotices }) {
 
       <div className="profile-grid">
         <aside className="profile-col">
+          {profile.role === 'employer' && !profile.is_staff && <CompanyCard status={profile.company_status} />}
           <StrengthCard profile={profile} />
 
           <section className="profile-card">
@@ -218,19 +225,6 @@ function ProfileView({ profile, notices, onDismissNotices }) {
               </blockquote>
             ) : (
               <EmptyState Icon={FileText} text="Tell employers about your experience and what you are looking for." action="Write your bio" />
-            )}
-          </section>
-
-          <section className="profile-card">
-            <CardTitle Icon={Wrench}>Skills</CardTitle>
-            {profile.skillList.length > 0 ? (
-              <ul className="profile-skills">
-                {profile.skillList.map((skill, index) => (
-                  <li key={skill} className={`tone-${index % SKILL_TONES}`}>{skill}</li>
-                ))}
-              </ul>
-            ) : (
-              <EmptyState Icon={Wrench} text="Add skills like React, Accounting or Customer Service." action="Add skills" />
             )}
           </section>
 
@@ -271,11 +265,35 @@ function EmployerStatus({ profile }) {
         <strong>{rejected ? 'Your employer account was not approved' : 'Your employer account is waiting for admin approval'}</strong>
         <p>
           {rejected
-            ? profile.employer_rejection_reason || 'Update your company details and contact us to try again.'
-            : 'You can post jobs as soon as an admin verifies your account. Completing your profile helps it get approved faster.'}
+            ? profile.employer_rejection_reason || 'Update your company details and documents, then submit them again.'
+            : profile.company_status === 'pending'
+              ? 'An admin is reviewing your company documents. You can post jobs as soon as your company is verified.'
+              : 'Submit your company details and documents for verification. You can post jobs once an admin verifies them.'}
         </p>
       </div>
     </div>
+  );
+}
+
+const COMPANY_CARD_TEXT = {
+  not_submitted: 'Upload your trade license and company details to get a "Verified company" badge.',
+  pending: 'An admin is reviewing your company documents.',
+  verified: 'Your company documents were checked and approved.',
+  rejected: 'Your company could not be verified. See the reason and resubmit.',
+};
+
+/** Employers only: company verification status and a link to /company-verification. */
+function CompanyCard({ status = 'not_submitted' }) {
+  const info = COMPANY_STATUS[status] ?? COMPANY_STATUS.not_submitted;
+  return (
+    <section className="profile-card company-card">
+      <CardTitle Icon={Building2}>Company verification</CardTitle>
+      <span className={`company-card-pill tone-${info.tone}`}>{info.text}</span>
+      <p className="company-card-text">{COMPANY_CARD_TEXT[status] ?? COMPANY_CARD_TEXT.not_submitted}</p>
+      <Link to={ROUTES.companyVerification} className="profile-btn profile-btn-ghost company-card-btn">
+        {status === 'not_submitted' ? 'Verify your company' : 'View details'} <ChevronRight aria-hidden="true" />
+      </Link>
+    </section>
   );
 }
 

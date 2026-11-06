@@ -56,8 +56,8 @@ const VARIANTS = {
     photo: employerPhoto,
     eyebrow: 'Employer verification',
     title: 'Your employer account is being reviewed',
-    text: 'To keep job circulars genuine, an admin verifies every new employer. You can post jobs as soon as your account is approved. Check back soon!',
-    primary: { to: ROUTES.profile, Icon: UserRound, label: 'Complete my profile' },
+    text: 'To keep job circulars genuine, an admin verifies every company. Submit your company details and documents (trade license, CEO / owner NID). You can post jobs as soon as your company is verified.',
+    primary: { to: ROUTES.companyVerification, Icon: ShieldCheck, label: 'Verify my company' },
     secondary: { to: ROUTES.home, Icon: ArrowLeft, label: 'Back to home' },
     steps: true,
   },
@@ -67,8 +67,8 @@ const VARIANTS = {
     photo: employerPhoto,
     eyebrow: 'Employer verification',
     title: 'Your employer account was not approved',
-    text: 'An admin reviewed your account and could not approve it, so you cannot post jobs. Update your profile with your company details and contact us to try again.',
-    primary: { to: ROUTES.profileEdit, Icon: UserRound, label: 'Update my profile' },
+    text: 'An admin reviewed your company documents and could not verify them, so you cannot post jobs yet. Fix the details or upload clearer documents and submit again.',
+    primary: { to: ROUTES.companyVerification, Icon: ShieldCheck, label: 'Fix and resubmit' },
     secondary: { to: ROUTES.home, Icon: ArrowLeft, label: 'Back to home' },
   },
 };
@@ -90,7 +90,7 @@ export default function AccessBlockedPage({ need, user }) {
         {variant.steps && (
           <ol className="ab-steps">
             <li className="is-done"><span><Check aria-hidden="true" /></span>Account created</li>
-            <li className="is-current"><span><ShieldCheck aria-hidden="true" /></span>Admin review</li>
+            <li className="is-current"><span><ShieldCheck aria-hidden="true" /></span>Company verification</li>
             <li><span><BriefcaseBusiness aria-hidden="true" /></span>Post jobs</li>
           </ol>
         )}

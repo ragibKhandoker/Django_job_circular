@@ -32,19 +32,3 @@ export const AdminModel = {
     return httpClient.delete(`/jobs/${id}/`);
   },
 };
-
-export const EmployerAdminModel = {
-  /** status: pending | approved | rejected | all. Returns { employers, counts }. */
-  async list(status) {
-    const data = await httpClient.get('/admin/employers/', status === 'all' ? undefined : { status });
-    return { employers: data.results, counts: data.counts };
-  },
-
-  approve(id) {
-    return httpClient.post(`/admin/employers/${id}/approve/`);
-  },
-
-  reject(id, reason) {
-    return httpClient.post(`/admin/employers/${id}/reject/`, { reason });
-  },
-};

@@ -11,13 +11,12 @@ export const PROFILE_FIELDS = [
   'phone',
   'location',
   'bio',
-  'skills',
   'website',
   'linkedin',
 ];
 
 // Filled-in fields that count towards "profile strength".
-const COMPLETENESS_FIELDS = ['first_name', 'last_name', 'headline', 'phone', 'location', 'bio', 'skills', 'photo'];
+const COMPLETENESS_FIELDS = ['first_name', 'last_name', 'headline', 'phone', 'location', 'bio', 'photo'];
 
 export class Profile {
   constructor(data) {

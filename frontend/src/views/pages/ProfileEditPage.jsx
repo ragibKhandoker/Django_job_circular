@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  BadgeCheck,
   AtSign,
   Camera,
   Check,
@@ -15,14 +16,12 @@ import {
   Mail,
   MapPin,
   Phone,
-  Plus,
   RotateCcw,
   Save,
   ShieldCheck,
   Sparkles,
   Trash2,
   UserRound,
-  X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -33,26 +32,34 @@ import { Profile } from '../../models/ProfileModel.js';
 import { PLUS_JAKARTA } from '../assets.js';
 import Page from '../components/Page.jsx';
 import '../styles/pages/profile.css';
+import '../styles/pages/company.css';
+import { Field, Section } from '../components/profile/FormParts.jsx';
+import { CompanyVerificationPanel } from './CompanyVerificationPage.jsx';
 import { Avatar, ProfileTopbar } from './ProfilePage.jsx';
 
 const BIO_MAX = 1000;
-const SKILLS_MAX = 300;
-const SKILL_SUGGESTIONS = ['Communication', 'Teamwork', 'MS Office', 'Customer Service', 'Sales', 'React', 'Python', 'Accounting'];
 
 const SECTIONS = [
   ['photo', 'Profile photo', Camera],
   ['basic', 'Basic information', UserRound],
   ['contact', 'Contact & links', Mail],
-  ['about', 'About & skills', Sparkles],
+  ['about', 'About', Sparkles],
   ['security', 'Password & security', ShieldCheck],
 ];
+// Employers also get the company verification form (documents for the admins to check).
+const COMPANY_SECTION = ['company-verification', 'Company verification', BadgeCheck];
+
+function sectionsFor(profile) {
+  if (profile?.role !== 'employer' || profile?.is_staff) return SECTIONS;
+  return [...SECTIONS.slice(0, -1), COMPANY_SECTION, SECTIONS[SECTIONS.length - 1]];
+}
 
 export default function ProfileEditPage() {
   const edit = useProfileEditController();
   const { values } = edit;
 
   return (
-    <Page name="page-profile" title="Edit Profile - JobFinder" stylesheets={[PLUS_JAKARTA]}>
+    <Page name="page-profile page-company" title="Edit Profile - JobFinder" stylesheets={[PLUS_JAKARTA]}>
       <ProfileTopbar />
 
       {edit.loading || !values ? (
@@ -69,7 +76,9 @@ export default function ProfileEditPage() {
 
 function EditView({ edit }) {
   const { values, errors, password } = edit;
-  const active = useActiveSection();
+  const sections = sectionsFor(edit.profile);
+  const isEmployer = sections.includes(COMPANY_SECTION);
+  const active = useActiveSection(sections);
 
   // Live preview of the card as the user types.
   const preview = useMemo(
@@ -99,7 +108,7 @@ function EditView({ edit }) {
         </div>
 
         <nav className="edit-nav" aria-label="Sections">
-          {SECTIONS.map(([id, text, Icon]) => (
+          {sections.map(([id, text, Icon]) => (
             <a key={id} href={`#${id}`} className={active === id ? 'is-active' : ''}>
               <Icon aria-hidden="true" /> {text}
             </a>
@@ -172,7 +181,7 @@ function EditView({ edit }) {
             </div>
           </Section>
 
-          <Section id="about" Icon={Sparkles} title="About & skills" text="Tell your story and show what you are good at.">
+          <Section id="about" Icon={Sparkles} title="About" text="Tell your story in a few lines.">
             <div className="profile-form-grid">
               <Field label="Bio" errors={errors.bio} wide counter={[values.bio.length, BIO_MAX]}>
                 <textarea
@@ -184,15 +193,6 @@ function EditView({ edit }) {
                   placeholder="A few lines about your experience, strengths and the kind of work you are looking for."
                 />
               </Field>
-              <div className="profile-field is-wide">
-                <span className="profile-label">Skills</span>
-                <SkillsInput value={values.skills} onChange={(next) => edit.setField('skills', next)} />
-                {errors.skills?.length ? (
-                  <small className="profile-error">{errors.skills.join(' ')}</small>
-                ) : (
-                  <small className="profile-hint">Press Enter or comma to add a skill.</small>
-                )}
-              </div>
             </div>
           </Section>
 
@@ -218,6 +218,22 @@ function EditView({ edit }) {
           </div>
         </form>
 
+        {isEmployer && (
+          <section id="company-verification" className="company-embed">
+            <header className="company-embed-head">
+              <span className="edit-section-icon"><BadgeCheck aria-hidden="true" /></span>
+              <div>
+                <h2>Company verification</h2>
+                <p>
+                  Upload your trade license and the CEO / owner&apos;s NID or passport. An admin checks the documents and
+                  marks your company as verified. This form is saved separately from your profile.
+                </p>
+              </div>
+            </header>
+            <CompanyVerificationPanel idPrefix="cv-" />
+          </section>
+        )}
+
         <Section id="security" Icon={ShieldCheck} title="Password & security" text="Use a strong password you do not use anywhere else.">
           <PasswordForm password={password} />
         </Section>
@@ -227,8 +243,9 @@ function EditView({ edit }) {
 }
 
 /** Highlights the sidebar link of the section currently on screen. */
-function useActiveSection() {
-  const [active, setActive] = useState(SECTIONS[0][0]);
+function useActiveSection(sections) {
+  const [active, setActive] = useState(sections[0][0]);
+  const ids = sections.map(([id]) => id).join(',');
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -237,28 +254,13 @@ function useActiveSection() {
       },
       { rootMargin: '-30% 0px -60% 0px' },
     );
-    SECTIONS.forEach(([id]) => {
+    ids.split(',').forEach((id) => {
       const element = document.getElementById(id);
       if (element) observer.observe(element);
     });
     return () => observer.disconnect();
-  }, []);
+  }, [ids]);
   return active;
-}
-
-function Section({ id, Icon, title, text, children }) {
-  return (
-    <section id={id} className="profile-card edit-section">
-      <header className="edit-section-head">
-        <span className="edit-section-icon"><Icon aria-hidden="true" /></span>
-        <div>
-          <h2>{title}</h2>
-          <p>{text}</p>
-        </div>
-      </header>
-      {children}
-    </section>
-  );
 }
 
 function PhotoPicker({ edit }) {
@@ -301,68 +303,6 @@ function PhotoPicker({ edit }) {
         </button>
       )}
     </div>
-  );
-}
-
-/** Comma-separated skills shown as removable chips. */
-function SkillsInput({ value, onChange }) {
-  const [draft, setDraft] = useState('');
-  const skills = value.split(',').map((skill) => skill.trim()).filter(Boolean);
-  const has = (skill) => skills.some((item) => item.toLowerCase() === skill.toLowerCase());
-
-  const save = (next) => onChange(next.join(', '));
-  const add = (raw) => {
-    const skill = raw.trim().replace(/,+$/, '');
-    if (!skill || has(skill) || [...skills, skill].join(', ').length > SKILLS_MAX) return;
-    save([...skills, skill]);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter' || event.key === ',') {
-      event.preventDefault();
-      add(draft);
-      setDraft('');
-    } else if (event.key === 'Backspace' && !draft && skills.length) {
-      save(skills.slice(0, -1));
-    }
-  };
-
-  const suggestions = SKILL_SUGGESTIONS.filter((skill) => !has(skill)).slice(0, 6);
-
-  return (
-    <>
-      <div className="edit-skills">
-        {skills.map((skill, index) => (
-          <span key={skill} className={`edit-chip tone-${index % 5}`}>
-            {skill}
-            <button type="button" onClick={() => save(skills.filter((item) => item !== skill))} aria-label={`Remove ${skill}`}>
-              <X aria-hidden="true" />
-            </button>
-          </span>
-        ))}
-        <input
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={() => {
-            add(draft);
-            setDraft('');
-          }}
-          placeholder={skills.length ? 'Add another...' : 'e.g. React, Accounting, Sales'}
-          aria-label="Add a skill"
-        />
-      </div>
-      {suggestions.length > 0 && (
-        <div className="edit-suggestions">
-          <span>Suggestions:</span>
-          {suggestions.map((skill) => (
-            <button key={skill} type="button" onClick={() => add(skill)}>
-              <Plus aria-hidden="true" /> {skill}
-            </button>
-          ))}
-        </div>
-      )}
-    </>
   );
 }
 
@@ -427,29 +367,5 @@ function PasswordForm({ password }) {
         </button>
       </div>
     </form>
-  );
-}
-
-function Field({ label, Icon, errors, hint, wide, required, counter, children }) {
-  const [length, max] = counter ?? [];
-  return (
-    <label className={`profile-field${wide ? ' is-wide' : ''}${errors?.length ? ' has-error' : ''}`}>
-      <span className="profile-label">
-        {label}
-        {required && <span className="edit-required" aria-hidden="true">*</span>}
-      </span>
-      <span className={`profile-input${Icon ? ' has-icon' : ''}`}>
-        {Icon && <Icon aria-hidden="true" />}
-        {children}
-      </span>
-      <span className="edit-field-foot">
-        {errors?.length ? (
-          <small className="profile-error">{errors.join(' ')}</small>
-        ) : (
-          hint && <small className="profile-hint">{hint}</small>
-        )}
-        {counter && <small className={`edit-counter${length > max * 0.9 ? ' is-near' : ''}`}>{length}/{max}</small>}
-      </span>
-    </label>
   );
 }

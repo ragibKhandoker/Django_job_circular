@@ -1997,3 +1997,42 @@
 :root[data-theme='dark'] .page-profile .edit-save-status .lucide {
     color: var(--green);
 }
+
+/* ---------- company verification card (employers) ---------- */
+.page-profile .company-verified-badge {
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+.page-profile .company-card-pill {
+    display: inline-flex;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.page-profile .company-card-pill.tone-neutral { background: var(--bg); color: var(--muted); }
+.page-profile .company-card-pill.tone-pending { background: var(--amber-soft); color: var(--amber); }
+.page-profile .company-card-pill.tone-verified { background: var(--green-soft); color: var(--green); }
+.page-profile .company-card-pill.tone-rejected { background: var(--red-soft); color: var(--red); }
+
+.page-profile .company-card-text {
+    margin: 10px 0 14px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page-profile .company-card-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* bell + theme toggle on the right of the top bar */
+.page-profile .profile-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-self: end;
+}

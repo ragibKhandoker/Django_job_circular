@@ -1,6 +1,6 @@
 import {
+  BadgeCheck,
   BriefcaseBusiness,
-  Building2,
   CalendarDays,
   Check,
   CircleCheck,
@@ -12,7 +12,6 @@ import {
   Inbox,
   LoaderCircle,
   LogOut,
-  Mail,
   MapPin,
   MessageSquareWarning,
   Search,
@@ -25,11 +24,13 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
-import { useAdminEmployersController, useAdminPanelController } from '../../controllers/AdminController.js';
+import { useAdminPanelController } from '../../controllers/AdminController.js';
+import { useAdminCompaniesController } from '../../controllers/CompanyController.js';
 import { APPROVAL_TABS } from '../../models/AdminModel.js';
 import { EDUCATION_CHOICES, EXPERIENCE_CHOICES, SALARY_CHOICES, STATUS_CHOICES } from '../../models/choices.js';
 import { formatDate } from '../../models/formatters.js';
 import { PLUS_JAKARTA } from '../assets.js';
+import AdminCompaniesSection from '../components/admin/AdminCompaniesSection.jsx';
 import Page from '../components/Page.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import '../styles/pages/admin.css';
@@ -58,7 +59,7 @@ const EMPTY_TEXT = {
 
 export default function AdminPanelPage() {
   const panel = useAdminPanelController();
-  const employers = useAdminEmployersController();
+  const companies = useAdminCompaniesController();
   const [section, setSection] = useState('jobs');
   const [emptyTitle, emptyText] = EMPTY_TEXT[panel.tab];
 
@@ -96,14 +97,14 @@ export default function AdminPanelPage() {
             <BriefcaseBusiness aria-hidden="true" /> Job posts
             {panel.counts.pending > 0 && <span className="admin-badge">{panel.counts.pending}</span>}
           </button>
-          <button type="button" className={section === 'employers' ? 'is-active' : ''} onClick={() => setSection('employers')}>
-            <Building2 aria-hidden="true" /> Employers
-            {employers.counts.pending > 0 && <span className="admin-badge">{employers.counts.pending}</span>}
+          <button type="button" className={section === 'companies' ? 'is-active' : ''} onClick={() => setSection('companies')}>
+            <BadgeCheck aria-hidden="true" /> Companies
+            {companies.counts.pending > 0 && <span className="admin-badge">{companies.counts.pending}</span>}
           </button>
         </nav>
 
-        {section === 'employers' ? (
-          <EmployersSection employers={employers} />
+        {section === 'companies' ? (
+          <AdminCompaniesSection companies={companies} />
         ) : (
         <>
         <div className="admin-heading">
@@ -197,22 +198,22 @@ export default function AdminPanelPage() {
         />
       )}
 
-      {employers.rejecting && (
+      {companies.rejecting && (
         <RejectDialog
-          title="Reject this employer?"
-          subject={<><strong>{employers.rejecting.name || employers.rejecting.username}</strong> will not be able to post jobs.</>}
-          placeholder="e.g. Could not verify the company, missing contact details..."
-          confirmLabel="Reject employer"
-          onCancel={employers.cancelReject}
-          onConfirm={employers.confirmReject}
+          title="Reject this company?"
+          subject={<><strong>{companies.rejecting.company_name}</strong> will not be verified and the employer cannot post jobs. They can fix it and resubmit.</>}
+          placeholder="e.g. Trade license is expired, name does not match the documents..."
+          confirmLabel="Reject company"
+          onCancel={companies.cancelReject}
+          onConfirm={companies.confirmReject}
         />
       )}
 
-      {employers.toast && (
-        <div className={`admin-toast tone-${employers.toast.tone}`} role="status">
-          {employers.toast.tone === 'success' ? <CircleCheck aria-hidden="true" /> : <CircleX aria-hidden="true" />}
-          <span>{employers.toast.message}</span>
-          <button type="button" onClick={employers.dismissToast} aria-label="Dismiss">
+      {companies.toast && (
+        <div className={`admin-toast tone-${companies.toast.tone}`} role="status">
+          {companies.toast.tone === 'success' ? <CircleCheck aria-hidden="true" /> : <CircleX aria-hidden="true" />}
+          <span>{companies.toast.message}</span>
+          <button type="button" onClick={companies.dismissToast} aria-label="Dismiss">
             <X aria-hidden="true" />
           </button>
         </div>
@@ -358,102 +359,5 @@ function RejectDialog({ title, subject, placeholder, confirmLabel, onCancel, onC
         </div>
       </form>
     </div>
-  );
-}
-
-const EMPLOYER_STATS = [
-  { key: 'pending', title: 'Awaiting approval', Icon: Hourglass, tone: 'amber' },
-  { key: 'approved', title: 'Approved', Icon: CircleCheck, tone: 'green' },
-  { key: 'rejected', title: 'Rejected', Icon: CircleX, tone: 'red' },
-  { key: 'all', title: 'All employers', Icon: Building2, tone: 'blue' },
-];
-
-const EMPLOYER_EMPTY = {
-  pending: ['No employers waiting', 'New employer sign-ups will appear here for approval.'],
-  approved: ['No approved employers yet', 'Employers you approve can post jobs.'],
-  rejected: ['No rejected employers', 'Employers you reject will appear here.'],
-  all: ['No employer accounts yet', 'Employers appear here when they sign up.'],
-};
-
-function EmployersSection({ employers }) {
-  const [emptyTitle, emptyText] = EMPLOYER_EMPTY[employers.tab];
-
-  return (
-    <>
-      <div className="admin-heading">
-        <h1>Employer verification</h1>
-        <p>New employer accounts must be approved before they can post jobs. Job seekers need no approval.</p>
-      </div>
-
-      <section className="admin-stats" aria-label="Employer summary">
-        {EMPLOYER_STATS.map(({ key, title, Icon, tone }) => (
-          <button
-            key={key}
-            type="button"
-            className={`admin-stat tone-${tone} ${employers.tab === key ? 'is-active' : ''}`}
-            onClick={() => employers.setTab(key)}
-          >
-            <span className="admin-stat-icon"><Icon aria-hidden="true" /></span>
-            <span className="admin-stat-text">
-              <strong>{employers.counts[key] ?? 0}</strong>
-              <small>{title}</small>
-            </span>
-          </button>
-        ))}
-      </section>
-
-      {employers.loading && employers.employers.length === 0 ? (
-        <div className="admin-empty">
-          <LoaderCircle className="admin-spin" aria-hidden="true" />
-          <p>Loading employers...</p>
-        </div>
-      ) : employers.employers.length === 0 ? (
-        <div className="admin-empty">
-          <span className="admin-empty-icon"><Inbox aria-hidden="true" /></span>
-          <h2>{emptyTitle}</h2>
-          <p>{emptyText}</p>
-        </div>
-      ) : (
-        <ul className={`admin-employers ${employers.loading ? 'is-refreshing' : ''}`}>
-          {employers.employers.map((employer) => {
-            const pill = STATUS_PILLS[employer.status] ?? STATUS_PILLS.pending;
-            const busy = employers.busyId === employer.id;
-            return (
-              <li key={employer.id} className={`admin-employer status-${employer.status}`}>
-                <span className="admin-employer-avatar">{(employer.name || employer.username).slice(0, 1).toUpperCase()}</span>
-                <div className="admin-employer-info">
-                  <strong>{employer.name || employer.username}</strong>
-                  <span><Mail aria-hidden="true" /> {employer.email || 'No email'}</span>
-                  <span>
-                    @{employer.username} · Joined {formatDate(employer.date_joined)} · {employer.job_count}{' '}
-                    {employer.job_count === 1 ? 'job post' : 'job posts'}
-                  </span>
-                  {employer.status === 'rejected' && employer.rejection_reason && (
-                    <span className="admin-employer-reason">
-                      <MessageSquareWarning aria-hidden="true" /> {employer.rejection_reason}
-                    </span>
-                  )}
-                </div>
-                <span className={`admin-pill pill-${employer.status}`}>
-                  <pill.Icon aria-hidden="true" /> {pill.text}
-                </span>
-                <div className="admin-job-actions">
-                  {employer.status !== 'approved' && (
-                    <button type="button" className="admin-btn admin-btn-approve" onClick={() => employers.approve(employer)} disabled={busy}>
-                      {busy ? <LoaderCircle className="admin-spin" aria-hidden="true" /> : <Check aria-hidden="true" />} Approve
-                    </button>
-                  )}
-                  {employer.status !== 'rejected' && (
-                    <button type="button" className="admin-btn admin-btn-reject" onClick={() => employers.startReject(employer)} disabled={busy}>
-                      <X aria-hidden="true" /> Reject
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </>
   );
 }

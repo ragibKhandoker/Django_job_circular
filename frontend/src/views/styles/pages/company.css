@@ -1,0 +1,628 @@
+/* /company-verification: builds on profile.css (tokens, cards, form fields). */
+
+.page-company .company-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 28px;
+    align-items: start;
+}
+
+.page-company .company-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.page-company .company-content .edit-heading {
+    margin-bottom: 0;
+}
+
+.page-company .company-aside {
+    position: sticky;
+    top: 92px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.page-company .company-aside-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.page-company .company-aside-title .lucide {
+    width: 18px;
+    height: 18px;
+    color: var(--primary);
+}
+
+.page-company .company-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.page-company .company-steps li {
+    display: flex;
+    gap: 12px;
+}
+
+.page-company .company-step-num {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.page-company .company-steps strong {
+    color: var(--ink);
+    font-size: 14px;
+}
+
+.page-company .company-steps p,
+.page-company .company-privacy p {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.page-company .company-privacy .company-aside-title .lucide {
+    color: var(--green);
+}
+
+/* status banner */
+.page-company .company-banner {
+    display: flex;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+}
+
+.page-company .company-banner.is-pending { border-color: color-mix(in srgb, var(--amber) 35%, transparent); background: var(--amber-soft); }
+.page-company .company-banner.is-verified { border-color: color-mix(in srgb, var(--green) 35%, transparent); background: var(--green-soft); }
+.page-company .company-banner.is-rejected { border-color: color-mix(in srgb, var(--red) 35%, transparent); background: var(--red-soft); }
+
+.page-company .company-banner-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface);
+}
+
+.page-company .is-pending .company-banner-icon { color: var(--amber); }
+.page-company .is-verified .company-banner-icon { color: var(--green); }
+.page-company .is-rejected .company-banner-icon { color: var(--red); }
+
+.page-company .company-banner strong {
+    color: var(--ink);
+    font-size: 15px;
+}
+
+.page-company .company-banner p {
+    margin: 4px 0 0;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page-company .company-banner .company-banner-reason {
+    color: var(--red);
+}
+
+.page-company .company-banner small {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* read-only summary */
+.page-company .company-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+    margin: 0;
+}
+
+.page-company .company-details .is-wide {
+    grid-column: 1 / -1;
+}
+
+.page-company .company-details dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.page-company .company-details dt .lucide {
+    width: 14px;
+    height: 14px;
+}
+
+.page-company .company-details dd {
+    margin: 4px 0 0;
+    color: var(--ink);
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.page-company .company-details a {
+    color: var(--primary);
+}
+
+.page-company .company-muted {
+    color: var(--muted);
+}
+
+.page-company .company-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* document list (summary) and picked file (form) */
+.page-company .company-docs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.page-company .company-doc,
+.page-company .company-file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface-2, var(--bg));
+    color: inherit;
+    text-decoration: none;
+}
+
+.page-company .company-doc {
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.page-company .company-doc:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.page-company .company-doc-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.page-company .company-doc-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.page-company .company-doc-text strong {
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-company .company-doc-text small {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-company .company-doc-text small .lucide {
+    width: 13px;
+    height: 13px;
+    color: var(--green);
+}
+
+.page-company .company-doc-open {
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+}
+
+/* upload slots */
+.page-company .company-uploads {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.page-company .company-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.page-company .company-upload-head strong {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink);
+    font-size: 14px;
+}
+
+.page-company .company-upload-head small {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.page-company .company-optional {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.page-company .company-dropzone {
+    min-height: 120px;
+}
+
+.page-company .company-upload.has-error .company-dropzone {
+    border-color: var(--red);
+}
+
+.page-company .company-replace {
+    position: relative;
+    padding: 0 12px;
+    height: 36px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.page-company .company-undo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--primary);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.page-company .company-undo .lucide {
+    width: 14px;
+    height: 14px;
+}
+
+.page-company .profile-input select {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    outline: none;
+    background: var(--surface-2);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.page-company .profile-input.has-icon select {
+    padding-left: 42px;
+}
+
+.page-company .profile-input select:focus {
+    border-color: var(--primary);
+    background: var(--surface);
+}
+
+.page-company .company-submit .edit-save-status .lucide {
+    color: var(--primary);
+}
+
+@media (max-width: 960px) {
+    .page-company .company-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .page-company .company-aside {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    .page-company .company-details,
+    .page-company .company-uploads {
+        grid-template-columns: 1fr;
+    }
+
+    .page-company .company-submit {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* ---------- embedded in /profile/edit (employers) ---------- */
+.page-company .company-embed {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 8px;
+    scroll-margin-top: 90px;
+}
+
+.page-company .company-embed-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 4px 4px 0;
+}
+
+.page-company .company-embed-head h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 20px;
+}
+
+.page-company .company-embed-head p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page-company .company-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.page-company .company-panel-anchor {
+    scroll-margin-top: 90px;
+}
+
+.page-company .company-panel .edit-section {
+    scroll-margin-top: 90px;
+}
+
+.page-company .company-panel-state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+}
+
+/* ---------- "submitted" toast ---------- */
+.page-company .company-toast {
+    position: fixed;
+    top: 88px;
+    right: 24px;
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: min(400px, calc(100vw - 32px));
+    padding: 18px 44px 20px 18px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--green) 25%, var(--line));
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: 0 24px 60px rgba(15, 27, 61, 0.18), 0 2px 6px rgba(15, 27, 61, 0.06);
+    animation: company-toast-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.page-company .company-toast.is-leaving {
+    animation: company-toast-out 0.28s ease-in both;
+}
+
+.page-company .company-toast::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--green);
+}
+
+.page-company .company-toast-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+/* soft ring that pulses out once the toast lands */
+.page-company .company-toast-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 45%, transparent);
+    animation: company-toast-ring 1.2s ease-out 0.35s 2;
+}
+
+.page-company .company-toast-icon .lucide {
+    width: 24px;
+    height: 24px;
+    animation: company-toast-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.4) 0.15s both;
+}
+
+.page-company .company-toast-body {
+    min-width: 0;
+}
+
+.page-company .company-toast-body strong {
+    display: block;
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.page-company .company-toast-body p {
+    margin: 4px 0 0;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.page-company .company-toast-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 12px 0 0;
+    padding: 12px 0 0;
+    border-top: 1px dashed var(--line);
+    list-style: none;
+}
+
+.page-company .company-toast-steps li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.page-company .company-toast-steps .lucide {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+}
+
+.page-company .company-toast-steps li.is-done {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.page-company .company-toast-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.page-company .company-toast-close:hover {
+    background: var(--bg);
+    color: var(--ink);
+}
+
+.page-company .company-toast-close .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+/* countdown bar along the bottom; pauses on hover */
+.page-company .company-toast-timer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--green);
+    transform-origin: left;
+    animation: company-toast-timer linear forwards;
+}
+
+.page-company .company-toast.is-paused .company-toast-timer {
+    animation-play-state: paused;
+}
+
+@keyframes company-toast-in {
+    from { opacity: 0; transform: translateX(calc(100% + 32px)); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes company-toast-out {
+    to { opacity: 0; transform: translateX(calc(100% + 32px)); }
+}
+
+@keyframes company-toast-pop {
+    from { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes company-toast-ring {
+    to { box-shadow: 0 0 0 14px transparent; }
+}
+
+@keyframes company-toast-timer {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+@media (max-width: 640px) {
+    .page-company .company-toast {
+        top: auto;
+        right: 16px;
+        bottom: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-company .company-toast,
+    .page-company .company-toast.is-leaving,
+    .page-company .company-toast-icon .lucide,
+    .page-company .company-toast-icon::after {
+        animation: none;
+    }
+}

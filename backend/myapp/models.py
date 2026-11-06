@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import timezone
 from django_mongodb_backend.fields import ObjectIdAutoField
@@ -252,3 +253,95 @@ class UserProfile(models.Model):
     @property
     def can_apply(self):
         return not self.is_employer
+
+
+# Company documents are private: they live outside MEDIA_ROOT (so /media/ never serves them)
+# and are only downloadable through the API by the employer who uploaded them or an admin.
+_private_storage = FileSystemStorage(location=settings.BASE_DIR / 'private_media')
+
+
+def private_storage():
+    # A callable keeps the machine-specific path out of migrations.
+    return _private_storage
+
+COMPANY_DOCUMENT_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png']
+
+
+def company_document_path(instance, filename):
+    return f'company_documents/{instance.employer_id}/{filename}'
+
+
+class CompanyVerification(models.Model):
+    """Company details and documents an employer submits so an admin can confirm the company is real."""
+    STATUS_PENDING = 'pending'
+    STATUS_VERIFIED = 'verified'
+    STATUS_REJECTED = 'rejected'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending review'),
+        (STATUS_VERIFIED, 'Verified'),
+        (STATUS_REJECTED, 'Rejected'),
+    ]
+    # (field name, label) for every uploadable document, in display order.
+    DOCUMENTS = [
+        ('trade_license', 'Trade license'),
+        ('tin_certificate', 'TIN certificate'),
+        ('incorporation_certificate', 'Certificate of incorporation'),
+        ('owner_id_document', 'CEO / owner NID or passport'),
+        ('other_document', 'Other supporting document'),
+    ]
+
+    employer = models.OneToOneField(User, on_delete=models.CASCADE, related_name='company_verification')
+    company_name = models.CharField(max_length=150)
+    trade_license_number = models.CharField(max_length=60)
+    company_type = models.CharField(max_length=60, blank=True)
+    industry = models.CharField(max_length=80, blank=True)
+    year_established = models.PositiveIntegerField(null=True, blank=True)
+    company_address = models.CharField(max_length=255)
+    company_email = models.EmailField(max_length=150)
+    company_phone = models.CharField(max_length=20)
+    company_website = models.URLField(max_length=200, blank=True)
+    contact_person = models.CharField(max_length=100)
+    contact_designation = models.CharField(max_length=100, blank=True)
+    ceo_name = models.CharField('CEO / owner name', max_length=100, blank=True)
+
+    trade_license = models.FileField(upload_to=company_document_path, storage=private_storage, max_length=255)
+    tin_certificate = models.FileField(upload_to=company_document_path, storage=private_storage, max_length=255, blank=True)
+    incorporation_certificate = models.FileField(upload_to=company_document_path, storage=private_storage, max_length=255, blank=True)
+    owner_id_document = models.FileField(upload_to=company_document_path, storage=private_storage, max_length=255, blank=True)
+    other_document = models.FileField(upload_to=company_document_path, storage=private_storage, max_length=255, blank=True)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    rejection_reason = models.TextField(blank=True)
+    submitted_at = models.DateTimeField(default=timezone.now)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.company_name} ({self.get_status_display()})"
+
+
+class Notification(models.Model):
+    """In-app message for a user, e.g. "your job post was approved". Shown under the bell on /profile."""
+    KIND_JOB_APPROVED = 'job_approved'
+    KIND_JOB_REJECTED = 'job_rejected'
+    KIND_COMPANY_VERIFIED = 'company_verified'
+    KIND_COMPANY_REJECTED = 'company_rejected'
+    KIND_CHOICES = [
+        (KIND_JOB_APPROVED, 'Job post approved'),
+        (KIND_JOB_REJECTED, 'Job post rejected'),
+        (KIND_COMPANY_VERIFIED, 'Company verified'),
+        (KIND_COMPANY_REJECTED, 'Company not verified'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    kind = models.CharField(max_length=30, choices=KIND_CHOICES)
+    title = models.CharField(max_length=150)
+    message = models.TextField(blank=True)
+    link = models.CharField(max_length=200, blank=True, help_text='Frontend path to open, e.g. /profile.')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username}: {self.title}"

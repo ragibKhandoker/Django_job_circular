@@ -1,21 +1,23 @@
 """JSON API consumed by the React frontend (frontend/)."""
 import json
+
+from bson import ObjectId
 from functools import wraps
 
 from django.contrib import auth
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.http import HttpResponse, JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .db_status import ping_mongodb
-from .forms import (AccountForm, ApplicantForm, EducationalBackgroundForm, JobPostForm, UserProfileForm,
-                    WorkExperienceForm)
-from .models import Applicant, JobPost, UserProfile
+from .forms import (AccountForm, ApplicantForm, CompanyVerificationForm, EducationalBackgroundForm, JobPostForm,
+                    UserProfileForm, WorkExperienceForm)
+from .models import Applicant, CompanyVerification, JobPost, Notification, UserProfile
 
 
 def _json_body(request):
@@ -68,6 +70,12 @@ def get_profile(user):
     return profile
 
 
+def company_status(user):
+    """'not_submitted' | 'pending' | 'verified' | 'rejected'."""
+    verification = CompanyVerification.objects.filter(employer=user).only('status').first()
+    return verification.status if verification else 'not_submitted'
+
+
 def serialize_user(user):
     if not user.is_authenticated:
         return {'is_authenticated': False}
@@ -76,6 +84,7 @@ def serialize_user(user):
         'role': profile.role,
         'employer_status': profile.employer_status if profile.is_employer else None,
         'employer_rejection_reason': profile.employer_rejection_reason if profile.is_employer else '',
+        'company_status': company_status(user) if profile.is_employer else None,
         'can_post_jobs': profile.can_post_jobs,
         'can_apply': profile.can_apply,
         'is_authenticated': True,
@@ -85,6 +94,7 @@ def serialize_user(user):
         'last_name': user.last_name,
         'email': user.email,
         'is_staff': user.is_staff,
+        'unread_notifications': Notification.objects.filter(user=user, is_read=False).count(),
     }
 
 
@@ -161,6 +171,68 @@ def serialize_applicant(applicant, detailed=False):
     return data
 
 
+# ---------- notifications ----------
+
+def notify(user, kind, title, message='', link=''):
+    return Notification.objects.create(user=user, kind=kind, title=title, message=message, link=link)
+
+
+def notify_job_reviewed(job):
+    if job.approval_status == JobPost.APPROVAL_APPROVED:
+        notify(job.employer, Notification.KIND_JOB_APPROVED, 'Your job post is live',
+               f'"{job.title}" at {job.company_name} was approved and is now visible to job seekers.', '/profile')
+    elif job.approval_status == JobPost.APPROVAL_REJECTED:
+        reason = f' Reason: {job.rejection_reason}' if job.rejection_reason else ''
+        notify(job.employer, Notification.KIND_JOB_REJECTED, 'Your job post was not approved',
+               f'"{job.title}" at {job.company_name} was rejected.{reason}', '/profile')
+
+
+def notify_company_reviewed(verification):
+    if verification.status == CompanyVerification.STATUS_VERIFIED:
+        notify(verification.employer, Notification.KIND_COMPANY_VERIFIED, 'Your company is verified',
+               f'{verification.company_name} was verified by an admin. You can now post jobs.', '/company-verification')
+    elif verification.status == CompanyVerification.STATUS_REJECTED:
+        reason = f' Reason: {verification.rejection_reason}' if verification.rejection_reason else ''
+        notify(verification.employer, Notification.KIND_COMPANY_REJECTED, 'Your company could not be verified',
+               f'{verification.company_name} was not verified.{reason} Please fix it and resubmit.', '/company-verification')
+
+
+def serialize_notification(notification):
+    return {
+        'id': str(notification.id),
+        'kind': notification.kind,
+        'title': notification.title,
+        'message': notification.message,
+        'link': notification.link,
+        'is_read': notification.is_read,
+        'created_at': notification.created_at.isoformat(),
+    }
+
+
+NOTIFICATION_LIMIT = 30
+
+
+@require_GET
+@api_login_required
+def notifications(request):
+    """The latest notifications for the logged-in user, newest first."""
+    items = Notification.objects.filter(user=request.user)[:NOTIFICATION_LIMIT]
+    unread = Notification.objects.filter(user=request.user, is_read=False).count()
+    return JsonResponse({'results': [serialize_notification(n) for n in items], 'unread_count': unread})
+
+
+@require_POST
+@api_login_required
+def notifications_read(request):
+    """Marks notifications as read: {"ids": [...]} for some, or no ids for all of them."""
+    ids = _json_body(request).get('ids')
+    items = Notification.objects.filter(user=request.user, is_read=False)
+    if ids:
+        items = items.filter(id__in=[i for i in ids if ObjectId.is_valid(str(i))])
+    items.update(is_read=True)
+    return JsonResponse({'unread_count': Notification.objects.filter(user=request.user, is_read=False).count()})
+
+
 # ---------- health ----------
 
 @require_GET
@@ -183,6 +255,33 @@ def me(request):
     return JsonResponse(serialize_user(request.user))
 
 
+def _new_tab_session(request):
+    """
+    Logins get a brand-new session. Reusing this tab's current one would make Django
+    delete it, and a new tab may share that key with the tab it was opened from.
+    """
+    request.session = type(request.session)()
+
+
+@csrf_exempt  # auth comes from the X-Session-Key header, which other sites cannot send
+@require_POST
+@ensure_csrf_cookie
+def fork_session(request):
+    """
+    A newly opened tab starts with the last login's key; it calls this to get its own copy
+    of that session, so logging in or out there never affects the original tab.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'user': serialize_user(request.user), 'session_key': None})
+    copy = type(request.session)()
+    for key, value in request.session.items():
+        copy[key] = value
+    copy.create()
+    user = request.user
+    request.session = copy  # the middleware saves this one; the original stays untouched
+    return JsonResponse({'user': serialize_user(user), 'session_key': copy.session_key})
+
+
 @require_POST
 def login(request):
     data = _json_body(request)
@@ -202,8 +301,14 @@ def login(request):
                            f'Please log in from the {roles[actual]} tab.'},
                 status=403,
             )
+    _new_tab_session(request)
     auth.login(request, user)
-    return JsonResponse({'detail': 'Logged in successfully', 'user': serialize_user(user)})
+    # The frontend keeps this key in the tab's sessionStorage and sends it back as X-Session-Key.
+    return JsonResponse({
+        'detail': 'Logged in successfully',
+        'user': serialize_user(user),
+        'session_key': request.session.session_key,
+    })
 
 
 @require_POST
@@ -217,8 +322,13 @@ def admin_login(request):
         return JsonResponse({'detail': 'Invalid email or password.'}, status=400)
     if not user.is_staff:
         return JsonResponse({'detail': 'This account does not have admin access.'}, status=403)
+    _new_tab_session(request)
     auth.login(request, user)
-    return JsonResponse({'detail': 'Welcome to the admin panel', 'user': serialize_user(user)})
+    return JsonResponse({
+        'detail': 'Welcome to the admin panel',
+        'user': serialize_user(user),
+        'session_key': request.session.session_key,
+    })
 
 
 @require_POST
@@ -404,6 +514,7 @@ def _review_job(job_id, approval_status, reason=''):
     job.rejection_reason = reason
     job.reviewed_at = timezone.now()
     job.save(update_fields=['approval_status', 'rejection_reason', 'reviewed_at'])
+    notify_job_reviewed(job)
     return JsonResponse(serialize_admin_job(job))
 
 
@@ -481,7 +592,7 @@ def password_change(request):
 
 # ---------- admin panel: employer accounts ----------
 
-def serialize_employer(profile):
+def serialize_employer(request, profile):
     user = profile.user
     return {
         'id': str(user.id),
@@ -493,6 +604,15 @@ def serialize_employer(profile):
         'rejection_reason': profile.employer_rejection_reason,
         'reviewed_at': profile.employer_reviewed_at.isoformat() if profile.employer_reviewed_at else None,
         'job_count': JobPost.objects.filter(employer=user).count(),
+        # Profile details the employer filled in on /profile, so admins can verify them.
+        'headline': profile.headline,
+        'phone': profile.phone,
+        'location': profile.location,
+        'bio': profile.bio,
+        'website': profile.website,
+        'linkedin': profile.linkedin,
+        'photo': request.build_absolute_uri(profile.photo.url) if profile.photo else '',
+        'company_status': company_status(user),
     }
 
 
@@ -510,26 +630,172 @@ def admin_employers(request):
     if status in dict(UserProfile.EMPLOYER_STATUS_CHOICES):
         employers = employers.filter(employer_status=status)
     employers = sorted(employers, key=lambda p: p.user.date_joined, reverse=True)
-    return JsonResponse({'results': [serialize_employer(p) for p in employers], 'counts': counts})
+    return JsonResponse({'results': [serialize_employer(request, p) for p in employers], 'counts': counts})
 
 
-def _review_employer(user_id, status, reason=''):
+def _review_employer(request, user_id, status, reason=''):
     profile = get_object_or_404(UserProfile, user_id=user_id, role=UserProfile.ROLE_EMPLOYER)
     profile.employer_status = status
     profile.employer_rejection_reason = reason
     profile.employer_reviewed_at = timezone.now()
     profile.save(update_fields=['employer_status', 'employer_rejection_reason', 'employer_reviewed_at'])
-    return JsonResponse(serialize_employer(profile))
+    return JsonResponse(serialize_employer(request, profile))
 
 
 @require_POST
 @api_admin_required
 def admin_approve_employer(request, user_id):
-    return _review_employer(user_id, UserProfile.EMPLOYER_APPROVED)
+    return _review_employer(request, user_id, UserProfile.EMPLOYER_APPROVED)
 
 
 @require_POST
 @api_admin_required
 def admin_reject_employer(request, user_id):
     reason = str(_json_body(request).get('reason', '')).strip()
-    return _review_employer(user_id, UserProfile.EMPLOYER_REJECTED, reason)
+    return _review_employer(request, user_id, UserProfile.EMPLOYER_REJECTED, reason)
+
+
+# ---------- company verification ----------
+
+COMPANY_FIELDS = [
+    'company_name', 'trade_license_number', 'company_type', 'industry', 'year_established',
+    'company_address', 'company_email', 'company_phone', 'company_website',
+    'contact_person', 'contact_designation', 'ceo_name',
+]
+DOCUMENT_FIELDS = dict(CompanyVerification.DOCUMENTS)
+
+
+def serialize_company_verification(verification):
+    employer = verification.employer
+    return {
+        **{field: getattr(verification, field) for field in COMPANY_FIELDS},
+        'employer': {
+            'id': str(employer.id),
+            'username': employer.username,
+            'name': employer.get_full_name(),
+            'email': employer.email,
+        },
+        # Links go through company_document(), which checks who is asking.
+        'documents': [
+            {
+                'field': field,
+                'label': label,
+                'name': getattr(verification, field).name.rsplit('/', 1)[-1],
+                'url': f'/api/company-verification/{employer.id}/documents/{field}/',
+            }
+            for field, label in CompanyVerification.DOCUMENTS
+            if getattr(verification, field)
+        ],
+        'status': verification.status,
+        'rejection_reason': verification.rejection_reason,
+        'submitted_at': verification.submitted_at.isoformat(),
+        'reviewed_at': verification.reviewed_at.isoformat() if verification.reviewed_at else None,
+    }
+
+
+@require_http_methods(['GET', 'POST'])
+@api_login_required
+def company_verification(request):
+    """Employers only. GET: their verification request (or null). POST (multipart): submit or update it."""
+    if not get_profile(request.user).is_employer:
+        return JsonResponse({'detail': 'Only employer accounts can verify a company.'}, status=403)
+    verification = CompanyVerification.objects.filter(employer=request.user).first()
+    if request.method == 'GET':
+        return JsonResponse({'verification': serialize_company_verification(verification) if verification else None})
+
+    old_files = {field: getattr(verification, field).name for field in DOCUMENT_FIELDS} if verification else {}
+    form = CompanyVerificationForm(request.POST, request.FILES, instance=verification)
+    if not form.is_valid():
+        return JsonResponse({'detail': 'Please correct the errors below.', 'errors': _form_errors(form)}, status=400)
+
+    verification = form.save(commit=False)
+    verification.employer = request.user
+    # Every submission (including edits to a verified company) goes back to the admins.
+    verification.status = CompanyVerification.STATUS_PENDING
+    verification.rejection_reason = ''
+    verification.submitted_at = timezone.now()
+    verification.reviewed_at = None
+    for field in DOCUMENT_FIELDS:
+        # Optional documents can be removed with remove_<field>=1.
+        if field != 'trade_license' and request.POST.get(f'remove_{field}') == '1' and field not in request.FILES:
+            setattr(verification, field, None)
+    verification.save()
+
+    for field, old_name in old_files.items():
+        new_name = getattr(verification, field).name or ''
+        if old_name and old_name != new_name:
+            CompanyVerification._meta.get_field(field).storage.delete(old_name)
+    return JsonResponse({
+        'detail': 'Company details submitted. An admin will review your documents soon.',
+        'verification': serialize_company_verification(verification),
+    })
+
+
+@require_GET
+@api_login_required
+def company_document(request, user_id, field):
+    """Streams one verification document; only its employer and admins may open it."""
+    if field not in DOCUMENT_FIELDS:
+        raise Http404
+    if not (request.user.is_staff or str(request.user.id) == str(user_id)):
+        return JsonResponse({'detail': 'You cannot view this document.'}, status=403)
+    verification = get_object_or_404(CompanyVerification, employer_id=user_id)
+    document = getattr(verification, field)
+    if not document:
+        raise Http404
+    try:
+        handle = document.open('rb')
+    except FileNotFoundError:
+        raise Http404
+    name = document.name.rsplit('/', 1)[-1]
+    response = FileResponse(handle, filename=name)  # inline, so PDFs and images open in the browser
+    response['X-Content-Type-Options'] = 'nosniff'
+    response['Cache-Control'] = 'private, no-store'
+    return response
+
+
+@require_GET
+@api_admin_required
+def admin_companies(request):
+    """Company verification requests, newest first; ?status=pending|verified|rejected narrows the list."""
+    items = CompanyVerification.objects.select_related('employer')
+    counts = {value: items.filter(status=value).count() for value, _ in CompanyVerification.STATUS_CHOICES}
+    counts['all'] = sum(counts.values())
+    status = request.GET.get('status', '')
+    if status in dict(CompanyVerification.STATUS_CHOICES):
+        items = items.filter(status=status)
+    items = sorted(items, key=lambda v: v.submitted_at, reverse=True)
+    return JsonResponse({'results': [serialize_company_verification(v) for v in items], 'counts': counts})
+
+
+def _review_company(user_id, status, reason=''):
+    verification = get_object_or_404(CompanyVerification, employer_id=user_id)
+    verification.status = status
+    verification.rejection_reason = reason
+    verification.reviewed_at = timezone.now()
+    verification.save(update_fields=['status', 'rejection_reason', 'reviewed_at'])
+
+    # The admin panel only has the Companies section now: verifying the company is what
+    # approves the employer account (lets them post jobs); rejecting it blocks posting.
+    profile = get_profile(verification.employer)
+    if profile.is_employer:
+        verified = status == CompanyVerification.STATUS_VERIFIED
+        profile.employer_status = UserProfile.EMPLOYER_APPROVED if verified else UserProfile.EMPLOYER_REJECTED
+        profile.employer_rejection_reason = '' if verified else (reason or 'Your company could not be verified.')
+        profile.employer_reviewed_at = verification.reviewed_at
+        profile.save(update_fields=['employer_status', 'employer_rejection_reason', 'employer_reviewed_at'])
+    notify_company_reviewed(verification)
+    return JsonResponse(serialize_company_verification(verification))
+
+
+@require_POST
+@api_admin_required
+def admin_verify_company(request, user_id):
+    return _review_company(user_id, CompanyVerification.STATUS_VERIFIED)
+
+
+@require_POST
+@api_admin_required
+def admin_reject_company(request, user_id):
+    reason = str(_json_body(request).get('reason', '')).strip()
+    return _review_company(user_id, CompanyVerification.STATUS_REJECTED, reason)

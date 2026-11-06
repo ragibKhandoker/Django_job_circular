@@ -23,6 +23,7 @@ export const ROUTES = {
   adminPanel: '/admin-panel',
   profile: '/profile',
   profileEdit: '/profile/edit',
+  companyVerification: '/company-verification',
 };
 
 export const routeTo = {

@@ -2,9 +2,11 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
+from django.utils import timezone
 
-from .models import (Applicant, Candidate, EducationalBackground, Employee,
-                     JobApplicationForm, JobPost, UserProfile, WorkExperience)
+from .models import (COMPANY_DOCUMENT_EXTENSIONS, Applicant, Candidate, CompanyVerification,
+                     EducationalBackground, Employee, JobApplicationForm, JobPost, UserProfile,
+                     WorkExperience)
 
 # class CandidateRegistrationForm(forms.ModelForm):
 #     class Meta:
@@ -167,10 +169,58 @@ class AccountForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['headline', 'phone', 'location', 'bio', 'skills', 'website', 'linkedin', 'photo']
+        # Skills are no longer edited on /profile/edit; leaving the field out keeps saved data intact.
+        fields = ['headline', 'phone', 'location', 'bio', 'website', 'linkedin', 'photo']
 
     def clean_photo(self):
         photo = self.cleaned_data.get('photo')
         if photo and photo.size > MAX_PHOTO_BYTES:
             raise forms.ValidationError('Photo must be 2 MB or smaller.')
         return photo
+
+
+MAX_COMPANY_DOCUMENT_BYTES = 5 * 1024 * 1024
+
+
+class CompanyVerificationForm(forms.ModelForm):
+    """Employer's company verification request. Saved files are kept when no new file is sent."""
+    class Meta:
+        model = CompanyVerification
+        fields = [
+            'company_name', 'trade_license_number', 'company_type', 'industry', 'year_established',
+            'company_address', 'company_email', 'company_phone', 'company_website',
+            'contact_person', 'contact_designation', 'ceo_name',
+            'trade_license', 'tin_certificate', 'incorporation_certificate', 'owner_id_document', 'other_document',
+        ]
+
+    def clean_year_established(self):
+        year = self.cleaned_data.get('year_established')
+        if year and not 1800 <= year <= timezone.now().year:
+            raise forms.ValidationError('Enter a valid year.')
+        return year
+
+    def _clean_document(self, name):
+        document = self.cleaned_data.get(name)
+        # Only newly uploaded files need checking; a saved file was checked when it was uploaded.
+        if document and name in self.files:
+            extension = document.name.rsplit('.', 1)[-1].lower() if '.' in document.name else ''
+            if extension not in COMPANY_DOCUMENT_EXTENSIONS:
+                raise forms.ValidationError('Upload a PDF, JPG or PNG file.')
+            if document.size > MAX_COMPANY_DOCUMENT_BYTES:
+                raise forms.ValidationError('Each document must be 5 MB or smaller.')
+        return document
+
+    def clean_trade_license(self):
+        return self._clean_document('trade_license')
+
+    def clean_tin_certificate(self):
+        return self._clean_document('tin_certificate')
+
+    def clean_incorporation_certificate(self):
+        return self._clean_document('incorporation_certificate')
+
+    def clean_owner_id_document(self):
+        return self._clean_document('owner_id_document')
+
+    def clean_other_document(self):
+        return self._clean_document('other_document')

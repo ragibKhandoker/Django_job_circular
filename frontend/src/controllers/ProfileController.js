@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../config/routes.js';
+import { NOTIFICATION_EVENT } from '../models/NotificationModel.js';
 import { PROFILE_FIELDS, ProfileModel } from '../models/ProfileModel.js';
 import { useAuth } from './AuthController.jsx';
 import { useFlash, useFlashMessages } from './FlashController.jsx';
@@ -14,11 +15,17 @@ const EMPTY_PASSWORDS = { old_password: '', new_password1: '', new_password2: ''
 export function useProfileController() {
   const navigate = useNavigate();
   const { notices, dismissNotices } = useFlashMessages();
-  const { data: profile, loading, error } = useAsync(() => ProfileModel.get(), [], null);
+  const { data: profile, loading, error, reload } = useAsync(() => ProfileModel.get(), [], null);
 
   useEffect(() => {
     if (error?.status === 401) navigate(ROUTES.login, { replace: true, state: { from: ROUTES.profile } });
   }, [error, navigate]);
+
+  // An admin just reviewed a job post or the company: show the new status without a refresh.
+  useEffect(() => {
+    window.addEventListener(NOTIFICATION_EVENT, reload);
+    return () => window.removeEventListener(NOTIFICATION_EVENT, reload);
+  }, [reload]);
 
   return { profile, loading, error, notices, dismissNotices };
 }

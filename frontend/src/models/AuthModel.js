@@ -15,8 +15,8 @@ export const AuthModel = {
     return httpClient.get('/auth/me/');
   },
 
-  login(username, password) {
-    return httpClient.post('/auth/login/', { username, password });
+  login(username, password, role) {
+    return httpClient.post('/auth/login/', { username, password, role });
   },
 
   logout() {

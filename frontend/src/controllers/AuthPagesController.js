@@ -12,8 +12,8 @@ const LOGIN_ROUTES = {
 };
 
 /**
- * One login page for job seekers and employers (both log in with the same
- * Django account; the role only changes the copy and the sign-up link).
+ * One login page for job seekers and employers. The selected role is sent to
+ * the backend, which rejects accounts registered with a different role.
  * The role comes from the URL, so links like "Employer Login" always open the
  * right tab. After logging in, return to the page RequireAuth sent the user from.
  */
@@ -33,7 +33,7 @@ export function useLoginController(role) {
     event.preventDefault();
     setSubmitting(true);
     try {
-      const result = await login(values.username, values.password);
+      const result = await login(values.username, values.password, role);
       flash(result.detail);
       navigate(location.state?.from ?? ROUTES.home, { replace: true });
     } catch (error) {

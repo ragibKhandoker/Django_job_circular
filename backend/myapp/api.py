@@ -189,6 +189,19 @@ def login(request):
     user = auth.authenticate(request, username=data.get('username', ''), password=data.get('password', ''))
     if user is None:
         return JsonResponse({'detail': 'Invalid credentials'}, status=400)
+    # The account may only log in from the tab matching the role it signed up with.
+    role = data.get('role')
+    roles = dict(UserProfile.ROLE_CHOICES)
+    if role not in roles:
+        return JsonResponse({'detail': 'Choose job seeker or employer.'}, status=400)
+    if not user.is_staff:
+        actual = get_profile(user).role
+        if actual != role:
+            return JsonResponse(
+                {'detail': f'This account is registered as {roles[actual].lower()}. '
+                           f'Please log in from the {roles[actual]} tab.'},
+                status=403,
+            )
     auth.login(request, user)
     return JsonResponse({'detail': 'Logged in successfully', 'user': serialize_user(user)})
 

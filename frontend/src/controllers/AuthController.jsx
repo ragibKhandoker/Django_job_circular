@@ -16,8 +16,8 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = useCallback(async (username, password) => {
-    const result = await AuthModel.login(username, password);
+  const login = useCallback(async (username, password, role) => {
+    const result = await AuthModel.login(username, password, role);
     setUser(result.user);
     return result;
   }, []);

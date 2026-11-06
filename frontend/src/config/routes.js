@@ -9,6 +9,7 @@ export const ROUTES = {
   candidateLogin: '/login_choice/candidate_login',
   passwordReset: '/password-reset',
   passwordResetDone: '/password-reset/done',
+  setPassword: '/set-password',
   jobList: '/job-list',
   jobCategory: '/jobs/category/:category',
   totalJobs: '/jobs/total',

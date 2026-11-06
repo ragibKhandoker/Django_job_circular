@@ -1,4 +1,4 @@
-import { ArrowRight, AtSign, Building, CircleAlert, CircleCheck, LoaderCircle, Lock, ShieldCheck, UserRound, X } from 'lucide-react';
+import { ArrowRight, AtSign, Building, CircleAlert, CircleCheck, KeyRound, LoaderCircle, Lock, ShieldCheck, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
@@ -38,7 +38,7 @@ const ROLES = {
 };
 
 export default function LoginPage({ role: routeRole = 'candidate' }) {
-  const { role, setRole, values, notices, errors, dismissNotices, submitting, signupRoute, handleChange, handleSubmit } =
+  const { role, setRole, values, notices, errors, dismissNotices, submitting, fromReset, signupRoute, handleChange, handleSubmit } =
     useLoginController(routeRole);
   const [showPassword, setShowPassword] = useState(false);
   const copy = ROLES[role];
@@ -59,6 +59,16 @@ export default function LoginPage({ role: routeRole = 'candidate' }) {
             <button type="button" className="login-notice-close" onClick={dismissNotices} aria-label="Dismiss message">
               <X aria-hidden="true" />
             </button>
+          </div>
+        )}
+
+        {fromReset && (
+          <div className="login-notice login-notice--reset" role="status">
+            <span className="login-notice-icon"><KeyRound aria-hidden="true" /></span>
+            <div className="login-notice-body">
+              <strong>Log in with your temporary password</strong>
+              <p>Paste the temporary password from the chat below. You'll set your new password right after.</p>
+            </div>
           </div>
         )}
 
@@ -100,7 +110,7 @@ export default function LoginPage({ role: routeRole = 'candidate' }) {
               autoComplete="username"
               placeholder="Your username"
               required
-              autoFocus
+              autoFocus={!fromReset}
             />
           </AuthField>
 
@@ -114,8 +124,9 @@ export default function LoginPage({ role: routeRole = 'candidate' }) {
               value={values.password}
               onChange={handleChange}
               autoComplete="current-password"
-              placeholder="Your password"
+              placeholder={fromReset ? 'Your temporary password' : 'Your password'}
               required
+              autoFocus={fromReset}
               visible={showPassword}
               onToggle={() => setShowPassword((visible) => !visible)}
             />

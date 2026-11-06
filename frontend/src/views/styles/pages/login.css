@@ -230,3 +230,8 @@
 :root[data-theme='dark'] .page-login .login-admin:hover .login-admin-arrow {
     color: #a78bfa;
 }
+
+/* Arrived from the forgot-password chat (no close button). */
+.page-login .login-notice--reset {
+    padding-right: 16px;
+}

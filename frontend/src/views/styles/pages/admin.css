@@ -1384,3 +1384,288 @@
     width: 22px;
     height: 22px;
 }
+
+/* ---------- password reset requests ---------- */
+.page-admin .admin-sections {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.page-admin .admin-sections button {
+    white-space: nowrap;
+}
+
+.page-admin .pill-issued { background: var(--primary-soft); color: var(--primary); }
+
+.page-admin .admin-employer.status-issued { border-left-color: var(--primary); }
+.page-admin .admin-employer.status-completed { border-left-color: var(--green); }
+.page-admin .admin-employer.status-rejected { border-left-color: var(--red); }
+
+.page-admin .admin-employer-info .admin-reset-state {
+    margin-top: 4px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.page-admin .admin-dialog-icon--key {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.page-admin .admin-dialog-icon--success {
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+.page-admin .admin-reset-rules {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    list-style: none;
+    text-align: left;
+}
+
+.page-admin .admin-reset-rules li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.page-admin .admin-reset-rules .lucide {
+    color: var(--primary);
+}
+
+.page-admin .admin-reset-avatar-unknown {
+    background: var(--line);
+    color: var(--muted);
+}
+
+.page-admin .admin-employer-info .admin-reset-preview {
+    align-self: flex-start;
+    max-width: 100%;
+    margin: 4px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.page-admin .admin-reset-preview > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-admin .admin-reset-chat-btn .admin-badge {
+    margin-left: 2px;
+}
+
+/* chat side panel */
+.page-admin .admin-chat-backdrop {
+    place-items: stretch end;
+    padding: 0;
+}
+
+.page-admin .admin-dialog-top {
+    z-index: 250;
+}
+
+.page-admin .admin-chat {
+    display: flex;
+    flex-direction: column;
+    width: min(460px, 100vw);
+    height: 100%;
+    background: var(--surface);
+    box-shadow: -20px 0 60px rgba(8, 18, 45, 0.25);
+    animation: admin-chat-in 0.25s ease-out;
+}
+
+@keyframes admin-chat-in {
+    from { transform: translateX(40px); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+
+.page-admin .admin-chat-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.page-admin .admin-chat-head .admin-employer-avatar {
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
+}
+
+.page-admin .admin-chat-title {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.35;
+}
+
+.page-admin .admin-chat-title strong {
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.page-admin .admin-chat-title small {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-admin .admin-chat-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.page-admin .admin-chat-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 18px;
+    overflow-y: auto;
+    background: var(--bg);
+    list-style: none;
+}
+
+.page-admin .admin-chat-empty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: auto;
+    max-width: 300px;
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+}
+
+.page-admin .admin-chat-msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 82%;
+}
+
+.page-admin .admin-chat-msg.from-admin {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.page-admin .admin-chat-msg.from-user {
+    align-self: flex-start;
+}
+
+.page-admin .admin-chat-msg.from-system {
+    align-self: center;
+    align-items: center;
+    max-width: 100%;
+}
+
+.page-admin .admin-chat-bubble {
+    padding: 9px 13px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.page-admin .from-admin .admin-chat-bubble {
+    border-bottom-right-radius: 4px;
+    background: var(--primary);
+    color: #fff;
+}
+
+.page-admin .from-user .admin-chat-bubble {
+    border: 1px solid var(--line);
+    border-bottom-left-radius: 4px;
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.page-admin .admin-chat-meta {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.page-admin .admin-chat-system,
+.page-admin .admin-chat-temp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.page-admin .admin-chat-temp {
+    border: 1px dashed var(--line);
+}
+
+.page-admin .admin-chat-temp.state-active {
+    border-color: var(--green);
+    background: var(--green-soft);
+    color: var(--green);
+    font-weight: 600;
+}
+
+.page-admin .admin-chat-composer {
+    display: flex;
+    gap: 8px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--line);
+}
+
+.page-admin .admin-chat-composer input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.page-admin .admin-chat-composer input:focus {
+    border-color: var(--primary);
+}
+
+.page-admin .admin-chat-composer .admin-btn {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+}
+
+.page-admin .admin-chat-closed {
+    padding: 14px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+}
+

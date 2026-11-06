@@ -237,6 +237,12 @@ class UserProfile(models.Model):
     website = models.URLField(max_length=200, blank=True)
     linkedin = models.URLField(max_length=200, blank=True)
     photo = models.ImageField(upload_to='profile_photos/', blank=True)
+    # One-time temporary password issued by an admin (see PasswordResetRequest). Only its hash
+    # is stored; it is cleared the moment it is used to log in, or ignored once it expires.
+    temp_password = models.CharField(max_length=128, blank=True)
+    temp_password_expires_at = models.DateTimeField(null=True, blank=True)
+    # Set after logging in with a temporary password: the user must choose a new password first.
+    must_change_password = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -345,3 +351,78 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.title}"
+
+
+class PasswordResetRequest(models.Model):
+    """
+    "Forgot password": a conversation between the user and the admins. The user (who is logged
+    out) opens it with a secret token kept in their browser. When an admin is satisfied it is
+    really them, they send a one-time temporary password into the chat; the admin never sees it.
+    The user logs in with it and must set a new password straight away.
+    """
+    STATUS_PENDING = 'pending'
+    STATUS_ISSUED = 'issued'
+    STATUS_COMPLETED = 'completed'
+    STATUS_REJECTED = 'rejected'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending review'),
+        (STATUS_ISSUED, 'Temporary password sent'),
+        (STATUS_COMPLETED, 'Password changed'),
+        (STATUS_REJECTED, 'Rejected'),
+    ]
+    OPEN_STATUSES = (STATUS_PENDING, STATUS_ISSUED)
+
+    # Empty when no account matched what was typed; the admin can still reply in the chat.
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='password_reset_requests')
+    identifier = models.CharField(max_length=150, blank=True, help_text='Username or email the user typed.')
+    # SHA-256 of the secret token the user's browser holds; the token itself is never stored.
+    access_token_hash = models.CharField(max_length=64, db_index=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    rejection_reason = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    completed_at = models.DateTimeField(null=True, blank=True)
+    # The temporary password, encrypted with a server key, so only the user's chat can show it.
+    # Wiped as soon as it is used, replaced, withdrawn or the request closes.
+    temp_cipher = models.CharField(max_length=128, blank=True)
+    temp_nonce = models.CharField(max_length=32, blank=True)
+    temp_expires_at = models.DateTimeField(null=True, blank=True)
+    temp_used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        who = self.user.username if self.user else f'"{self.identifier}" (no account)'
+        return f"{who}: {self.get_status_display()}"
+
+    @property
+    def is_open(self):
+        return self.status in self.OPEN_STATUSES
+
+
+class PasswordResetMessage(models.Model):
+    """One chat message in a PasswordResetRequest."""
+    SENDER_USER = 'user'
+    SENDER_ADMIN = 'admin'
+    SENDER_SYSTEM = 'system'
+    SENDER_CHOICES = [(SENDER_USER, 'User'), (SENDER_ADMIN, 'Admin'), (SENDER_SYSTEM, 'System')]
+    KIND_TEXT = 'text'
+    KIND_TEMP_PASSWORD = 'temp_password'
+    KIND_CHOICES = [(KIND_TEXT, 'Text'), (KIND_TEMP_PASSWORD, 'Temporary password')]
+
+    request = models.ForeignKey(PasswordResetRequest, on_delete=models.CASCADE, related_name='messages')
+    sender = models.CharField(max_length=10, choices=SENDER_CHOICES)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=KIND_TEXT)
+    body = models.TextField(max_length=1000, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    # When the other side (admins for user messages, the user for admin/system ones) saw it.
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.get_sender_display()}: {self.body[:40]}"

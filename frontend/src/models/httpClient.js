@@ -14,9 +14,9 @@ function readCookie(name) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-async function request(method, url, { json, formData, params } = {}) {
+async function request(method, url, { json, formData, params, headers: extraHeaders } = {}) {
   const query = params ? `?${new URLSearchParams(params)}` : '';
-  const headers = {};
+  const headers = { ...extraHeaders };
   let body;
   // This tab's login (see tabSession.js); the session cookie is shared by all tabs, so it is not used.
   const sessionKey = tabSession.get();
@@ -77,8 +77,8 @@ export async function openProtectedFile(url) {
 }
 
 export const httpClient = {
-  get: (url, params) => request('GET', url, { params }),
-  post: (url, json = {}) => request('POST', url, { json }),
+  get: (url, params, headers) => request('GET', url, { params, headers }),
+  post: (url, json = {}, headers) => request('POST', url, { json, headers }),
   postForm: (url, formData) => request('POST', url, { formData }),
   delete: (url) => request('DELETE', url),
 };

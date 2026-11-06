@@ -15,6 +15,9 @@ urlpatterns = [
     path('auth/logout/', api.logout),
     path('auth/signup/', api.signup),
     path('auth/password-reset/', api.password_reset),
+    path('auth/password-reset/thread/', api.password_reset_thread),
+    path('auth/password-reset/thread/status/', api.password_reset_thread_status),
+    path('auth/password-set/', api.password_set),
     path('auth/profile/', api.profile),
     path('auth/password-change/', api.password_change),
     path('notifications/', api.notifications),
@@ -35,4 +38,8 @@ urlpatterns = [
     path('admin/companies/', api.admin_companies),
     path('admin/companies/<oid:user_id>/verify/', api.admin_verify_company),
     path('admin/companies/<oid:user_id>/reject/', api.admin_reject_company),
+    path('admin/password-requests/', api.admin_password_requests),
+    path('admin/password-requests/<oid:request_id>/messages/', api.admin_password_request_messages),
+    path('admin/password-requests/<oid:request_id>/issue/', api.admin_issue_temp_password),
+    path('admin/password-requests/<oid:request_id>/reject/', api.admin_reject_password_request),
 ]

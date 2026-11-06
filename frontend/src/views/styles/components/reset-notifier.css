@@ -1,0 +1,177 @@
+/* Site-wide notice for forgot-password chat replies (ResetChatNotifier). */
+
+.reset-notice {
+    --rn-accent: #0b5ed7;
+    --rn-accent-soft: #e7f0ff;
+    --rn-ink: #0f1b3d;
+    --rn-muted: #6b7591;
+    --rn-line: #e4e9f2;
+    --rn-surface: #fff;
+
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 1100;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: min(380px, calc(100vw - 40px));
+    padding: 16px;
+    border: 1px solid var(--rn-line);
+    border-left: 4px solid var(--rn-accent);
+    border-radius: 16px;
+    background: var(--rn-surface);
+    box-shadow: 0 18px 48px rgba(15, 27, 61, 0.22);
+    color: var(--rn-ink);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: reset-notice-in 0.35s ease-out both;
+}
+
+.reset-notice *,
+.reset-notice *::before,
+.reset-notice *::after {
+    box-sizing: border-box;
+}
+
+.reset-notice.is-ready {
+    --rn-accent: #138a52;
+    --rn-accent-soft: #e3f6ec;
+}
+
+:root[data-theme='dark'] .reset-notice {
+    --rn-accent: #4c8dff;
+    --rn-accent-soft: rgba(76, 141, 255, 0.14);
+    --rn-ink: #eef2fa;
+    --rn-muted: #8b95ad;
+    --rn-line: #26324d;
+    --rn-surface: #131c2f;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme='dark'] .reset-notice.is-ready {
+    --rn-accent: #3ccf8a;
+    --rn-accent-soft: rgba(60, 207, 138, 0.14);
+}
+
+.reset-notice .lucide {
+    width: 1.15em;
+    height: 1.15em;
+    flex-shrink: 0;
+}
+
+.reset-notice-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--rn-accent-soft);
+    color: var(--rn-accent);
+    font-size: 19px;
+}
+
+.reset-notice-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    display: grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border: 2px solid var(--rn-surface);
+    border-radius: 999px;
+    background: #e5484d;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.reset-notice-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.reset-notice-body strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.reset-notice-body p {
+    margin: 2px 0 0;
+    overflow: hidden;
+    color: var(--rn-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.reset-notice-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--rn-accent);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.reset-notice-open:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+:root[data-theme='dark'] .reset-notice-open {
+    color: #0b1120;
+}
+
+.reset-notice-close {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--rn-muted);
+    cursor: pointer;
+}
+
+.reset-notice-close:hover {
+    background: var(--rn-accent-soft);
+    color: var(--rn-ink);
+}
+
+@keyframes reset-notice-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reset-notice {
+        animation: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .reset-notice {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: auto;
+    }
+}

@@ -1,11 +1,17 @@
 """JSON API consumed by the React frontend (frontend/)."""
+import hashlib
+import hmac
 import json
+import secrets
+from datetime import timedelta
 
 from bson import ObjectId
 from functools import wraps
 
+from django.conf import settings
 from django.contrib import auth
-from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
+from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
@@ -17,7 +23,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from .db_status import ping_mongodb
 from .forms import (AccountForm, ApplicantForm, CompanyVerificationForm, EducationalBackgroundForm, JobPostForm,
                     UserProfileForm, WorkExperienceForm)
-from .models import Applicant, CompanyVerification, JobPost, Notification, UserProfile
+from .models import Applicant, CompanyVerification, JobPost, Notification, PasswordResetMessage, PasswordResetRequest, UserProfile
 
 
 def _json_body(request):
@@ -40,8 +46,22 @@ def api_login_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'detail': 'Authentication required.'}, status=401)
+        if _must_change_password(request.user):
+            return _password_change_required()
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def _must_change_password(user):
+    """True right after a login with a temporary password, until a new password is set."""
+    return UserProfile.objects.filter(user=user, must_change_password=True).exists()
+
+
+def _password_change_required():
+    return JsonResponse(
+        {'detail': 'Please set a new password before continuing.', 'code': 'password_change_required'},
+        status=403,
+    )
 
 
 def api_admin_required(view_func):
@@ -94,6 +114,7 @@ def serialize_user(user):
         'last_name': user.last_name,
         'email': user.email,
         'is_staff': user.is_staff,
+        'must_change_password': profile.must_change_password,
         'unread_notifications': Notification.objects.filter(user=user, is_read=False).count(),
     }
 
@@ -286,6 +307,9 @@ def fork_session(request):
 def login(request):
     data = _json_body(request)
     user = auth.authenticate(request, username=data.get('username', ''), password=data.get('password', ''))
+    temp_hash = None
+    if user is None:
+        user, temp_hash = _temp_password_user(data.get('username', ''), data.get('password', ''))
     if user is None:
         return JsonResponse({'detail': 'Invalid credentials'}, status=400)
     # The account may only log in from the tab matching the role it signed up with.
@@ -301,8 +325,16 @@ def login(request):
                            f'Please log in from the {roles[actual]} tab.'},
                 status=403,
             )
+    if temp_hash:
+        # One-time: the temporary password stops working now, and the user must set a new one.
+        # Claimed atomically, so two logins at the same moment cannot both use it.
+        if not _claim_temp_password(user, temp_hash):
+            return JsonResponse({'detail': 'Invalid credentials'}, status=400)
+    else:
+        # Logged in with their real password after all: no need to force a new one any more.
+        UserProfile.objects.filter(user=user, must_change_password=True).update(must_change_password=False)
     _new_tab_session(request)
-    auth.login(request, user)
+    auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     # The frontend keeps this key in the tab's sessionStorage and sends it back as X-Session-Key.
     return JsonResponse({
         'detail': 'Logged in successfully',
@@ -366,13 +398,388 @@ def signup(request):
     return JsonResponse({'detail': detail}, status=201)
 
 
+# ---------- forgot password: chat with the admins + one-time temporary password ----------
+
+TEMP_PASSWORD_LIFETIME = timedelta(hours=24)
+# No look-alike characters (0/O, 1/l/I), so it is easy to type.
+TEMP_PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+RESET_TOKEN_HEADER = 'X-Reset-Token'
+MAX_MESSAGE_LENGTH = 1000
+MAX_USER_MESSAGES = 50  # per request, so the public chat cannot be used to flood the admins
+
+
+def _generate_temp_password():
+    groups = [''.join(secrets.choice(TEMP_PASSWORD_ALPHABET) for _ in range(4)) for _ in range(3)]
+    return '-'.join(groups)
+
+
+def _hash_token(token):
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _keystream(nonce, length):
+    # Key derived from the server secret and a fresh nonce per password (the value is at most 32 bytes).
+    return hmac.new(settings.SECRET_KEY.encode(), b'temp-password:' + bytes.fromhex(nonce), hashlib.sha256).digest()[:length]
+
+
+def _encrypt_temp(plain):
+    nonce = secrets.token_hex(16)
+    data = plain.encode()
+    return bytes(a ^ b for a, b in zip(data, _keystream(nonce, len(data)))).hex(), nonce
+
+
+def _decrypt_temp(cipher, nonce):
+    data = bytes.fromhex(cipher)
+    return bytes(a ^ b for a, b in zip(data, _keystream(nonce, len(data)))).decode()
+
+
+def _wipe_temp(reset):
+    reset.temp_cipher = ''
+    reset.temp_nonce = ''
+
+
+def _clear_profile_temp(user):
+    UserProfile.objects.filter(user=user).update(temp_password='', temp_password_expires_at=None)
+
+
+def _temp_password_user(username, password):
+    """(user, stored hash) when an unexpired temporary password matches, else (None, None)."""
+    if not username or not password:
+        return None, None
+    profile = (UserProfile.objects.select_related('user')
+               .filter(user__username=username, user__is_active=True).exclude(temp_password='').first())
+    if not profile or not profile.temp_password_expires_at or profile.temp_password_expires_at < timezone.now():
+        return None, None
+    if not check_password(password, profile.temp_password):
+        return None, None
+    return profile.user, profile.temp_password
+
+
+def _claim_temp_password(user, temp_hash):
+    """
+    Uses up the temporary password: it is wiped from the account (only if it is still the one
+    that was checked, so it can be used exactly once) and from the chat. False if already used.
+    """
+    claimed = UserProfile.objects.filter(user=user, temp_password=temp_hash).update(
+        temp_password='', temp_password_expires_at=None, must_change_password=True,
+    )
+    if not claimed:
+        return False
+    PasswordResetRequest.objects.filter(user=user, status=PasswordResetRequest.STATUS_ISSUED).exclude(
+        temp_cipher='').update(temp_cipher='', temp_nonce='', temp_used_at=timezone.now())
+    return True
+
+
+def _system_message(reset, body, kind=PasswordResetMessage.KIND_TEXT, author=None):
+    return PasswordResetMessage.objects.create(
+        request=reset, sender=PasswordResetMessage.SENDER_SYSTEM, kind=kind, body=body, author=author,
+    )
+
+
+def _temp_state(reset, message, latest_temp_id):
+    """'active' | 'used' | 'expired' | 'replaced' | 'withdrawn' for a temporary-password message."""
+    if message.id != latest_temp_id:
+        return 'replaced'
+    if reset.temp_used_at:
+        return 'used'
+    if reset.temp_cipher and reset.temp_expires_at and reset.temp_expires_at > timezone.now():
+        return 'active'
+    if reset.temp_expires_at and reset.temp_expires_at <= timezone.now():
+        return 'expired'
+    return 'withdrawn'
+
+
+def serialize_reset_messages(reset, for_user):
+    messages = list(reset.messages.select_related('author'))
+    temp_ids = [m.id for m in messages if m.kind == PasswordResetMessage.KIND_TEMP_PASSWORD]
+    latest_temp_id = temp_ids[-1] if temp_ids else None
+    result = []
+    for message in messages:
+        item = {
+            'id': str(message.id),
+            'sender': message.sender,
+            'kind': message.kind,
+            'body': message.body,
+            'author': (message.author.get_full_name() or message.author.username) if message.author else None,
+            'created_at': message.created_at.isoformat(),
+            'is_read': message.read_at is not None,
+        }
+        if message.kind == PasswordResetMessage.KIND_TEMP_PASSWORD:
+            item['state'] = _temp_state(reset, message, latest_temp_id)
+            item['expires_at'] = reset.temp_expires_at.isoformat() if reset.temp_expires_at else None
+            # Only the user's own chat ever shows the password; the admin view never includes it.
+            if for_user and item['state'] == 'active':
+                item['temp_password'] = _decrypt_temp(reset.temp_cipher, reset.temp_nonce)
+                item['username'] = reset.user.username
+                item['role'] = get_profile(reset.user).role  # so "Log in now" opens the right tab
+        result.append(item)
+    return result
+
+
+def _mark_read(reset, senders):
+    reset.messages.filter(sender__in=senders, read_at__isnull=True).update(read_at=timezone.now())
+
+
+def _thread_for_token(request):
+    token = request.headers.get(RESET_TOKEN_HEADER, '')
+    if len(token) < 32:
+        return None
+    return PasswordResetRequest.objects.select_related('user').filter(access_token_hash=_hash_token(token)).first()
+
+
 @require_POST
 def password_reset(request):
-    form = PasswordResetForm(_json_body(request))
+    """
+    "Forgot password": opens a chat with the admins and returns its secret token. The reply is
+    the same whether or not an account matched, so the form cannot reveal who has an account.
+    """
+    data = _json_body(request)
+    identifier = str(data.get('identifier', '')).strip()[:150]
+    message = str(data.get('message', '')).strip()[:MAX_MESSAGE_LENGTH]
+    if not identifier:
+        return JsonResponse({'detail': 'Enter your username or email address.'}, status=400)
+
+    lookup = Q(email__iexact=identifier) if '@' in identifier else Q(username=identifier)
+    user = User.objects.filter(lookup, is_active=True, is_staff=False).first()
+    token = secrets.token_urlsafe(32)
+    reset = PasswordResetRequest.objects.create(user=user, identifier=identifier, access_token_hash=_hash_token(token))
+    if message:
+        PasswordResetMessage.objects.create(request=reset, sender=PasswordResetMessage.SENDER_USER, body=message)
+    return JsonResponse({'detail': 'Your request has been sent to the admin.', 'token': token}, status=201)
+
+
+@require_http_methods(['GET', 'POST'])
+def password_reset_thread(request):
+    """The user's side of the chat, opened with the X-Reset-Token header. POST {body} sends a message."""
+    reset = _thread_for_token(request)
+    if reset is None:
+        return JsonResponse({'detail': 'This request could not be found.'}, status=404)
+    if request.method == 'POST':
+        if not reset.is_open:
+            return JsonResponse({'detail': 'This request is closed. Send a new request if you still need help.'}, status=400)
+        body = str(_json_body(request).get('body', '')).strip()
+        if not body:
+            return JsonResponse({'detail': 'Write a message first.'}, status=400)
+        if reset.messages.filter(sender=PasswordResetMessage.SENDER_USER).count() >= MAX_USER_MESSAGES:
+            return JsonResponse({'detail': 'Message limit reached for this request.'}, status=429)
+        PasswordResetMessage.objects.create(
+            request=reset, sender=PasswordResetMessage.SENDER_USER, body=body[:MAX_MESSAGE_LENGTH],
+        )
+    _mark_read(reset, [PasswordResetMessage.SENDER_ADMIN, PasswordResetMessage.SENDER_SYSTEM])
+    return JsonResponse({
+        'status': reset.status,
+        'identifier': reset.identifier,
+        'created_at': reset.created_at.isoformat(),
+        'can_reply': reset.is_open,
+        # The one temporary password of this request was used up or expired: another needs a new request.
+        'needs_new_request': reset.status == PasswordResetRequest.STATUS_ISSUED and not (
+            reset.temp_cipher and reset.temp_expires_at and reset.temp_expires_at > timezone.now()
+        ),
+        'messages': serialize_reset_messages(reset, for_user=True),
+    })
+
+
+@require_GET
+def password_reset_thread_status(request):
+    """
+    Light check the site runs on every page while the user has a request open, to tell them
+    the admin replied. Unlike the chat itself it does not mark anything as read.
+    """
+    reset = _thread_for_token(request)
+    if reset is None:
+        return JsonResponse({'detail': 'This request could not be found.'}, status=404)
+    unread = list(reset.messages.filter(
+        sender__in=[PasswordResetMessage.SENDER_ADMIN, PasswordResetMessage.SENDER_SYSTEM], read_at__isnull=True,
+    ).order_by('created_at'))
+    latest = unread[-1] if unread else None
+    temp_ready = bool(reset.temp_cipher and reset.temp_expires_at and reset.temp_expires_at > timezone.now())
+    return JsonResponse({
+        'status': reset.status,
+        'unread': len(unread),
+        'temp_password_ready': temp_ready,
+        'latest': {
+            'id': str(latest.id),
+            'sender': latest.sender,
+            'kind': latest.kind,
+            # The password itself is never in here, only in the chat.
+            'body': '' if latest.kind == PasswordResetMessage.KIND_TEMP_PASSWORD else latest.body[:140],
+            'created_at': latest.created_at.isoformat(),
+        } if latest else None,
+    })
+
+
+@require_POST
+def password_set(request):
+    """After logging in with a temporary password: choose the new password (no old one needed)."""
+    if not request.user.is_authenticated:
+        return JsonResponse({'detail': 'Authentication required.'}, status=401)
+    profile = get_profile(request.user)
+    if not profile.must_change_password:
+        return JsonResponse({'detail': 'Use "Change password" on your profile instead.'}, status=400)
+    form = SetPasswordForm(request.user, _json_body(request))
     if not form.is_valid():
-        return JsonResponse({'detail': 'Enter a valid email address.'}, status=400)
-    form.save(request=request)
-    return JsonResponse({'detail': 'Password reset email sent.'})
+        return JsonResponse({'detail': 'Please correct the errors below.', 'errors': _form_errors(form)}, status=400)
+    user = form.save()
+    profile.must_change_password = False
+    profile.save(update_fields=['must_change_password'])
+    for reset in PasswordResetRequest.objects.filter(user=user, status=PasswordResetRequest.STATUS_ISSUED):
+        reset.status = PasswordResetRequest.STATUS_COMPLETED
+        reset.completed_at = timezone.now()
+        _wipe_temp(reset)
+        reset.save(update_fields=['status', 'completed_at', 'temp_cipher', 'temp_nonce'])
+        _system_message(reset, 'Your new password is saved. This request is now closed.')
+    auth.update_session_auth_hash(request, user)  # keep the user logged in
+    # update_session_auth_hash gave the session a new key; the tab must send the new one from now on.
+    return JsonResponse({
+        'detail': 'Your new password is saved.',
+        'user': serialize_user(user),
+        'session_key': request.session.session_key,
+    })
+
+
+def serialize_password_request(reset, with_messages=False):
+    user = reset.user
+    profile = get_profile(user) if user else None
+    messages = list(reset.messages.all())
+    last = messages[-1] if messages else None
+    data = {
+        'id': str(reset.id),
+        'identifier': reset.identifier,
+        'user': {
+            'id': str(user.id),
+            'username': user.username,
+            'name': user.get_full_name(),
+            'email': user.email,
+            'role': profile.role,
+        } if user else None,
+        'status': reset.status,
+        'rejection_reason': reset.rejection_reason,
+        'created_at': reset.created_at.isoformat(),
+        'reviewed_at': reset.reviewed_at.isoformat() if reset.reviewed_at else None,
+        'reviewed_by': reset.reviewed_by.username if reset.reviewed_by else None,
+        'completed_at': reset.completed_at.isoformat() if reset.completed_at else None,
+        'temp_password_active': bool(
+            reset.temp_cipher and reset.temp_expires_at and reset.temp_expires_at > timezone.now()
+        ),
+        'temp_password_used': reset.temp_used_at is not None,
+        'temp_password_expires_at': reset.temp_expires_at.isoformat() if reset.temp_expires_at else None,
+        'unread': sum(1 for m in messages if m.sender == PasswordResetMessage.SENDER_USER and m.read_at is None),
+        'message_count': len(messages),
+        'last_message': {
+            'sender': last.sender,
+            'body': 'Temporary password sent' if last.kind == PasswordResetMessage.KIND_TEMP_PASSWORD else last.body,
+            'created_at': last.created_at.isoformat(),
+        } if last else None,
+        # Several open requests for one account can mean someone else is asking in their name.
+        'other_open_requests': PasswordResetRequest.objects.filter(
+            user=user, status__in=PasswordResetRequest.OPEN_STATUSES,
+        ).exclude(id=reset.id).count() if user else 0,
+    }
+    if with_messages:
+        data['messages'] = serialize_reset_messages(reset, for_user=False)
+    return data
+
+
+@require_GET
+@api_admin_required
+def admin_password_requests(request):
+    """Forgot-password chats, newest first; ?status=pending|issued|completed|rejected narrows the list."""
+    items = PasswordResetRequest.objects.select_related('user', 'reviewed_by')
+    counts = {value: items.filter(status=value).count() for value, _ in PasswordResetRequest.STATUS_CHOICES}
+    counts['all'] = sum(counts.values())
+    counts['unread'] = PasswordResetMessage.objects.filter(
+        sender=PasswordResetMessage.SENDER_USER, read_at__isnull=True,
+        request__status__in=PasswordResetRequest.OPEN_STATUSES,
+    ).count()
+    status = request.GET.get('status', '')
+    if status in dict(PasswordResetRequest.STATUS_CHOICES):
+        items = items.filter(status=status)
+    return JsonResponse({'results': [serialize_password_request(r) for r in items], 'counts': counts})
+
+
+@require_http_methods(['GET', 'POST'])
+@api_admin_required
+def admin_password_request_messages(request, request_id):
+    """GET: the chat (marks the user's messages read). POST {body}: reply to the user."""
+    reset = get_object_or_404(PasswordResetRequest.objects.select_related('user', 'reviewed_by'), id=request_id)
+    if request.method == 'POST':
+        if not reset.is_open:
+            return JsonResponse({'detail': 'This request is closed.'}, status=400)
+        body = str(_json_body(request).get('body', '')).strip()
+        if not body:
+            return JsonResponse({'detail': 'Write a message first.'}, status=400)
+        PasswordResetMessage.objects.create(
+            request=reset, sender=PasswordResetMessage.SENDER_ADMIN, author=request.user,
+            body=body[:MAX_MESSAGE_LENGTH],
+        )
+    _mark_read(reset, [PasswordResetMessage.SENDER_USER])
+    return JsonResponse(serialize_password_request(reset, with_messages=True))
+
+
+@require_POST
+@api_admin_required
+def admin_issue_temp_password(request, request_id):
+    """
+    Creates a one-time temporary password and posts it into the user's chat. It is never
+    returned to the admin: the account keeps its hash, the chat an encrypted copy.
+    """
+    reset = get_object_or_404(PasswordResetRequest.objects.select_related('user'), id=request_id)
+    if not reset.is_open:
+        return JsonResponse({'detail': 'This request is already closed.'}, status=400)
+    if reset.user is None:
+        return JsonResponse({'detail': 'No account matches this request.'}, status=400)
+    # One temporary password per request: for another one the user sends a new request.
+    if reset.status != PasswordResetRequest.STATUS_PENDING:
+        return JsonResponse(
+            {'detail': 'A temporary password was already sent for this request. '
+                       'The user must send a new request to get another one.'},
+            status=400,
+        )
+
+    temp_password = _generate_temp_password()
+    expires = timezone.now() + TEMP_PASSWORD_LIFETIME
+    profile = get_profile(reset.user)
+    profile.temp_password = make_password(temp_password)
+    profile.temp_password_expires_at = expires
+    profile.save(update_fields=['temp_password', 'temp_password_expires_at'])
+    # Only one temporary password per account: any copy in another chat no longer works.
+    PasswordResetRequest.objects.filter(user=reset.user).exclude(id=reset.id).exclude(temp_cipher='').update(
+        temp_cipher='', temp_nonce='',
+    )
+    reset.temp_cipher, reset.temp_nonce = _encrypt_temp(temp_password)
+    reset.temp_expires_at = expires
+    reset.status = PasswordResetRequest.STATUS_ISSUED
+    reset.reviewed_at = timezone.now()
+    reset.reviewed_by = request.user
+    reset.save(update_fields=['temp_cipher', 'temp_nonce', 'temp_expires_at', 'status', 'reviewed_at', 'reviewed_by'])
+    _system_message(
+        reset,
+        'Here is your one-time temporary password. Log in with it, then choose a new password.',
+        kind=PasswordResetMessage.KIND_TEMP_PASSWORD,
+        author=request.user,
+    )
+    return JsonResponse(serialize_password_request(reset, with_messages=True))
+
+
+@require_POST
+@api_admin_required
+def admin_reject_password_request(request, request_id):
+    reset = get_object_or_404(PasswordResetRequest.objects.select_related('user'), id=request_id)
+    if not reset.is_open:
+        return JsonResponse({'detail': 'This request is already closed.'}, status=400)
+    if reset.temp_cipher and reset.user:
+        _clear_profile_temp(reset.user)  # withdraw a temporary password that has not been used yet
+    _wipe_temp(reset)
+    reset.status = PasswordResetRequest.STATUS_REJECTED
+    reset.rejection_reason = str(_json_body(request).get('reason', '')).strip()
+    reset.reviewed_at = timezone.now()
+    reset.reviewed_by = request.user
+    reset.save(update_fields=['temp_cipher', 'temp_nonce', 'status', 'rejection_reason', 'reviewed_at', 'reviewed_by'])
+    text = 'An admin closed this request.'
+    if reset.rejection_reason:
+        text += f' Reason: {reset.rejection_reason}'
+    _system_message(reset, text, author=request.user)
+    return JsonResponse(serialize_password_request(reset, with_messages=True))
 
 
 # ---------- jobs ----------
@@ -587,7 +994,8 @@ def password_change(request):
         return JsonResponse({'detail': 'Please correct the errors below.', 'errors': _form_errors(form)}, status=400)
     user = form.save()
     auth.update_session_auth_hash(request, user)  # keep the user logged in
-    return JsonResponse({'detail': 'Password changed successfully'})
+    # That gives the session a new key; the tab must send the new one from now on.
+    return JsonResponse({'detail': 'Password changed successfully', 'session_key': request.session.session_key})
 
 
 # ---------- admin panel: employer accounts ----------

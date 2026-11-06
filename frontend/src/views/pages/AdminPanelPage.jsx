@@ -10,6 +10,7 @@ import {
   GraduationCap,
   Hourglass,
   Inbox,
+  KeyRound,
   LoaderCircle,
   LogOut,
   MapPin,
@@ -26,11 +27,16 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../config/routes.js';
 import { useAdminPanelController } from '../../controllers/AdminController.js';
 import { useAdminCompaniesController } from '../../controllers/CompanyController.js';
+import { usePasswordRequestsController } from '../../controllers/PasswordRequestsController.js';
 import { APPROVAL_TABS } from '../../models/AdminModel.js';
 import { EDUCATION_CHOICES, EXPERIENCE_CHOICES, SALARY_CHOICES, STATUS_CHOICES } from '../../models/choices.js';
 import { formatDate } from '../../models/formatters.js';
 import { PLUS_JAKARTA } from '../assets.js';
 import AdminCompaniesSection from '../components/admin/AdminCompaniesSection.jsx';
+import AdminPasswordRequestsSection, {
+  AdminResetChat,
+  IssueConfirmDialog,
+} from '../components/admin/AdminPasswordRequestsSection.jsx';
 import Page from '../components/Page.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import '../styles/pages/admin.css';
@@ -60,6 +66,7 @@ const EMPTY_TEXT = {
 export default function AdminPanelPage() {
   const panel = useAdminPanelController();
   const companies = useAdminCompaniesController();
+  const resets = usePasswordRequestsController();
   const [section, setSection] = useState('jobs');
   const [emptyTitle, emptyText] = EMPTY_TEXT[panel.tab];
 
@@ -101,9 +108,17 @@ export default function AdminPanelPage() {
             <BadgeCheck aria-hidden="true" /> Companies
             {companies.counts.pending > 0 && <span className="admin-badge">{companies.counts.pending}</span>}
           </button>
+          <button type="button" className={section === 'passwords' ? 'is-active' : ''} onClick={() => setSection('passwords')}>
+            <KeyRound aria-hidden="true" /> Password requests
+            {resets.counts.pending + resets.counts.unread > 0 && (
+              <span className="admin-badge">{resets.counts.pending + resets.counts.unread}</span>
+            )}
+          </button>
         </nav>
 
-        {section === 'companies' ? (
+        {section === 'passwords' ? (
+          <AdminPasswordRequestsSection resets={resets} />
+        ) : section === 'companies' ? (
           <AdminCompaniesSection companies={companies} />
         ) : (
         <>
@@ -207,6 +222,33 @@ export default function AdminPanelPage() {
           onCancel={companies.cancelReject}
           onConfirm={companies.confirmReject}
         />
+      )}
+
+      {resets.chatId && <AdminResetChat resets={resets} />}
+
+      {resets.confirming && (
+        <IssueConfirmDialog request={resets.confirming} onCancel={resets.cancelIssue} onConfirm={resets.confirmIssue} />
+      )}
+
+      {resets.rejecting && (
+        <RejectDialog
+          title="Close this request?"
+          subject={<><strong>{resets.rejecting.user?.name || resets.rejecting.user?.username || resets.rejecting.identifier}</strong> will not get a temporary password{resets.rejecting.status === 'issued' ? ', and the one already sent stops working' : ''}. The reason is shown in their chat.</>}
+          placeholder="e.g. Could not confirm it was the account owner..."
+          confirmLabel="Close request"
+          onCancel={resets.cancelReject}
+          onConfirm={resets.confirmReject}
+        />
+      )}
+
+      {resets.toast && (
+        <div className={`admin-toast tone-${resets.toast.tone}`} role="status">
+          {resets.toast.tone === 'success' ? <CircleCheck aria-hidden="true" /> : <CircleX aria-hidden="true" />}
+          <span>{resets.toast.message}</span>
+          <button type="button" onClick={resets.dismissToast} aria-label="Dismiss">
+            <X aria-hidden="true" />
+          </button>
+        </div>
       )}
 
       {companies.toast && (

@@ -1,6 +1,6 @@
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ROUTES } from './config/routes.js';
-import { AuthProvider } from './controllers/AuthController.jsx';
+import { AuthProvider, useAuth } from './controllers/AuthController.jsx';
 import { FlashProvider } from './controllers/FlashController.jsx';
 import { RequireAdmin, RequireAuth, RequireRole } from './controllers/RequireAuth.jsx';
 import { ThemeProvider } from './controllers/ThemeController.jsx';
@@ -25,6 +25,8 @@ import ProfileEditPage from './views/pages/ProfileEditPage.jsx';
 import ProfilePage from './views/pages/ProfilePage.jsx';
 import PostJobPage from './views/pages/PostJobPage.jsx';
 import RegistrationChoosePage from './views/pages/RegistrationChoosePage.jsx';
+import SetPasswordPage from './views/pages/SetPasswordPage.jsx';
+import ResetChatNotifier from './views/components/ResetChatNotifier.jsx';
 import ThemeToggle from './views/components/ThemeToggle.jsx';
 import TotalJobsPage from './views/pages/TotalJobsPage.jsx';
 
@@ -37,6 +39,9 @@ const PAGES_WITH_OWN_TOGGLE = new Set([
   ROUTES.login,
   ROUTES.employerLogin,
   ROUTES.candidateLogin,
+  ROUTES.passwordReset,
+  ROUTES.passwordResetDone,
+  ROUTES.setPassword,
   ROUTES.adminLogin,
   ROUTES.adminPanel,
   ROUTES.profile,
@@ -58,6 +63,14 @@ function FloatingThemeToggle() {
   return <ThemeToggle className="theme-toggle-floating" />;
 }
 
+/** Logged in with a temporary password: keep the user on "Set new password" until they choose one. */
+function ForcePasswordChange() {
+  const { user } = useAuth();
+  const { pathname } = useLocation();
+  if (!user.must_change_password || pathname.replace(/\/+$/, '') === ROUTES.setPassword) return null;
+  return <Navigate to={ROUTES.setPassword} replace />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -65,6 +78,8 @@ export default function App() {
         <AuthProvider>
           <FlashProvider>
             <FloatingThemeToggle />
+            <ForcePasswordChange />
+            <ResetChatNotifier />
             <Routes>
               <Route path={ROUTES.home} element={<HomePage />} />
               <Route path={ROUTES.signup} element={<RegistrationChoosePage />} />
@@ -76,6 +91,7 @@ export default function App() {
               <Route path={ROUTES.candidateLogin} element={<LoginPage key="login" role="candidate" />} />
               <Route path={ROUTES.passwordReset} element={<PasswordResetPage />} />
               <Route path={ROUTES.passwordResetDone} element={<PasswordResetDonePage />} />
+              <Route path={ROUTES.setPassword} element={<SetPasswordPage />} />
               <Route path={ROUTES.jobList} element={<JobListPage />} />
               <Route path={ROUTES.jobCategory} element={<JobListPage />} />
               <Route path={ROUTES.totalJobs} element={<TotalJobsPage />} />

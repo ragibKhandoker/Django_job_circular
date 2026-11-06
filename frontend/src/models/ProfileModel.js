@@ -1,5 +1,6 @@
 import { httpClient } from './httpClient.js';
 import { Job } from './JobModel.js';
+import { tabSession } from './tabSession.js';
 
 /** Fields of /profile/edit; `photo` is handled separately as a File. */
 export const PROFILE_FIELDS = [
@@ -63,7 +64,10 @@ export const ProfileModel = {
     return { ...result, profile: new Profile(result.profile) };
   },
 
-  changePassword(values) {
-    return httpClient.post('/auth/password-change/', values);
+  /** Changing the password gives the session a new key, so this tab switches to it. */
+  async changePassword(values) {
+    const result = await httpClient.post('/auth/password-change/', values);
+    if (result.session_key) tabSession.set(result.session_key);
+    return result;
   },
 };

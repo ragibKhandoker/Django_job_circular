@@ -16,12 +16,23 @@ A job portal for Bangladesh where job seekers find and apply for jobs, and emplo
 </div>
 
 ## 🌐 Live Links
-| | Link |
-|---|---|
-| 🖥️ Frontend (Vercel) | [job-circular.vercel.app](https://job-circular.vercel.app) |
-| ⚙️ Backend (Render) | [job-circular-api.onrender.com](https://job-circular-api.onrender.com/api/health/) |
-
-> ⏳ First load can take 30–50 seconds (Render free plan wakes up from sleep).
+<div align="center">
+<table>
+  <tr>
+    <td align="center" width="300">
+      <img src="https://img.shields.io/badge/Frontend-Vercel-2563eb?style=flat-square&logo=vercel&logoColor=white" alt="Vercel"><br>
+      <sub>🖥️ <b>Website</b></sub><br>
+      <a href="https://job-circular.vercel.app"><b>job-circular.vercel.app</b></a>
+    </td>
+    <td align="center" width="300">
+      <img src="https://img.shields.io/badge/Backend-Render-46E3B7?style=flat-square&logo=render&logoColor=black" alt="Render"><br>
+      <sub>⚙️ <b>REST API</b></sub><br>
+      <a href="https://job-circular-api.onrender.com/api/health/"><b>job-circular-api.onrender.com</b></a>
+    </td>
+  </tr>
+</table>
+<sub>⏳ First load can take 30–50 seconds while the free Render server wakes up.</sub>
+</div>
 
 ![Home](docs/screenshots/home.png)
 

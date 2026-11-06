@@ -198,6 +198,23 @@ def notify(user, kind, title, message='', link=''):
     return Notification.objects.create(user=user, kind=kind, title=title, message=message, link=link)
 
 
+def notify_welcome(user, role):
+    name = user.first_name or user.username
+    if role == UserProfile.ROLE_EMPLOYER:
+        notify(user, Notification.KIND_WELCOME, f'Welcome to JobFinder, {name}!',
+               'Your employer account is ready. Verify your company so you can start posting jobs.',
+               '/company-verification')
+    else:
+        notify(user, Notification.KIND_WELCOME, f'Welcome to JobFinder, {name}!',
+               'Your account is ready. Complete your profile so employers can get to know you.', '/profile')
+
+
+def notify_password_changed(user):
+    notify(user, Notification.KIND_PASSWORD_CHANGED, 'Your password was changed',
+           f'Changed on {timezone.localtime().strftime("%b %d, %Y at %I:%M %p")}. '
+           'If this was not you, contact the admin right away.', '/profile')
+
+
 def notify_job_reviewed(job):
     if job.approval_status == JobPost.APPROVAL_APPROVED:
         notify(job.employer, Notification.KIND_JOB_APPROVED, 'Your job post is live',
@@ -391,6 +408,7 @@ def signup(request):
         last_name=data.get('last_name', ''),
     )
     UserProfile.objects.create(user=user, role=role)
+    notify_welcome(user, role)
     if role == UserProfile.ROLE_EMPLOYER:
         detail = 'Employer account created. An admin will verify it before you can post jobs.'
     else:
@@ -628,6 +646,7 @@ def password_set(request):
         _wipe_temp(reset)
         reset.save(update_fields=['status', 'completed_at', 'temp_cipher', 'temp_nonce'])
         _system_message(reset, 'Your new password is saved. This request is now closed.')
+    notify_password_changed(user)
     auth.update_session_auth_hash(request, user)  # keep the user logged in
     # update_session_auth_hash gave the session a new key; the tab must send the new one from now on.
     return JsonResponse({
@@ -826,6 +845,9 @@ def _create_job(request):
     # Admins' own posts need no review.
     job.approval_status = JobPost.APPROVAL_APPROVED if request.user.is_staff else JobPost.APPROVAL_PENDING
     job.save()
+    if not request.user.is_staff:
+        notify(request.user, Notification.KIND_JOB_SUBMITTED, f'"{job.title}" was submitted for review',
+               'An admin will check it soon. We will let you know as soon as it is live.', '/profile')
     return JsonResponse(serialize_job(job, request.user), status=201)
 
 
@@ -880,6 +902,12 @@ def apply(request, job_id):
         item = form.save(commit=False)
         item.applicant = applicant
         item.save()
+    notify(request.user, Notification.KIND_APPLICATION_SENT, f'Application sent: {job.title}',
+           f'Your application to {job.company_name} was delivered. Good luck!', '/job-list')
+    if job.employer_id and job.employer_id != request.user.id:
+        notify(job.employer, Notification.KIND_NEW_APPLICANT, f'New applicant for {job.title}',
+               f'{applicant.full_name} just applied. Open their profile to review the CV.',
+               f'/candidate/{applicant.id}')
     return JsonResponse(serialize_applicant(applicant, detailed=True), status=201)
 
 
@@ -983,6 +1011,8 @@ def profile(request):
     new_photo = profile_obj.photo.name if profile_obj.photo else ''
     if old_photo and old_photo != new_photo:
         profile_obj.photo.storage.delete(old_photo)
+    notify(user, Notification.KIND_PROFILE_UPDATED, 'Your profile was updated',
+           'Your latest details are now visible on your profile.', '/profile')
     return JsonResponse({'detail': 'Profile updated successfully', 'profile': serialize_profile(request, user)})
 
 
@@ -993,6 +1023,7 @@ def password_change(request):
     if not form.is_valid():
         return JsonResponse({'detail': 'Please correct the errors below.', 'errors': _form_errors(form)}, status=400)
     user = form.save()
+    notify_password_changed(user)
     auth.update_session_auth_hash(request, user)  # keep the user logged in
     # That gives the session a new key; the tab must send the new one from now on.
     return JsonResponse({'detail': 'Password changed successfully', 'session_key': request.session.session_key})
@@ -1133,6 +1164,9 @@ def company_verification(request):
         new_name = getattr(verification, field).name or ''
         if old_name and old_name != new_name:
             CompanyVerification._meta.get_field(field).storage.delete(old_name)
+    notify(request.user, Notification.KIND_COMPANY_SUBMITTED, 'Company details received',
+           f'{verification.company_name} is now waiting for admin review. You will hear from us here.',
+           '/company-verification')
     return JsonResponse({
         'detail': 'Company details submitted. An admin will review your documents soon.',
         'verification': serialize_company_verification(verification),

@@ -331,11 +331,25 @@ class Notification(models.Model):
     KIND_JOB_REJECTED = 'job_rejected'
     KIND_COMPANY_VERIFIED = 'company_verified'
     KIND_COMPANY_REJECTED = 'company_rejected'
+    KIND_WELCOME = 'welcome'
+    KIND_PROFILE_UPDATED = 'profile_updated'
+    KIND_PASSWORD_CHANGED = 'password_changed'
+    KIND_JOB_SUBMITTED = 'job_submitted'
+    KIND_APPLICATION_SENT = 'application_sent'
+    KIND_NEW_APPLICANT = 'new_applicant'
+    KIND_COMPANY_SUBMITTED = 'company_submitted'
     KIND_CHOICES = [
         (KIND_JOB_APPROVED, 'Job post approved'),
         (KIND_JOB_REJECTED, 'Job post rejected'),
         (KIND_COMPANY_VERIFIED, 'Company verified'),
         (KIND_COMPANY_REJECTED, 'Company not verified'),
+        (KIND_WELCOME, 'Welcome'),
+        (KIND_PROFILE_UPDATED, 'Profile updated'),
+        (KIND_PASSWORD_CHANGED, 'Password changed'),
+        (KIND_JOB_SUBMITTED, 'Job post submitted'),
+        (KIND_APPLICATION_SENT, 'Application sent'),
+        (KIND_NEW_APPLICANT, 'New applicant'),
+        (KIND_COMPANY_SUBMITTED, 'Company details submitted'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')

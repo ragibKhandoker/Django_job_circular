@@ -384,3 +384,19 @@
         animation: none;
     }
 }
+
+/* Tones for account updates (welcome, profile, password, applications...). */
+.notif-icon.tone-blue {
+    background: var(--primary-soft, #e7f0ff);
+    color: var(--primary, #0b5ed7);
+}
+
+.notif-icon.tone-amber {
+    background: var(--amber-soft, #fff4e0);
+    color: var(--amber, #b45309);
+}
+
+.notif-popup.tone-blue::before,
+.notif-popup.tone-blue::after { background: var(--primary, #0b5ed7); }
+.notif-popup.tone-amber::before,
+.notif-popup.tone-amber::after { background: var(--amber, #b45309); }

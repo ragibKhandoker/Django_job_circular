@@ -19,6 +19,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../config/routes.js';
+import NotificationBell from '../NotificationBell.jsx';
 import ThemeToggle from '../ThemeToggle.jsx';
 import { categoryInfo } from './categoryInfo.js';
 
@@ -28,9 +29,26 @@ const SECTION_LINKS = [
   { href: '#about', Icon: Info, label: 'About' },
 ];
 
+// Below this width the desktop header actions are hidden and the compact buttons show instead.
+const COMPACT_QUERY = '(max-width: 1024px)';
+
+function useCompactHeader() {
+  const [compact, setCompact] = useState(() => window.matchMedia(COMPACT_QUERY).matches);
+  useEffect(() => {
+    const query = window.matchMedia(COMPACT_QUERY);
+    const onChange = (event) => setCompact(event.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+  return compact;
+}
+
 export default function SiteHeader({ isAuthenticated, username, isStaff, canPost = true, roleText = '', categories, categoryLink, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
+  const compact = useCompactHeader();
+  // One bell only (it polls for updates): beside the menu button on small screens, by the account menu on wide ones.
+  const bell = isAuthenticated && <div className="header-bell"><NotificationBell /></div>;
 
   const focusSearch = () => {
     const input = document.getElementById('job-search');
@@ -51,6 +69,7 @@ export default function SiteHeader({ isAuthenticated, username, isStaff, canPost
 
         {/* Shown next to the menu button on tablets/phones; desktop uses the one in header-actions. */}
         <ThemeToggle className="icon-btn theme-toggle-compact" />
+        {compact && bell}
 
         <button
           type="button"
@@ -106,6 +125,7 @@ export default function SiteHeader({ isAuthenticated, username, isStaff, canPost
           <button type="button" className="icon-btn" aria-label="Search jobs" onClick={focusSearch}>
             <Search aria-hidden="true" />
           </button>
+          {!compact && bell}
           <span className="divider" aria-hidden="true"></span>
           <HeaderActions isAuthenticated={isAuthenticated} username={username} isStaff={isStaff} canPost={canPost} roleText={roleText} onLogout={onLogout} withMenu />
         </div>

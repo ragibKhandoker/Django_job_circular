@@ -1869,3 +1869,41 @@
     background: rgba(255, 107, 125, 0.12);
     color: #ff6b7d;
 }
+
+/* ---------- notification bell in the header ---------- */
+/* The bell's styles read these tokens; the home page names its surface colour --white. */
+.page-home {
+    --surface: var(--white);
+    --green: #15803d;
+    --green-soft: #e8f7ee;
+    --red: #c42b3c;
+    --red-soft: #fdecee;
+    --amber: #b45309;
+    --amber-soft: #fff4e0;
+}
+
+:root[data-theme='dark'] .page-home {
+    --green: #22c55e;
+    --green-soft: rgba(34, 197, 94, 0.14);
+    --red: #ff6b7d;
+    --red-soft: rgba(255, 107, 125, 0.12);
+    --amber: #f5a524;
+    --amber-soft: rgba(245, 165, 36, 0.14);
+}
+
+.page-home .header-bell {
+    display: flex;
+    align-items: center;
+}
+
+.page-home .header-bell .notif-bell {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+}
+
+@media (max-width: 1024px) {
+    .page-home .header-bell {
+        order: 2;
+    }
+}

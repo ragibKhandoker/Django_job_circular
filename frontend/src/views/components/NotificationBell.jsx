@@ -1,4 +1,20 @@
-import { BadgeCheck, Bell, BellOff, CheckCheck, CircleCheck, CircleX, ShieldX, X } from 'lucide-react';
+import {
+  BadgeCheck,
+  Bell,
+  BellOff,
+  Building2,
+  CheckCheck,
+  CircleCheck,
+  CircleX,
+  FileClock,
+  KeyRound,
+  PartyPopper,
+  Send,
+  ShieldX,
+  UserPen,
+  UserRoundPlus,
+  X,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../controllers/NotificationController.js';
@@ -11,6 +27,13 @@ const KINDS = {
   job_rejected: { Icon: CircleX, tone: 'red' },
   company_verified: { Icon: BadgeCheck, tone: 'green' },
   company_rejected: { Icon: ShieldX, tone: 'red' },
+  welcome: { Icon: PartyPopper, tone: 'blue' },
+  profile_updated: { Icon: UserPen, tone: 'blue' },
+  password_changed: { Icon: KeyRound, tone: 'amber' },
+  job_submitted: { Icon: FileClock, tone: 'amber' },
+  application_sent: { Icon: Send, tone: 'green' },
+  new_applicant: { Icon: UserRoundPlus, tone: 'blue' },
+  company_submitted: { Icon: Building2, tone: 'amber' },
 };
 
 const ago = (iso) => `${timesince(iso).split(',')[0]} ago`;
@@ -81,12 +104,12 @@ export default function NotificationBell() {
             <div className="notif-empty">
               <span><BellOff aria-hidden="true" /></span>
               <p>No notifications yet</p>
-              <small>You will hear from us here when an admin reviews your job posts or company.</small>
+              <small>Updates about your account, applications, job posts and company will show up here.</small>
             </div>
           ) : (
             <ul className="notif-list">
               {notes.items.map((note) => {
-                const kind = KINDS[note.kind] ?? KINDS.job_approved;
+                const kind = KINDS[note.kind] ?? KINDS.welcome;
                 return (
                   <li key={note.id}>
                     <button type="button" className={`notif-item${note.is_read ? '' : ' is-unread'}`} onClick={() => openItem(note)}>
@@ -112,7 +135,7 @@ export default function NotificationBell() {
 }
 
 function NotificationPopup({ note, onOpen, onClose }) {
-  const kind = KINDS[note.kind] ?? KINDS.job_approved;
+  const kind = KINDS[note.kind] ?? KINDS.welcome;
   return (
     <div className={`notif-popup tone-${kind.tone}`} role="status" aria-live="polite">
       <button type="button" className="notif-popup-main" onClick={() => onOpen(note)}>

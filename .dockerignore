@@ -1,0 +1,13 @@
+.git
+**/__pycache__
+**/*.pyc
+**/.env
+backend/venv
+backend/media
+backend/private_media
+backend/resumes
+backend/staticfiles
+backend/*.sqlite3
+backend/db.sqbpro
+frontend
+docs

@@ -291,6 +291,19 @@ npm install
 npm run dev     # http://localhost:5173
 ```
 
+## 🐳 Docker
+The backend API is published as a Docker image on **GitHub Packages**:
+```bash
+docker pull ghcr.io/ragibkhandoker/job-circular-api:latest
+
+docker run -p 8000:8000 \
+  -e MONGODB_URI="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/" \
+  -e SECRET_KEY="any-long-random-string" \
+  ghcr.io/ragibkhandoker/job-circular-api:latest
+# → http://localhost:8000/api/health/
+```
+A new image is built automatically for every GitHub release ([workflow](.github/workflows/docker-publish.yml)).
+
 ## 🚀 Deployment
 The project is live in production, and both parts **deploy automatically on every push to `main`**.
 

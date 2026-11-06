@@ -16,11 +16,11 @@ A job portal for Bangladesh where job seekers find and apply for jobs, and emplo
 </div>
 
 ## 🌐 Live Links
-| | URL | Hosted on |
-|---|---|---|
-| 🖥️ **Frontend (Website)** | **[https://job-circular.vercel.app](https://job-circular.vercel.app)** | ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white) |
-| ⚙️ **Backend (REST API)** | **[https://job-circular-api.onrender.com](https://job-circular-api.onrender.com/api/health/)** | ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black) |
-| ❤️ **API Health Check** | **[/api/health/](https://job-circular-api.onrender.com/api/health/)** → `{"status": "OK", "database": "connected"}` | ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black) |
+| | URL | Hosted on | Status |
+|---|---|---|---|
+| 🖥️ **Frontend (Website)** | **[https://job-circular.vercel.app](https://job-circular.vercel.app)** | ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white) | 🟢 Production |
+| ⚙️ **Backend (REST API)** | **[https://job-circular-api.onrender.com](https://job-circular-api.onrender.com/api/health/)** | ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black) | 🟢 Production |
+| ❤️ **API Health Check** | **[/api/health/](https://job-circular-api.onrender.com/api/health/)** → `{"status": "OK", "database": "connected"}` | ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black) | 🟢 Connected |
 
 > ⏳ **Note:** The backend runs on Render's free plan and sleeps when idle, so the **first load can take 30–50 seconds**. After that it's fast.
 
@@ -291,6 +291,51 @@ cd frontend
 npm install
 npm run dev     # http://localhost:5173
 ```
+
+## 🚀 Deployment
+The project is live in production, and both parts **deploy automatically on every push to `main`**.
+
+```
+ git push origin main
+        │
+        ├──► Vercel  → builds frontend/  (npm install → vite build)  → https://job-circular.vercel.app
+        └──► Render  → builds backend/   (pip install → collectstatic → migrate → gunicorn)
+                                                                     → https://job-circular-api.onrender.com
+```
+
+### 🖥️ Frontend: Vercel
+| Setting | Value |
+|---|---|
+| Root Directory | `frontend` |
+| Framework | Vite |
+| Build Command | `vite build` (output: `dist/`) |
+| Config file | [`frontend/vercel.json`](frontend/vercel.json) |
+
+`vercel.json` forwards `/api/*`, `/admin/*`, `/static/*`, `/media/*` and `/reset/*` to the Render backend, and sends every other path to `index.html` so React Router can handle it. The browser only ever talks to **one domain**, so login and CSRF work without any CORS setup.
+
+### ⚙️ Backend: Render
+| Setting | Value |
+|---|---|
+| Root Directory | `backend` |
+| Runtime | Python 3.12 (free plan, Singapore region) |
+| Build Command | `pip install -r ../requirements.txt && python manage.py collectstatic --noinput` |
+| Start Command | `python manage.py migrate --noinput && gunicorn myproject.wsgi:application` |
+| Config file | [`render.yaml`](render.yaml) |
+
+**Environment variables** (set in the Render dashboard, never committed):
+| Variable | Purpose |
+|---|---|
+| `MONGODB_URI` | MongoDB Atlas connection string |
+| `MONGODB_DB` | Database name (`jobportal`) |
+| `SECRET_KEY` | Django secret key (random) |
+| `DEBUG` | `False` in production |
+| `CSRF_TRUSTED_ORIGINS` | `https://job-circular.vercel.app` |
+| `FRONTEND_URL` | `https://job-circular.vercel.app` |
+
+### 🍃 Database: MongoDB Atlas
+Network Access allows `0.0.0.0/0` so Render's servers can connect.
+
+> ⚠️ **Free-plan limits:** the Render backend sleeps after ~15 minutes idle (the first request then takes 30–50 seconds), and uploaded files (resumes, photos, company documents) are stored on Render's temporary disk, so they are **lost on every redeploy**.
 
 ## 👨‍💻 Author
 **Khandoker Md. Ragib Ahsan** — [GitHub](https://github.com/ragibKhandoker)

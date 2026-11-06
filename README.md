@@ -1,10 +1,28 @@
+<div align="center">
+
 # 💼 JobFinder — Job Circular Website
 
 A job portal for Bangladesh where job seekers find and apply for jobs, and employers post job circulars and review applicants.
 
-🔗 **Live Demo:** [job-circular.vercel.app](https://job-circular.vercel.app) &nbsp;·&nbsp; **API:** [job-circular-api.onrender.com](https://job-circular-api.onrender.com/api/health/)
+<a href="https://job-circular.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-Visit%20Website-2563eb?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo"></a>
+&nbsp;
+<a href="https://job-circular-api.onrender.com/api/health/"><img src="https://img.shields.io/badge/Backend%20API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Backend API"></a>
 
-> ⏳ The backend runs on Render's free plan and sleeps when idle, so the first load can take 30–50 seconds.
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
+
+</div>
+
+## 🌐 Live Links
+| | URL | Hosted on |
+|---|---|---|
+| 🖥️ **Frontend (Website)** | **[https://job-circular.vercel.app](https://job-circular.vercel.app)** | ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white) |
+| ⚙️ **Backend (REST API)** | **[https://job-circular-api.onrender.com](https://job-circular-api.onrender.com/api/health/)** | ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black) |
+| ❤️ **API Health Check** | [/api/health/](https://job-circular-api.onrender.com/api/health/) → `{"status": "OK", "database": "connected"}` | |
+
+> ⏳ **Note:** The backend runs on Render's free plan and sleeps when idle, so the **first load can take 30–50 seconds**. After that it's fast.
 
 ![Home](docs/screenshots/home.png)
 

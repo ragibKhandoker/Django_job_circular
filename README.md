@@ -2,7 +2,9 @@
 
 A job portal for Bangladesh where job seekers find and apply for jobs, and employers post job circulars and review applicants.
 
-🔗 **Live Demo:** _coming soon_ &nbsp;·&nbsp; **API:** _coming soon_
+🔗 **Live Demo:** [job-circular.vercel.app](https://job-circular.vercel.app) &nbsp;·&nbsp; **API:** [job-circular-api.onrender.com](https://job-circular-api.onrender.com/api/health/)
+
+> ⏳ The backend runs on Render's free plan and sleeps when idle, so the first load can take 30–50 seconds.
 
 ![Home](docs/screenshots/home.png)
 
@@ -82,21 +84,10 @@ The backend is a **Django REST API** with **MongoDB Atlas** as the database. The
 ## 🗄️ Database Structure
 The project uses **MongoDB Atlas** through **`django-mongodb-backend`**, so Django models are stored as MongoDB **collections**, and every document's primary key is a MongoDB **`ObjectId`**. Collections are named `myapp_<model>` (for example `myapp_jobpost`).
 
-### Entity relationship diagram
-```mermaid
-erDiagram
-    USER ||--|| USER_PROFILE : "has"
-    USER ||--o{ JOB_POST : "posts (employer)"
-    USER ||--o| COMPANY_VERIFICATION : "submits (employer)"
-    USER ||--o{ APPLICANT : "applies (job seeker)"
-    JOB_POST ||--o{ APPLICANT : "receives"
-    APPLICANT ||--o{ WORK_EXPERIENCE : "has"
-    APPLICANT ||--o{ EDUCATIONAL_BACKGROUND : "has"
-    USER ||--o{ NOTIFICATION : "receives"
-    USER ||--o{ APPLICANT_BAN : "blocks (employer)"
-    USER ||--o{ PASSWORD_RESET_REQUEST : "opens"
-    PASSWORD_RESET_REQUEST ||--o{ PASSWORD_RESET_MESSAGE : "contains"
-```
+### Schema diagram
+![Database Structure](docs/screenshots/database-schema.png)
+
+> **How to read it:** each box is a MongoDB collection. **PK** = primary key (`_id`, an ObjectId) and **FK** = a reference to another collection. Arrows show relationships: **1 : 1** = one to one, **1 : N** = one to many. `auth_user` is the center: every account (job seeker, employer or admin) is one document there, and almost everything else points back to it.
 
 ### Collections
 

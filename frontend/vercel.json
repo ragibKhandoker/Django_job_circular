@@ -1,10 +1,10 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://job-circular-api.onrender.com/api/:path*" },
-    { "source": "/admin/:path*", "destination": "https://job-circular-api.onrender.com/admin/:path*" },
-    { "source": "/static/:path*", "destination": "https://job-circular-api.onrender.com/static/:path*" },
-    { "source": "/media/:path*", "destination": "https://job-circular-api.onrender.com/media/:path*" },
-    { "source": "/reset/:path*", "destination": "https://job-circular-api.onrender.com/reset/:path*" },
+    { "source": "/api/(.*)", "destination": "https://job-circular-api.onrender.com/api/$1" },
+    { "source": "/admin/(.*)", "destination": "https://job-circular-api.onrender.com/admin/$1" },
+    { "source": "/static/(.*)", "destination": "https://job-circular-api.onrender.com/static/$1" },
+    { "source": "/media/(.*)", "destination": "https://job-circular-api.onrender.com/media/$1" },
+    { "source": "/reset/(.*)", "destination": "https://job-circular-api.onrender.com/reset/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
